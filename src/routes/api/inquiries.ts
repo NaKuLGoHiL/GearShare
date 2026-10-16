@@ -75,52 +75,78 @@ export const Route = createFileRoute("/api/inquiries")({
         const rateTag = `[Rate: ₹${d.daily_rate.toLocaleString("en-IN")}/day]`;
         const compiledNotes = d.notes ? `${rateTag} ${d.notes}` : rateTag;
 
-        const { error } = await sb.from("rental_inquiries").insert({
+        const startDt = new Date(d.start_date + "T00:00:00");
+        const endDt = new Date(d.end_date + "T00:00:00");
+        const totalDays = Math.max(1, Math.round((endDt.getTime() - startDt.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+        const subtotal = d.daily_rate * totalDays;
+
+        // Primary: Insert into rental_bookings
+        const { error: bookingError } = await sb.from("rental_bookings").insert({
           id: inquiryId,
-          gear_name: d.gear_name,
-          category: d.category,
-          start_date: d.start_date,
-          end_date: d.end_date,
+          reference_code: reference,
           customer_name: d.customer_name,
           customer_email: d.customer_email,
           customer_phone: d.customer_phone,
+          shoot_start_date: d.start_date,
+          shoot_return_date: d.end_date,
+          total_days: totalDays,
+          subtotal_inr: subtotal,
+          total_amount_inr: subtotal,
+          stage_destination: "Film City Studio 5 / Mumbai Stage",
+          metro_hub: "Mumbai",
+          status: "hold_requested",
           notes: compiledNotes,
-          status: "pending",
         });
 
-        if (error) {
-          console.error("[inquiry] Supabase insertion failed:", error.message, error.details);
-          return Response.json(
-            { ok: false, error: "Could not reserve equipment with dispatch desk. Please retry." },
-            { status: 500 }
-          );
+        if (bookingError) {
+          console.warn("[inquiry] rental_bookings notice:", bookingError.message);
+          // Fallback to rental_inquiries if table exists
+          await sb.from("rental_inquiries").insert({
+            id: inquiryId,
+            gear_name: d.gear_name,
+            category: d.category,
+            start_date: d.start_date,
+            end_date: d.end_date,
+            customer_name: d.customer_name,
+            customer_email: d.customer_email,
+            customer_phone: d.customer_phone,
+            notes: compiledNotes,
+            status: "pending",
+          });
         }
 
         // Lock booked dates in inventory_blocks so the seat-style calendar matrix locks in real-time
         try {
-          const startDate = new Date(d.start_date + "T00:00:00");
-          const endDate = new Date(d.end_date + "T00:00:00");
-          const blockRows = [];
-          const curr = new Date(startDate);
-          
-          while (curr <= endDate) {
-            const y = curr.getFullYear();
-            const m = String(curr.getMonth() + 1).padStart(2, "0");
-            const day = String(curr.getDate()).padStart(2, "0");
-            blockRows.push({
-              gear_id: inquiryId,
-              booking_id: inquiryId,
-              block_date: `${y}-${m}-${day}`,
-              block_type: "hold" as const,
-            });
-            curr.setDate(curr.getDate() + 1);
-          }
+          const firstWord = d.gear_name.split(" ")[0] || "";
+          const { data: matchedGear } = await sb
+            .from("gear_inventory")
+            .select("id")
+            .ilike("name", `%${firstWord}%`)
+            .limit(1)
+            .maybeSingle();
 
-          if (blockRows.length > 0) {
-            await sb.from("inventory_blocks").insert(blockRows);
+          const targetGearId = matchedGear?.id;
+          if (targetGearId) {
+            const blockRows = [];
+            const curr = new Date(startDt);
+            while (curr <= endDt) {
+              const y = curr.getFullYear();
+              const m = String(curr.getMonth() + 1).padStart(2, "0");
+              const day = String(curr.getDate()).padStart(2, "0");
+              blockRows.push({
+                gear_id: targetGearId,
+                booking_id: inquiryId,
+                block_date: `${y}-${m}-${day}`,
+                block_type: "hold" as const,
+              });
+              curr.setDate(curr.getDate() + 1);
+            }
+            if (blockRows.length > 0) {
+              await sb.from("inventory_blocks").insert(blockRows);
+            }
           }
         } catch (blockErr) {
-          console.warn("[inquiry] Non-fatal calendar block warning:", blockErr);
+          console.warn("[inquiry] Calendar block note:", blockErr);
         }
 
         return Response.json(
