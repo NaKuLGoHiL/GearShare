@@ -6,6 +6,7 @@ import light from "@/assets/light.jpg";
 import audio from "@/assets/audio.jpg";
 import { DURATIONS, rentalTotal } from "@/lib/inquiry";
 import { Tilt } from "@/components/Tilt";
+import { SilkBackground } from "@/components/SilkBackground";
 import { ReserveModal, type Gear } from "@/components/ReserveModal";
 
 export const Route = createFileRoute("/")({
@@ -71,19 +72,27 @@ function Index() {
         </div>
       </header>
 
-      <section id="top" className="relative overflow-hidden">
-        <div className="grid-lines absolute inset-0 opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-10 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-            <span className="tally h-1.5 w-1.5 rounded-full" /> REC · NOW DISPATCHING
-          </span>
-          <h1 className="mx-auto mt-6 max-w-4xl text-5xl font-semibold tracking-tight md:text-7xl">
-            Precision Optics.<br /><span className="text-muted-foreground">Uncompromised Sensor Power.</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-muted-foreground">On-demand cinema bodies, glass, light and sound — calibrated, cased and delivered to your set.</p>
-          <div className="mt-8 flex justify-center gap-3">
-            <a href="#catalog" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90">Browse Catalog</a>
-            <a href="#pipeline" className="rounded-full border border-border px-6 py-3 text-sm hover:bg-secondary">How it works</a>
+      <section id="top" className="relative -mt-16 overflow-hidden">
+        <div className="relative flex min-h-svh items-center">
+          <div className="absolute inset-0"><SilkBackground /></div>
+          <div className="grid-lines pointer-events-none absolute inset-0 opacity-40" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-background" />
+          <div className="relative mx-auto max-w-5xl px-6 pt-24 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur">
+              <span className="tally h-1.5 w-1.5 rounded-full" /> REC · NOW DISPATCHING
+            </span>
+            <h1 className="mt-6 text-5xl font-medium tracking-tight sm:text-6xl md:text-8xl">
+              Precision Optics. Uncompromised Sensor Power.
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-muted-foreground">On-demand cinema bodies, glass, light and sound — calibrated, cased and delivered to your set.</p>
+            <div className="mt-8 flex justify-center gap-3">
+              <a href="#catalog" className="flex items-center gap-2 rounded-xl border border-border bg-background/70 py-1.5 pr-4 pl-1.5 text-sm backdrop-blur hover:bg-secondary">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">→</span> Browse Catalog
+              </a>
+              <a href="#pipeline" className="flex items-center gap-2 rounded-xl border border-border bg-background/70 py-1.5 pr-4 pl-1.5 text-sm backdrop-blur hover:bg-secondary">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">↗</span> How it works
+              </a>
+            </div>
           </div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6">
