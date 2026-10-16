@@ -5,6 +5,7 @@ import lens from "@/assets/lens.jpg";
 import light from "@/assets/light.jpg";
 import audio from "@/assets/audio.jpg";
 import { DURATIONS, rentalTotal } from "@/lib/inquiry";
+import { Tilt } from "@/components/Tilt";
 import { ReserveModal, type Gear } from "@/components/ReserveModal";
 
 export const Route = createFileRoute("/")({
@@ -86,7 +87,7 @@ function Index() {
           </div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6">
-          <img src={camera} alt="RED V-Raptor cinema camera with PL prime lens" width={1600} height={1008} className="w-full rounded-2xl border border-border" />
+          <Tilt max={6} className="tilt-card overflow-hidden rounded-2xl border border-border"><img src={camera} alt="RED V-Raptor cinema camera with PL prime lens" width={1600} height={1008} className="block w-full" /></Tilt>
           <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border font-mono text-xs md:grid-cols-4">
             {[["SENSOR", "40.96 × 21.60mm"], ["RESOLUTION", "8192 × 4320"], ["DYNAMIC RANGE", "17+ STOPS"], ["MOUNT", "PL / RF / LPL"]].map(([k, v]) => (
               <div key={k} className="bg-carbon p-4"><p className="text-muted-foreground">{k}</p><p className="mt-1 text-foreground">{v}</p></div>
@@ -120,7 +121,7 @@ function Index() {
         </div>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((g) => (
-            <article key={g.name} className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/50">
+            <Tilt key={g.name} max={10} className="tilt-card group h-full overflow-hidden rounded-xl border border-border bg-card"><article>
               <div className="aspect-[4/3] overflow-hidden bg-background">
                 <img src={g.img} alt={g.name} loading="lazy" width={1024} height={768} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
               </div>
@@ -139,7 +140,7 @@ function Index() {
                     className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">Reserve</button>
                 </div>
               </div>
-            </article>
+            </article></Tilt>
           ))}
         </div>
       </section>
