@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      rental_inquiries: {
+        Row: {
+          category: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          end_date: string
+          gear_name: string
+          id: string
+          notes: string
+          start_date: string
+          status: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          end_date: string
+          gear_name: string
+          id?: string
+          notes?: string
+          start_date: string
+          status?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          end_date?: string
+          gear_name?: string
+          id?: string
+          notes?: string
+          start_date?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
