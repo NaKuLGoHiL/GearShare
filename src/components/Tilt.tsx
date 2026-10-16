@@ -18,7 +18,7 @@ export function Tilt({ children, max = 8, className = "" }: { children: ReactNod
       el.style.setProperty("--ry", `${(x - 0.5) * max}deg`);
       el.style.setProperty("--mx", `${x * 100}%`);
       el.style.setProperty("--my", `${y * 100}%`);
-      el.dataset.active = "true";
+      el.dataset["active"] = "true";
     });
   };
   const leave = () => {
@@ -27,7 +27,7 @@ export function Tilt({ children, max = 8, className = "" }: { children: ReactNod
     cancelAnimationFrame(frame.current);
     el.style.setProperty("--rx", "0deg");
     el.style.setProperty("--ry", "0deg");
-    el.dataset.active = "false";
+    el.dataset["active"] = "false";
   };
 
   return (
