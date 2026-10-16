@@ -6,6 +6,7 @@ import light from "@/assets/light.jpg";
 import audio from "@/assets/audio.jpg";
 import { DURATIONS, rentalTotal } from "@/lib/inquiry";
 import { Tilt } from "@/components/Tilt";
+import { SilkBackground } from "@/components/SilkBackground";
 import { ReserveModal, type Gear } from "@/components/ReserveModal";
 
 export const Route = createFileRoute("/")({
