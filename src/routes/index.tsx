@@ -51,7 +51,7 @@ function Index() {
   const [dur, setDur] = useState(0);
   const [selected, setSelected] = useState<Gear | null>(null);
   const close = useCallback(() => setSelected(null), []);
-  const d = DURATIONS[dur];
+  const d = DURATIONS[dur] ?? DURATIONS[0];
   const items = useMemo(() => (cat === "All" ? GEAR : GEAR.filter((g) => g.category === cat)), [cat]);
 
   return (
