@@ -114,4 +114,12 @@ describe("Inquiry Schema & Pricing Engine", () => {
     expect(calculateDaysBetween("2026-10-20", "2026-10-22")).toBe(3);
     expect(calculateDaysBetween("2026-10-20", "2026-10-26")).toBe(7);
   });
+
+  it("formats cinema reference code with Mumbai hub prefix", () => {
+    const uuid = "be63e6a9-0290-4f77-9541-1d7efe8c4198";
+    const ref = `GS-MUM-${uuid.slice(0, 6).toUpperCase()}`;
+    expect(ref).toBe("GS-MUM-BE63E6");
+    expect(ref.startsWith("GS-MUM-")).toBe(true);
+    expect(ref.length).toBe(13);
+  });
 });

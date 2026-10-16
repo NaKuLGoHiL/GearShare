@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiAvailabilityRouteImport } from './routes/api/availability'
 import { Route as ApiInquiriesRouteImport } from './routes/api/inquiries'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAvailabilityRoute = ApiAvailabilityRouteImport.update({
+  id: '/api/availability',
+  path: '/api/availability',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiInquiriesRoute = ApiInquiriesRouteImport.update({
@@ -25,27 +31,31 @@ const ApiInquiriesRoute = ApiInquiriesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/availability': typeof ApiAvailabilityRoute
   '/api/inquiries': typeof ApiInquiriesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/availability': typeof ApiAvailabilityRoute
   '/api/inquiries': typeof ApiInquiriesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/availability': typeof ApiAvailabilityRoute
   '/api/inquiries': typeof ApiInquiriesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/inquiries'
+  fullPaths: '/' | '/api/availability' | '/api/inquiries'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/inquiries'
-  id: '__root__' | '/' | '/api/inquiries'
+  to: '/' | '/api/availability' | '/api/inquiries'
+  id: '__root__' | '/' | '/api/availability' | '/api/inquiries'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiAvailabilityRoute: typeof ApiAvailabilityRoute
   ApiInquiriesRoute: typeof ApiInquiriesRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/availability': {
+      id: '/api/availability'
+      path: '/api/availability'
+      fullPath: '/api/availability'
+      preLoaderRoute: typeof ApiAvailabilityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/inquiries': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiAvailabilityRoute: ApiAvailabilityRoute,
   ApiInquiriesRoute: ApiInquiriesRoute,
 }
 export const routeTree = rootRouteImport

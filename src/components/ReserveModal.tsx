@@ -133,6 +133,32 @@ export function ReserveModal({
   const [viewMonth, setViewMonth] = useState(tomorrow.getMonth());
   const [pickingTarget, setPickingTarget] = useState<"start" | "end">("start");
   const [stageNotice, setStageNotice] = useState<string | null>(null);
+  const [liveBlockedDates, setLiveBlockedDates] = useState<Set<string>>(new Set());
+
+  // Fetch real-time live slot blocks from /api/availability
+  useEffect(() => {
+    if (!gear) return;
+    let isMounted = true;
+    const fetchLiveAvailability = async () => {
+      try {
+        const res = await fetch(
+          `/api/availability?gear_name=${encodeURIComponent(gear.name)}&year=${viewYear}&month=${viewMonth + 1}`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json.ok && Array.isArray(json.blocked_dates)) {
+            setLiveBlockedDates(new Set(json.blocked_dates));
+          }
+        }
+      } catch {
+        // Fall back gracefully to local deterministic schedule
+      }
+    };
+    fetchLiveAvailability();
+    return () => {
+      isMounted = false;
+    };
+  }, [gear, viewYear, viewMonth]);
 
   useEffect(() => {
     setErrors({});
@@ -755,7 +781,7 @@ export function ReserveModal({
                         const dayNum = idx + 1;
                         const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
                         const isPast = dateStr < todayStr;
-                        const isBooked = !isPast && isDateBooked(gear.name, dateStr);
+                        const isBooked = !isPast && (liveBlockedDates.has(dateStr) || isDateBooked(gear.name, dateStr));
                         const isStart = dateStr === startDate;
                         const isEnd = dateStr === returnDate;
                         const isInRange = Boolean(startDate && returnDate && dateStr > startDate && dateStr < returnDate);
