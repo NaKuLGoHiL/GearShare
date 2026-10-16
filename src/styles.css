@@ -85,30 +85,111 @@
 }
 @keyframes tally { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 
-/* 3D tilt */
+/* 3D Hero Perspective Showcase */
+.hero-3d-stage {
+  perspective: 1400px;
+}
+.hero-3d-chassis {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  --glare-opacity: 0.4;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  box-shadow: 0 35px 70px -25px rgba(0, 0, 0, 0.95), 0 0 45px -10px rgba(239, 68, 68, 0.25);
+}
+.hero-3d-chassis:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 45px 90px -30px rgba(0, 0, 0, 0.98), 0 0 60px -5px rgba(239, 68, 68, 0.4);
+}
+.hero-red-rim {
+  background:
+    radial-gradient(ellipse 65% 55% at var(--mx) var(--my), rgba(239, 68, 68, 0.35), transparent 75%),
+    linear-gradient(to top, rgba(14, 14, 17, 0.9) 0%, transparent 65%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.hero-specular-glare {
+  background: radial-gradient(circle 380px at var(--mx) var(--my), rgba(255, 255, 255, 0.16), transparent 75%);
+  opacity: var(--glare-opacity, 0.4);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.hero-hud-layer {
+  transform: translateZ(55px);
+  transform-style: preserve-3d;
+}
+.hero-hud-floating {
+  transform: translateZ(75px);
+  transform-style: preserve-3d;
+}
+.hero-hud-reticle {
+  transform: translateZ(25px);
+  transform-style: preserve-3d;
+}
+
+/* Equipment 3D Tilt Cards */
 .tilt-stage { perspective: 1200px; }
 .tilt {
   --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
   position: relative;
   transform: rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
   transform-style: preserve-3d;
-  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease, border-color .5s ease;
+  transition: box-shadow .4s ease, border-color .4s ease;
   will-change: transform;
 }
-.tilt[data-active="true"] { transition: transform .08s linear, box-shadow .4s ease, border-color .4s ease; }
 .tilt-glare {
   pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0;
-  transition: opacity .4s ease;
-  background: radial-gradient(circle at var(--mx) var(--my), oklch(0.586 0.222 17.6 / 28%), transparent 45%);
-  box-shadow: inset 0 0 0 1px oklch(0.586 0.222 17.6 / 45%);
+  transition: opacity .35s ease;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(239, 68, 68, 0.3), transparent 50%);
   mix-blend-mode: screen;
 }
-.tilt[data-active="true"] .tilt-glare { opacity: 1; }
-.tilt-card:hover, .tilt-card[data-active="true"] {
-  border-color: oklch(0.586 0.222 17.6 / 55%);
-  box-shadow: 0 30px 60px -20px oklch(0 0 0 / 90%), 0 0 0 1px oklch(0.586 0.222 17.6 / 25%), 0 0 40px -10px oklch(0.586 0.222 17.6 / 35%);
+.tilt-rim {
+  pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0;
+  transition: opacity .35s ease;
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.45), 0 0 25px rgba(239, 68, 68, 0.2);
 }
+.tilt[data-active="true"] .tilt-glare,
+.tilt[data-active="true"] .tilt-rim {
+  opacity: 1;
+}
+.tilt-card:hover, .tilt-card[data-active="true"] {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.95), 0 0 35px -5px rgba(239, 68, 68, 0.35);
+}
+
 @media (hover: none), (prefers-reduced-motion: reduce) {
+  .hero-3d-chassis {
+    transform: none !important;
+    transition: border-color .3s ease;
+  }
+  .hero-hud-layer, .hero-hud-floating, .hero-hud-reticle {
+    transform: none !important;
+  }
   .tilt { transform: none !important; transition: border-color .3s ease; }
-  .tilt-glare { display: none; }
+  .tilt-glare, .tilt-rim { display: none; }
+}
+
+/* Custom Sleek Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }

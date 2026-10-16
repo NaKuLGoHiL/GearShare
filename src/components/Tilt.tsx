@@ -1,40 +1,96 @@
-import { useRef, type ReactNode, type PointerEvent } from "react";
+import { useRef, useEffect, useState, type ReactNode, type PointerEvent } from "react";
 
-/** GPU-only pointer tilt. Writes CSS vars via rAF; skipped for touch & reduced motion. */
-export function Tilt({ children, max = 8, className = "" }: { children: ReactNode; max?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const frame = useRef(0);
+/**
+ * 3D Perspective Tilt with inertial lerp smoothing, anodized-red rim highlight,
+ * dynamic glare reflection, and mobile touch fallback.
+ */
+export function Tilt({
+  children,
+  max = 8,
+  className = "",
+  glowColor = "rgba(239, 68, 68, 0.35)",
+}: {
+  children: ReactNode;
+  max?: number;
+  className?: string;
+  glowColor?: string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef(0);
 
-  const move = (e: PointerEvent<HTMLDivElement>) => {
+  // Inertial tracking state
+  const targetX = useRef(0);
+  const targetY = useRef(0);
+  const currentX = useRef(0);
+  const currentY = useRef(0);
+  const isHovered = useRef(false);
+
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    // Detect touch-only devices for graceful 2D fallback
+    if (typeof window !== "undefined") {
+      const touch =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.matchMedia("(hover: none)").matches;
+      setIsTouchDevice(touch);
+    }
+
+    const animate = () => {
+      const el = cardRef.current;
+      if (el && !isTouchDevice) {
+        // Smooth lerp interpolation (0.12 speed)
+        currentX.current += (targetX.current - currentX.current) * 0.12;
+        currentY.current += (targetY.current - currentY.current) * 0.12;
+
+        const rx = (0.5 - currentY.current) * max;
+        const ry = (currentX.current - 0.5) * max;
+
+        el.style.setProperty("--rx", `${rx.toFixed(2)}deg`);
+        el.style.setProperty("--ry", `${ry.toFixed(2)}deg`);
+        el.style.setProperty("--mx", `${(currentX.current * 100).toFixed(1)}%`);
+        el.style.setProperty("--my", `${(currentY.current * 100).toFixed(1)}%`);
+      }
+      frameRef.current = requestAnimationFrame(animate);
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [max, isTouchDevice]);
+
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== "mouse") return;
-    const el = ref.current;
+    const el = cardRef.current;
     if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top) / r.height;
-    cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(() => {
-      el.style.setProperty("--rx", `${(0.5 - y) * max}deg`);
-      el.style.setProperty("--ry", `${(x - 0.5) * max}deg`);
-      el.style.setProperty("--mx", `${x * 100}%`);
-      el.style.setProperty("--my", `${y * 100}%`);
-      el.dataset["active"] = "true";
-    });
+    const rect = el.getBoundingClientRect();
+    targetX.current = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    targetY.current = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    isHovered.current = true;
+    el.dataset["active"] = "true";
   };
-  const leave = () => {
-    const el = ref.current;
-    if (!el) return;
-    cancelAnimationFrame(frame.current);
-    el.style.setProperty("--rx", "0deg");
-    el.style.setProperty("--ry", "0deg");
-    el.dataset["active"] = "false";
+
+  const handlePointerLeave = () => {
+    targetX.current = 0.5;
+    targetY.current = 0.5;
+    isHovered.current = false;
+    const el = cardRef.current;
+    if (el) el.dataset["active"] = "false";
   };
 
   return (
-    <div className="tilt-stage">
-      <div ref={ref} onPointerMove={move} onPointerLeave={leave} className={`tilt ${className}`}>
+    <div ref={containerRef} className="tilt-stage">
+      <div
+        ref={cardRef}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+        className={`tilt ${className}`}
+        style={{ "--glow-color": glowColor } as React.CSSProperties}
+      >
         {children}
         <span aria-hidden className="tilt-glare" />
+        <span aria-hidden className="tilt-rim" />
       </div>
     </div>
   );

@@ -11,49 +11,108 @@ export const Route = createFileRoute("/api/inquiries")({
         try {
           body = await request.json();
         } catch {
-          return Response.json({ ok: false, error: "Invalid request" }, { status: 400 });
-        }
-        const parsed = inquirySchema.safeParse(body);
-        if (!parsed.success) {
           return Response.json(
-            { ok: false, error: "Please check the highlighted fields", issues: parsed.error.flatten().fieldErrors },
-            { status: 422 },
+            { ok: false, error: "Invalid JSON request body" },
+            { status: 400 }
           );
         }
-        const url = process.env["SUPABASE_URL"];
-        const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-        if (!url || !key) {
-          return Response.json({ ok: false, error: "Booking service unavailable" }, { status: 503 });
+
+        // Dual server-side validation via Zod
+        const parsed = inquirySchema.safeParse(body);
+        if (!parsed.success) {
+          const fieldErrors = parsed.error.flatten().fieldErrors;
+          return Response.json(
+            {
+              ok: false,
+              error: "Please review the highlighted rental details",
+              issues: fieldErrors,
+            },
+            { status: 422 }
+          );
         }
-        const sb = createClient<Database>(url, key, {
+
+        // Environment variables: safely prefer server service role or publishable keys
+        const url =
+          process.env["SUPABASE_URL"] ||
+          process.env["NEXT_PUBLIC_SUPABASE_URL"] ||
+          process.env["VITE_SUPABASE_URL"];
+
+        const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+        const publishableKey =
+          serviceKey ||
+          process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+          process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"] ||
+          process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
+
+        if (!url || !publishableKey) {
+          console.error("[inquiry] Missing Supabase configuration in environment");
+          return Response.json(
+            { ok: false, error: "GearShare booking service is temporarily unavailable" },
+            { status: 503 }
+          );
+        }
+
+        const sb = createClient<Database>(url, publishableKey, {
           auth: { persistSession: false, autoRefreshToken: false },
           global: {
             fetch: (input, init) => {
               const h = new Headers(init?.headers);
-              if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
-              h.set("apikey", key);
+              // Supabase publishable keys starting with sb_ are opaque strings, not JWTs
+              if (publishableKey.startsWith("sb_") && h.get("Authorization") === `Bearer ${publishableKey}`) {
+                h.delete("Authorization");
+              }
+              h.set("apikey", publishableKey);
               return fetch(input, { ...init, headers: h });
             },
           },
         });
+
         const d = parsed.data;
-        const id = crypto.randomUUID();
+        const inquiryId = crypto.randomUUID();
+        const reference = `GS-${inquiryId.slice(0, 8).toUpperCase()}`;
+
+        // Format rates into notes for complete persistence audit trail
+        const rateTag = `[Rate: ₹${d.daily_rate.toLocaleString("en-IN")}/day]`;
+        const compiledNotes = d.notes ? `${rateTag} ${d.notes}` : rateTag;
+
         const { error } = await sb.from("rental_inquiries").insert({
-          id,
-          gear_name: d.gear,
+          id: inquiryId,
+          gear_name: d.gear_name,
           category: d.category,
-          start_date: d.startDate,
-          end_date: d.returnDate,
-          customer_name: d.name,
-          customer_email: d.email,
-          customer_phone: d.phone,
-          notes: d.notes ?? "",
+          start_date: d.start_date,
+          end_date: d.end_date,
+          customer_name: d.customer_name,
+          customer_email: d.customer_email,
+          customer_phone: d.customer_phone,
+          notes: compiledNotes,
+          status: "pending",
         });
+
         if (error) {
-          console.error("[inquiry] insert failed", error.message);
-          return Response.json({ ok: false, error: "Could not save your booking. Please try again." }, { status: 500 });
+          console.error("[inquiry] Supabase insertion failed:", error.message, error.details);
+          return Response.json(
+            { ok: false, error: "Could not reserve equipment with dispatch desk. Please retry." },
+            { status: 500 }
+          );
         }
-        return Response.json({ ok: true, reference: `GS-${id.slice(0, 8).toUpperCase()}` }, { status: 201 });
+
+        return Response.json(
+          {
+            ok: true,
+            reference,
+            confirmation: {
+              id: inquiryId,
+              gear_name: d.gear_name,
+              category: d.category,
+              daily_rate: d.daily_rate,
+              start_date: d.start_date,
+              end_date: d.end_date,
+              customer_name: d.customer_name,
+              customer_email: d.customer_email,
+            },
+          },
+          { status: 201 }
+        );
       },
     },
   },
