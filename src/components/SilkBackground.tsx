@@ -8,17 +8,17 @@ float n(vec2 p){return sin(p.x)*sin(p.y);}
 void main(){
   vec2 uv=(gl_FragCoord.xy-.5*r)/min(r.x,r.y);
   uv+= (m-.5)*.25;
-  vec2 q=uv*1.6;
+  vec2 q=uv*2.2;
   float T=t*.12;
   for(int i=1;i<7;i++){
     float fi=float(i);
     q+=vec2(.55/fi*sin(fi*q.y+T+.3*fi),.45/fi*cos(fi*q.x-T*1.3+.5*fi));
   }
   float s=.5+.5*sin(q.x*1.4+q.y*1.1);
-  float ribbon=pow(s,6.)*1.2+pow(s,2.)*.18;
+  float ribbon=pow(s,10.)*.85+pow(s,3.)*.08;
   float vig=smoothstep(1.4,.15,length(uv));
-  vec3 red=vec3(.88,.11,.24);
-  vec3 col=red*ribbon*vig+vec3(1.,.5,.55)*pow(s,24.)*.35*vig;
+  vec3 red=vec3(.75,.06,.18);
+  vec3 col=red*ribbon*vig+vec3(1.,.5,.55)*pow(s,24.)*.18*vig;
   gl_FragColor=vec4(col,1.);
 }`;
 
