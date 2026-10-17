@@ -1,5 +1,18 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { ShieldCheck, ChevronDown, CheckCircle2, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ShieldCheck,
+  ChevronDown,
+  Sparkles,
+  Plus,
+  X,
+  Crosshair,
+  SlidersHorizontal,
+  Flame,
+  Aperture,
+  Cpu,
+  BatteryCharging,
+} from "lucide-react";
 
 interface MasterImages {
   beat1: HTMLImageElement;
@@ -7,6 +20,58 @@ interface MasterImages {
   beat3: HTMLImageElement;
   beat4: HTMLImageElement;
 }
+
+export interface HotspotSpec {
+  id: "optics" | "sensor" | "power";
+  label: string;
+  tag: string;
+  name: string;
+  relX: number;
+  relY: number;
+  specs: string[];
+  description: string;
+  tooltipSide: "left" | "top" | "right";
+  icon: "aperture" | "cpu" | "battery";
+}
+
+const SPEC_HOTSPOTS: HotspotSpec[] = [
+  {
+    id: "optics",
+    label: "OPTICS",
+    tag: "01 // ANAMORPHIC GLASS",
+    name: "Cooke S4/i 35mm T2.0 • PL Mount",
+    relX: 0.32,
+    relY: 0.58,
+    specs: ["T2.0 - T22 Iris", "/i Metadata Protocol", "±0.005mm Collimation", "110mm Front"],
+    description: "Factory-collimated anamorphic prime with organic cinema roll-off, matched focal geometry, and laser-centered optics.",
+    tooltipSide: "left",
+    icon: "aperture",
+  },
+  {
+    id: "sensor",
+    label: "SENSOR CORE",
+    tag: "02 // 8K SENSOR DIE",
+    name: "Full-Frame 8K VV • 16.5 Stops DR",
+    relX: 0.54,
+    relY: 0.53,
+    specs: ["Exmor R BSI CMOS", "Dual ISO 800 / 12,800", "16-Bit Linear RAW", "Active Vapor Chamber"],
+    description: "Back-illuminated full-frame sensor die with zero thermal throttling and sub-millimeter titanium flange lock.",
+    tooltipSide: "top",
+    icon: "cpu",
+  },
+  {
+    id: "power",
+    label: "POWER / I/O",
+    tag: "03 // DUAL BUS POWER",
+    name: "Dual V-Lock Hot-Swap • 12G-SDI RAW Out",
+    relX: 0.70,
+    relY: 0.52,
+    specs: ["Continuous 14.8V", "12G-SDI 4K 120p", "SMPTE Timecode", "Lemo 2-Pin Aux"],
+    description: "Uninterrupted soundstage power switching with dual high-bandwidth uncompressed RAW monitoring pipelines.",
+    tooltipSide: "right",
+    icon: "battery",
+  },
+];
 
 export function AppleScrollyCanvas({
   onRentClick,
@@ -20,6 +85,13 @@ export function AppleScrollyCanvas({
   const [imagesReady, setImagesReady] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+  // ARRI / RED Viewfinder OS State
+  const [activeMode, setActiveMode] = useState<"assembled" | "exploded" | "optics">("assembled");
+  const [activeHotspot, setActiveHotspot] = useState<"optics" | "sensor" | "power" | null>(null);
+  const [timecode, setTimecode] = useState("01:24:18:14");
+  const [fps, setFps] = useState(120);
+  const [viewportSize, setViewportSize] = useState({ w: 1200, h: 800 });
+
   // Preloaded master cinema storytelling images
   const masterImagesRef = useRef<MasterImages | null>(null);
 
@@ -28,6 +100,8 @@ export function AppleScrollyCanvas({
   const targetProgressRef = useRef(0);
   const mouseLerpRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const animFrameIdRef = useRef(0);
+  const lastFpsTimeRef = useRef(performance.now());
+  const framesCountRef = useRef(0);
 
   // Preload the 4 High-Resolution Cinema Storytelling Master Images
   useEffect(() => {
@@ -102,6 +176,112 @@ export function AppleScrollyCanvas({
     setMousePos({ x, y });
   }, []);
 
+  // 24fps live cinema timecode counter
+  useEffect(() => {
+    let frame = 14;
+    let sec = 18;
+    let min = 24;
+    let hour = 1;
+
+    const interval = setInterval(() => {
+      frame++;
+      if (frame >= 24) {
+        frame = 0;
+        sec++;
+        if (sec >= 60) {
+          sec = 0;
+          min++;
+          if (min >= 60) {
+            min = 0;
+            hour++;
+          }
+        }
+      }
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      setTimecode(`${pad(hour)}:${pad(min)}:${pad(sec)}:${pad(frame)}`);
+    }, 1000 / 24);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Track viewport size for hotspot coordinate projection
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({ w: window.innerWidth, h: window.innerHeight });
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Synchronize activeMode with scroll position
+  useEffect(() => {
+    if (scrollProgress < 0.22) {
+      setActiveMode("assembled");
+    } else if (scrollProgress >= 0.22 && scrollProgress < 0.52) {
+      setActiveMode("exploded");
+    } else if (scrollProgress >= 0.52 && scrollProgress < 0.78) {
+      setActiveMode("optics");
+    }
+  }, [scrollProgress]);
+
+  // Mode button click handler
+  const handleSelectMode = useCallback((mode: "assembled" | "exploded" | "optics") => {
+    setActiveMode(mode);
+    let targetP = 0;
+    if (mode === "exploded") targetP = 0.35;
+    if (mode === "optics") targetP = 0.65;
+
+    targetProgressRef.current = targetP;
+    setScrollProgress(targetP);
+
+    const container = containerRef.current;
+    if (container) {
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      const targetScroll = container.offsetTop + targetP * totalScrollable;
+      window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    }
+  }, []);
+
+  // Mobile follow-focus slider handler
+  const handleSliderChange = useCallback((val: number) => {
+    targetProgressRef.current = val;
+    setScrollProgress(val);
+    const container = containerRef.current;
+    if (container) {
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      const targetScroll = container.offsetTop + val * totalScrollable;
+      window.scrollTo({ top: targetScroll, behavior: "auto" });
+    }
+  }, []);
+
+  // Exact camera bounding box calculation matching canvas renderKinematicCameraFlow
+  const cameraStage = useMemo(() => {
+    const { w: width, h: height } = viewportSize;
+    const isPortrait = height > width;
+    const isMobile = width < 640;
+    const isTabletPortrait = isPortrait && width < 1024;
+    const imgAspect = 1376 / 768;
+
+    const textBottomSafe = isMobile ? 210 : isTabletPortrait ? 250 : 285;
+    const bottomPromptSafe = height - (isMobile ? 55 : 70);
+    const availStageH = Math.max(180, bottomPromptSafe - textBottomSafe);
+
+    const fitScale = Math.min(
+      1,
+      Math.min(
+        (width * (isMobile ? 0.92 : 0.86)) / width,
+        (availStageH * (isMobile ? 0.95 : isTabletPortrait ? 0.88 : 0.90)) / (width / imgAspect),
+        (height * (isMobile ? 0.44 : isTabletPortrait ? 0.48 : 0.54)) / (width / imgAspect)
+      )
+    );
+    const finalW = width * fitScale;
+    const finalH = finalW / imgAspect;
+    const origX = (width - finalW) / 2;
+    const heroStageY = textBottomSafe + (availStageH - finalH) / 2 + (isMobile ? 12 : 18);
+    return { x: origX, y: heroStageY, w: finalW, h: finalH };
+  }, [viewportSize]);
+
   // Main Canvas Render Loop (Apple-style Alpha Cross-Fade + Parallax + Procedural Fallback)
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -113,6 +293,16 @@ export function AppleScrollyCanvas({
 
     const render = () => {
       time += 0.015;
+
+      // Live cinema telemetry FPS measurement
+      framesCountRef.current++;
+      const now = performance.now();
+      if (now - lastFpsTimeRef.current >= 500) {
+        const measured = Math.round((framesCountRef.current * 1000) / (now - lastFpsTimeRef.current));
+        setFps(Math.min(120, Math.max(30, measured)));
+        framesCountRef.current = 0;
+        lastFpsTimeRef.current = now;
+      }
 
       // Lerp progress for ultra-buttery Apple momentum
       currentProgressRef.current +=
@@ -231,74 +421,528 @@ export function AppleScrollyCanvas({
       className="relative w-full h-[350vh] bg-[#050505] select-none touch-pan-y"
     >
       {/* Sticky Fullscreen Canvas Viewport with 100dvh for iOS Safari stability */}
-      <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden relative">
+      <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden relative flex flex-col justify-between">
+        {/* 1. ATMOSPHERIC AMBIENT CANVAS LAYERS */}
+        {/* Subtle SVG procedural film-grain overlay */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10 opacity-[0.035] mix-blend-screen"
+          aria-hidden="true"
+        >
+          <svg className="h-full w-full">
+            <filter id="hero-film-grain">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.8"
+                numOctaves="3"
+                stitchTiles="stitch"
+              />
+              <feColorMatrix type="saturate" values="0" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#hero-film-grain)" />
+          </svg>
+        </div>
+
+        {/* Dynamic Dual Radial Spotlights behind camera */}
+        <div
+          className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_55%,rgba(220,38,38,0.18),rgba(9,9,11,0)_70%)]"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_48%,rgba(255,255,255,0.03),transparent_60%)]"
+          aria-hidden="true"
+        />
+
+        {/* Ultra-faint perspective technical grid with radial fade mask */}
+        <div
+          className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_65%_55%_at_50%_50%,black_35%,transparent_90%)] opacity-80"
+          aria-hidden="true"
+        />
+
+        {/* 2. MAIN HTML5 SCROLLYTELLING CANVAS (Unboxed with radial edge feathering) */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          className="absolute inset-0 w-full h-full pointer-events-none [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_100%)] z-0"
           style={{ width: "100%", height: "100%" }}
         />
 
-        {/* 24px Background Grid Overlay that blends into canvas */}
-        <div className="pointer-events-none absolute inset-0 framer-grid-lines framer-grid-mask opacity-60" />
+        {/* 3. ARRI / RED VIEWFINDER OS FRAMING & RETICLES */}
+        <div className="pointer-events-none absolute inset-3 sm:inset-5 md:inset-8 flex flex-col justify-between z-20">
+          {/* Top Reticles Bar */}
+          <div className="flex items-start justify-between font-mono text-[9px] sm:text-[10px] tracking-wider text-zinc-500">
+            {/* Top-Left: Corner Bracket ┌ & Live REC Tally */}
+            <div className="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
+                <path d="M1 17V1H17" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+              <div className="flex items-center gap-1.5 font-mono text-[10px] text-zinc-400">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+                <span className="font-bold text-white tracking-widest">REC</span>
+                <span className="text-zinc-600">·</span>
+                <span className="text-red-400 font-semibold">{timecode}</span>
+              </div>
+            </div>
 
-        {/* Cinematic Viewfinder Framing Brackets (Responsive Inset) */}
-        <div className="pointer-events-none absolute inset-3 sm:inset-6 md:inset-12 flex flex-col justify-between z-20 opacity-40">
-          <div className="flex justify-between items-start font-mono text-[9px] sm:text-[10px] text-zinc-500 tracking-wider">
-            <span className="flex items-center gap-1.5 sm:gap-2">
-              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse" />
-              <span>RAW REC • 4K 120P</span>
-            </span>
-            <span className="hidden xs:inline">2.39:1 VIEWPORT</span>
+            {/* Top-Right: Sensor Format & Corner Bracket ┐ */}
+            <div className="flex items-center gap-2">
+              <div className="font-mono text-[10px] text-zinc-400 text-right hidden xs:block">
+                <span className="text-white font-semibold">8K VISTAVISION</span>
+                <span className="text-zinc-600"> · </span>
+                <span className="text-emerald-400 font-semibold">120 FPS RAW</span>
+              </div>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
+                <path d="M17 17V1H1" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </div>
           </div>
-          <div className="flex justify-between items-end font-mono text-[9px] sm:text-[10px] text-zinc-600">
-            <span>SCROLL DISASSEMBLY: {Math.round(scrollProgress * 100)}%</span>
-            <span className="hidden sm:inline">SHUTTER 1/48 • DUAL ISO 800/12800</span>
+
+          {/* Rule-of-Thirds Crosshairs (+) with mouse parallax */}
+          <div
+            className="pointer-events-none absolute inset-0 z-10 transition-transform duration-100 ease-out"
+            style={{
+              transform: `translate3d(${mousePos.x * 10}px, ${mousePos.y * 10}px, 0)`,
+            }}
+          >
+            <div className="absolute left-[33.3%] top-[33.3%] -translate-x-1/2 -translate-y-1/2 font-mono text-xs text-white/20 select-none">
+              +
+            </div>
+            <div className="absolute left-[66.7%] top-[33.3%] -translate-x-1/2 -translate-y-1/2 font-mono text-xs text-white/20 select-none">
+              +
+            </div>
+            <div className="absolute left-[33.3%] top-[66.7%] -translate-x-1/2 -translate-y-1/2 font-mono text-xs text-white/20 select-none">
+              +
+            </div>
+            <div className="absolute left-[66.7%] top-[66.7%] -translate-x-1/2 -translate-y-1/2 font-mono text-xs text-white/20 select-none">
+              +
+            </div>
+          </div>
+
+          {/* Bottom Reticles Bar */}
+          <div className="flex items-end justify-between font-mono text-[9px] sm:text-[10px] tracking-wider text-zinc-500">
+            {/* Bottom-Left: Corner Bracket └ & Soundstage Battery */}
+            <div className="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
+                <path d="M1 1V17H17" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+              <div className="font-mono text-[10px] text-zinc-400 hidden sm:flex items-center gap-1.5">
+                <span className="text-zinc-500">STAGE:</span>
+                <span className="text-zinc-200 font-medium">MUMBAI-STAGE-04</span>
+                <span className="text-zinc-600">·</span>
+                <span className="text-emerald-400 font-semibold">BAT 14.8V (98%)</span>
+              </div>
+            </div>
+
+            {/* Bottom-Right: Color Space & Corner Bracket ┘ */}
+            <div className="flex items-center gap-2">
+              <div className="font-mono text-[10px] text-zinc-400 text-right hidden sm:block">
+                <span className="text-zinc-500">COLOR SPACE: </span>
+                <span className="text-red-400 font-medium">S-GAMUT3.CINE / S-LOG3</span>
+              </div>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
+                <path d="M17 1V17H1" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* SYNCHRONIZED SCROLL STORYTELLING BEATS */}
-
-        {/* BEAT 1 (0% - 20%): Fully Assembled Hero Shot */}
+        {/* 4. BEAT 1 HERO DISPLAY: TYPOGRAPHY, STAGGERED REVEAL & CALLOUT ACTION CLUSTER */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-20 md:top-22 lg:top-24 max-w-3xl mx-auto text-center z-30 transition-all duration-300 ease-out pointer-events-none ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-14 sm:top-18 md:top-20 max-w-4xl mx-auto text-center z-30 transition-all duration-300 ease-out ${
             scrollProgress <= 0.20
               ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 -translate-y-6 scale-95"
+              : "opacity-0 -translate-y-6 scale-95 pointer-events-none"
           }`}
         >
-          {/* Soft ambient vignette backing ensuring 100% crisp editorial contrast */}
-          <div className="pointer-events-none absolute -inset-x-8 -top-8 -bottom-6 bg-gradient-to-b from-[#050505]/80 via-[#050505]/35 to-transparent blur-xl -z-10 rounded-3xl" />
+          {/* Subtle atmospheric vignette backing for 100% crisp editorial contrast */}
+          <div className="pointer-events-none absolute -inset-x-12 -top-10 -bottom-8 bg-gradient-to-b from-[#050505]/85 via-[#050505]/40 to-transparent blur-2xl -z-10 rounded-3xl" />
 
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/80 px-3 sm:px-3.5 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 backdrop-blur-xl mb-2 sm:mb-2.5 shadow-md ring-1 ring-white/10 max-w-[95vw]">
-            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
-            <span className="hidden sm:inline">01 / CINEMA HARDWARE ARCHITECTURE • </span>
-            <span className="sm:hidden">01 / CINEMA RIG • </span>
-            <span>MUMBAI STAGE DESK</span>
-          </div>
+          {/* Top Telemetry Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-flex items-center gap-2 border border-white/10 bg-zinc-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-300 shadow-[0_0_20px_rgba(220,38,38,0.15)] mb-2.5 sm:mb-3"
+          >
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+            <span className="hidden sm:inline">01 // CINEMA HARDWARE ARCHITECTURE • MUMBAI STAGE DESK</span>
+            <span className="sm:hidden">01 // MUMBAI STAGE DESK</span>
+          </motion.div>
 
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-black tracking-[-0.035em] text-white leading-[1.08] text-balance drop-shadow-lg">
-            Precision Optics.{" "}
-            <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
+          {/* Hero Display Title: Metallic + Tungsten Red Gradients */}
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] font-extrabold tracking-[-0.03em] leading-[1.02] text-balance drop-shadow-2xl"
+          >
+            <span className="bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent block">
+              Precision Optics.
+            </span>
+            <span className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent block drop-shadow-[0_0_35px_rgba(239,68,68,0.25)]">
               Uncompromised Sensor Power.
             </span>
-          </h1>
+          </motion.h1>
 
-          <p className="mt-2 sm:mt-2.5 text-xs sm:text-sm md:text-[15px] text-zinc-300 max-w-lg mx-auto font-normal leading-relaxed drop-shadow-md text-balance px-2 sm:px-0">
-            The cinema hardware behind award-winning frames. Calibrated to ±0.010mm FFD, flight-cased, and dispatched directly to your set.
-          </p>
+          {/* Technical Sub-copy with inline monospace spec pills */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-2.5 sm:mt-3 text-xs sm:text-sm md:text-base text-zinc-300 max-w-2xl mx-auto font-normal leading-relaxed text-balance px-2"
+          >
+            The cinema hardware behind award-winning frames. Calibrated to{" "}
+            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+              ±0.010mm FFD
+            </span>
+            , standard{" "}
+            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+              PL-Mount
+            </span>
+            , with{" "}
+            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+              16+ Stops DR
+            </span>
+            —flight-cased and dispatched directly to your set.
+          </motion.p>
+
+          {/* Action Cluster */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-3.5 sm:mt-4 flex flex-col xs:flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full max-w-md mx-auto pointer-events-auto"
+          >
+            <button
+              onClick={onRentClick}
+              className="w-full xs:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold px-6 sm:px-7 py-2.5 sm:py-3 rounded-full shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-h-[44px] text-xs sm:text-sm tracking-wide"
+            >
+              <span>Configure & Reserve Kit</span>
+              <span className="font-mono text-xs">→</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectMode(activeMode === "assembled" ? "exploded" : "assembled")}
+              className="w-full xs:w-auto inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full backdrop-blur-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-h-[44px] text-xs sm:text-sm"
+            >
+              <Sparkles className="h-4 w-4 text-rose-400" />
+              <span>{activeMode === "assembled" ? "Inspect Exploded View ⚡" : "Reset Assembled Rig"}</span>
+            </button>
+          </motion.div>
+
+          {/* Tactile Segmented Mode Switcher */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-3 inline-flex items-center gap-1 p-1 rounded-full border border-white/10 bg-zinc-900/80 backdrop-blur-xl shadow-2xl pointer-events-auto max-w-[95vw]"
+          >
+            {[
+              { id: "assembled", label: "Assembled Rig", badge: "8K VV" },
+              { id: "exploded", label: "Exploded X-Ray", badge: "SENSOR" },
+              { id: "optics", label: "Optical Path", badge: "T2.0 GLASS" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleSelectMode(tab.id as any)}
+                className={`relative px-3 sm:px-4 py-1 rounded-full font-mono text-[10px] sm:text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeMode === tab.id
+                    ? "text-white font-semibold shadow-md"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+                }`}
+              >
+                {activeMode === tab.id && (
+                  <motion.div
+                    layoutId="hero-mode-pill"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_0_20px_rgba(220,38,38,0.45)]"
+                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
+                <span
+                  className={`relative z-10 text-[9px] px-1.5 py-0.2 rounded font-bold ${
+                    activeMode === tab.id ? "bg-white/20 text-white" : "bg-white/5 text-zinc-500"
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              </button>
+            ))}
+          </motion.div>
         </div>
 
-        {/* Scroll Prompt at Viewport Bottom (Fades out when user starts scrolling) */}
-        <div
-          className={`absolute inset-x-0 bottom-6 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-300 ${
-            scrollProgress < 0.1
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-4"
-          }`}
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-950/80 px-3.5 sm:px-4 py-1 sm:py-1.5 font-mono text-[10px] sm:text-[11px] text-zinc-300 backdrop-blur-xl shadow-xl ring-1 ring-white/10">
-            <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-red-500 animate-bounce" />
-            <span>Scroll to disassemble camera</span>
+        {/* 5. INTERACTIVE "X-RAY" HARDWARE HOTSPOTS & SVG LEADER LINES */}
+        {scrollProgress <= 0.20 && activeMode === "assembled" && (
+          <div
+            className="pointer-events-none absolute inset-0 z-30 transition-transform duration-100 ease-out"
+            style={{
+              transform: `translate3d(${mousePos.x * 12}px, ${mousePos.y * 12}px, 0)`,
+            }}
+          >
+            {/* SVG Connecting Leader Lines for Active Desktop Tooltip */}
+            <svg className="hidden md:block absolute inset-0 h-full w-full pointer-events-none z-30">
+              {SPEC_HOTSPOTS.map((h) => {
+                if (activeHotspot !== h.id) return null;
+                const ax = cameraStage.x + h.relX * cameraStage.w;
+                const ay = cameraStage.y + h.relY * cameraStage.h;
+                let path = "";
+
+                if (h.tooltipSide === "left") {
+                  path = `M ${ax} ${ay} L ${ax - 40} ${ay - 40} L ${ax - 70} ${ay - 40}`;
+                } else if (h.tooltipSide === "top") {
+                  path = `M ${ax} ${ay} L ${ax - 20} ${ay - 50} L ${ax - 20} ${ay - 80}`;
+                } else {
+                  path = `M ${ax} ${ay} L ${ax + 40} ${ay - 30} L ${ax + 80} ${ay - 30}`;
+                }
+
+                return (
+                  <g key={`svg-leader-${h.id}`}>
+                    <motion.path
+                      d={path}
+                      fill="none"
+                      stroke="rgba(239, 68, 68, 0.9)"
+                      strokeWidth="1.5"
+                      strokeDasharray="4 2"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <circle cx={ax} cy={ay} r="3" fill="#ef4444" className="animate-pulse" />
+                  </g>
+                );
+              })}
+            </svg>
+
+            {/* Pulsing Hotspot Nodes anchored on Camera Components */}
+            {SPEC_HOTSPOTS.map((h) => {
+              const ax = cameraStage.x + h.relX * cameraStage.w;
+              const ay = cameraStage.y + h.relY * cameraStage.h;
+              const isActive = activeHotspot === h.id;
+
+              return (
+                <div
+                  key={h.id}
+                  className="absolute pointer-events-auto"
+                  style={{
+                    left: `${ax}px`,
+                    top: `${ay}px`,
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  <button
+                    onClick={() => setActiveHotspot(isActive ? null : h.id)}
+                    onMouseEnter={() => setActiveHotspot(h.id)}
+                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none"
+                    aria-label={`Inspect ${h.label} specifications`}
+                  >
+                    {/* Pulsing outer aura ring */}
+                    <span className="absolute h-8 w-8 rounded-full border border-red-500/50 bg-red-500/15 animate-ping pointer-events-none" />
+
+                    {/* Button node chassis */}
+                    <span
+                      className={`relative flex h-6 w-6 items-center justify-center rounded-full border shadow-xl transition-all duration-300 ${
+                        isActive
+                          ? "border-red-400 bg-red-600 text-white scale-125 shadow-red-500/50"
+                          : "border-white/30 bg-zinc-950/90 text-zinc-300 hover:scale-110 hover:border-white group-hover:text-white"
+                      }`}
+                    >
+                      <Crosshair className="h-3 w-3" />
+                    </span>
+
+                    {/* Subtle label pill for instant context */}
+                    <span className="absolute left-8 top-1/2 -translate-y-1/2 hidden lg:inline-flex items-center gap-1 rounded bg-black/80 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-zinc-300 border border-white/10 opacity-70 group-hover:opacity-100 transition whitespace-nowrap">
+                      {h.label}
+                    </span>
+                  </button>
+
+                  {/* Desktop Hover / Click HUD Tooltip Card */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className={`hidden md:block absolute z-40 w-72 rounded-xl border border-white/20 bg-zinc-950/90 p-3.5 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_25px_rgba(239,68,68,0.2)] text-left pointer-events-auto ${
+                          h.tooltipSide === "left"
+                            ? "right-10 bottom-6"
+                            : h.tooltipSide === "top"
+                            ? "left-1/2 -translate-x-1/2 bottom-12"
+                            : "left-10 bottom-6"
+                        }`}
+                        onMouseLeave={() => setActiveHotspot(null)}
+                      >
+                        <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+                          <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                            {h.tag}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveHotspot(null);
+                            }}
+                            className="text-zinc-500 hover:text-white text-xs cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </div>
+
+                        <h4 className="mt-2 text-xs font-bold text-white tracking-tight">{h.name}</h4>
+                        <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">{h.description}</p>
+
+                        <div className="mt-2.5 flex flex-wrap gap-1 font-mono text-[9px]">
+                          {h.specs.map((spec) => (
+                            <span
+                              key={spec}
+                              className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 text-zinc-300 font-medium"
+                            >
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Mobile Hotspot Drawer Card (Tapping a hotspot opens this dismissible mini-card) */}
+        <AnimatePresence>
+          {activeHotspot && (
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 280, damping: 25 }}
+              className="md:hidden absolute inset-x-4 bottom-20 z-40 rounded-2xl border border-white/20 bg-zinc-950/95 p-4 backdrop-blur-2xl shadow-2xl text-left pointer-events-auto"
+            >
+              {(() => {
+                const h = SPEC_HOTSPOTS.find((item) => item.id === activeHotspot);
+                if (!h) return null;
+                return (
+                  <div>
+                    <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+                      <span className="font-mono text-[10px] text-red-400 font-bold tracking-wider">
+                        {h.tag}
+                      </span>
+                      <button
+                        onClick={() => setActiveHotspot(null)}
+                        className="h-6 w-6 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center text-xs"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <h4 className="mt-2 text-sm font-bold text-white">{h.name}</h4>
+                    <p className="mt-1 text-xs text-zinc-400 leading-relaxed">{h.description}</p>
+
+                    <div className="mt-2.5 flex flex-wrap gap-1 font-mono text-[10px]">
+                      {h.specs.map((spec) => (
+                        <span
+                          key={spec}
+                          className="rounded bg-white/5 border border-white/10 px-2 py-0.5 text-zinc-300"
+                        >
+                          {spec}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 6. BOTTOM CINEMA TELEMETRY HUD & MOBILE FOLLOW-FOCUS SCRUBBER */}
+        <div className="relative z-30 w-full pointer-events-auto">
+          {/* Mobile Follow-Focus Touch Scrubber Slider */}
+          <div className="sm:hidden w-full max-w-xs mx-auto px-4 py-2">
+            <div className="flex justify-between items-center text-[9px] font-mono text-zinc-400 mb-1">
+              <span className="text-red-400 font-bold flex items-center gap-1">
+                <SlidersHorizontal className="h-2.5 w-2.5" />
+                <span>FOCUS / DISASSEMBLY</span>
+              </span>
+              <span className="font-semibold text-white">
+                {Math.round(scrollProgress * 100).toString().padStart(2, "0")}%
+              </span>
+            </div>
+            <div className="relative flex items-center">
+              <div className="absolute inset-x-0 h-1.5 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-between px-2 text-[6px] text-zinc-600 select-none pointer-events-none">
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+                <span>|</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.002"
+                value={scrollProgress}
+                onChange={(e) => handleSliderChange(parseFloat(e.target.value))}
+                className="relative z-10 w-full accent-red-500 cursor-pointer h-5 bg-transparent appearance-none focus:outline-none"
+                aria-label="Cinema Rig Follow Focus Disassembly Scrubber"
+              />
+            </div>
+
+            {/* Mobile 2-Pill Glass Dock */}
+            <div className="flex items-center justify-center gap-2 pt-2 pb-5 font-mono text-[10px]">
+              <div className="rounded-full border border-white/15 bg-zinc-900/80 px-3 py-0.5 text-zinc-300 backdrop-blur-md shadow-md">
+                <span className="text-zinc-500 mr-1.5">ISO</span>
+                <span className="text-white font-bold">800 / 12,800</span>
+              </div>
+              <div className="rounded-full border border-white/15 bg-zinc-900/80 px-3 py-0.5 text-zinc-300 backdrop-blur-md shadow-md">
+                <span className="text-zinc-500 mr-1.5">SHUTTER</span>
+                <span className="text-emerald-400 font-bold">180° (1/48)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop 3-Column Cinema Telemetry Dock */}
+          <div className="hidden sm:flex items-center justify-between max-w-6xl mx-auto w-full px-6 py-3 font-mono text-xs text-zinc-400 border-t border-white/5 bg-zinc-950/40 backdrop-blur-md">
+            {/* Left Telemetry Column */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-zinc-300 font-semibold">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span>DISASSEMBLY: {Math.round(scrollProgress * 100).toString().padStart(2, "0")}%</span>
+              </div>
+              <div className="h-1.5 w-16 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-red-600 to-rose-400 transition-all duration-75"
+                  style={{ width: `${Math.max(2, scrollProgress * 100)}%` }}
+                />
+              </div>
+              <span className="rounded bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] text-zinc-300 font-bold">
+                FPS: {fps}.0
+              </span>
+            </div>
+
+            {/* Center Interactive Scroll / Drag Pill */}
+            <div className="relative rounded-full border border-red-500/30 bg-zinc-900/80 px-4 py-1 text-[11px] text-zinc-300 shadow-[0_0_15px_rgba(220,38,38,0.2)] flex items-center gap-2">
+              <ChevronDown className="h-3.5 w-3.5 text-red-500 animate-bounce" />
+              <span>SCROLL OR SCRUB TO DISASSEMBLE CAMERA</span>
+            </div>
+
+            {/* Right Live Cinema Sensor Badges */}
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300 font-medium">
+                SHUTTER 180°
+              </span>
+              <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300 font-medium">
+                EI 800
+              </span>
+              <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300 font-medium">
+                6000K
+              </span>
+              <span className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-red-300 font-bold">
+                T2.0
+              </span>
+            </div>
           </div>
         </div>
 
