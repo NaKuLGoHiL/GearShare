@@ -688,50 +688,43 @@ function Index() {
       />
 
       {/* OPTICAL LUT SHADER TEST BENCH & 3D RIG SHOWCASE */}
-      <section id="rig-showcase" className="relative pt-24 sm:pt-32 pb-20 px-4 sm:px-6 text-center z-10 border-t border-slate-200 bg-[#f8fafc] scroll-mt-32 sm:scroll-mt-40">
+      <section id="rig-showcase" className="relative pt-20 sm:pt-28 pb-16 sm:pb-20 px-3 sm:px-6 text-center z-10 border-t border-slate-200 bg-[#f8fafc] scroll-mt-28 sm:scroll-mt-36">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 font-mono text-[10px] tracking-widest text-slate-700 shadow-sm backdrop-blur-md">
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span>CALIBRATED CINEMA FLEET • READY FOR SOUNDSTAGE DISPATCH</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-slate-700 shadow-sm backdrop-blur-md">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span>CALIBRATED CINEMA FLEET • SET DISPATCH READY</span>
           </div>
 
-          <h2 className="mt-6 text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] leading-[1.04] text-slate-900">
+          <h2 className="mt-3 sm:mt-5 text-2xl xs:text-3xl sm:text-5xl font-black tracking-[-0.04em] leading-[1.08] text-slate-900">
             Real-Time Optical Physics & Sensor Rigging.
           </h2>
 
-          <p className="mt-4 text-base text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-600 max-w-xl mx-auto font-normal leading-relaxed">
             Test custom chromatic anamorphic LUTs, inspect multi-axis rig tilt physics, and reserve zero-deposit cinema packages below.
           </p>
 
-          {/* Optical LUT Shader Switcher & Interactive 3D Showcase */}
-          <div className="relative mx-auto mt-12 max-w-5xl">
+          {/* Unified Cinema Console & Interactive 3D Showcase */}
+          <div className="relative mx-auto mt-6 sm:mt-10 max-w-5xl">
             <div className="pointer-events-none absolute -bottom-10 inset-x-12 h-24 bg-gradient-to-b from-slate-200/50 via-red-500/10 to-transparent blur-xl rounded-full transform scale-y-50" />
 
-            <div className="relative rounded-3xl border border-slate-200 bg-white p-2 sm:p-3 shadow-xl backdrop-blur-2xl ring-1 ring-slate-900/5">
-              <div className="pointer-events-none absolute top-3 left-3 h-3.5 w-3.5 border-t-2 border-l-2 border-red-500/70 z-20" />
-              <div className="pointer-events-none absolute top-3 right-3 h-3.5 w-3.5 border-t-2 border-r-2 border-red-500/70 z-20" />
-              <div className="pointer-events-none absolute bottom-3 left-3 h-3.5 w-3.5 border-b-2 border-l-2 border-red-500/70 z-20" />
-              <div className="pointer-events-none absolute bottom-3 right-3 h-3.5 w-3.5 border-b-2 border-r-2 border-red-500/70 z-20" />
-
+            <div className="relative rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-2 sm:p-3 shadow-xl backdrop-blur-2xl ring-1 ring-slate-900/5">
               <Hero3DShowcase onSelectGear={handleOpenReserve} className="p-0" />
-            </div>
 
-            {/* Optical LUT Switcher */}
-            <div className="mt-6 flex items-center justify-center px-2">
-              <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 rounded-2xl sm:rounded-full border border-slate-200 bg-white p-1.5 sm:px-4 sm:py-2 font-mono text-xs shadow-md max-w-full">
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5">
+              {/* Integrated Optical LUT Console Bar */}
+              <div className="mt-2 pt-2.5 pb-1 px-2.5 sm:px-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+                <div className="flex items-center gap-1.5 text-slate-500">
                   <Sparkles className="h-3.5 w-3.5 text-red-500" />
-                  <span className="text-slate-500 uppercase text-[9px] sm:text-[10px] tracking-wider font-semibold">LUT:</span>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold">3-WAY OPTICAL LUT:</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 p-1 border border-slate-200/80">
                   {(["kodak-500t", "anamorphic-cyan", "silver-noir"] as const).map((mode) => (
                     <button
                       key={mode}
                       onClick={() => setCinemaLook(mode)}
-                      className={`rounded-full px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-[11px] font-medium transition cursor-pointer ${
+                      className={`rounded-full px-2.5 sm:px-3 py-1 text-[10px] font-medium transition cursor-pointer ${
                         cinemaLook === mode
                           ? "bg-slate-900 text-white font-semibold shadow-sm"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                       }`}
                     >
                       {mode === "kodak-500t" ? "Kodak 500T" : mode === "anamorphic-cyan" ? "Cyan" : "Noir"}

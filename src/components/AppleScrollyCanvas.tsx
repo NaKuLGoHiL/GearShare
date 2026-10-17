@@ -371,60 +371,54 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 4 (80% - 100%): Turnkey Stage Dispatch */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-24 sm:top-28 md:top-32 max-w-xl mx-auto z-30 transition-all duration-300 ease-out ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-28 sm:top-32 md:top-36 max-w-lg mx-auto z-30 transition-all duration-300 ease-out ${
             scrollProgress >= 0.80
               ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
               : "opacity-0 translate-y-6 scale-95 pointer-events-none"
           }`}
         >
           {/* Framer Frosted Glass Mirror Blurred Container Box */}
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/20 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-center text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/20 bg-zinc-950/90 p-3.5 xs:p-4 sm:p-6 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-center text-white">
             {/* Top Specular Mirror Sheen Highlight */}
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
 
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-1.5 sm:mb-3 shadow-sm">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-1.5 sm:mb-2 shadow-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>03 / TURNKEY DISPATCH • PELICAN SEALED</span>
             </div>
             
-            <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-[1.12]">
+            <h2 className="text-base xs:text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Soundstage-Ready Fleet.
-              <span className="block mt-0.5 sm:mt-1 bg-gradient-to-r from-red-500 via-rose-400 to-amber-200 bg-clip-text text-transparent">
+              <span className="block mt-0.5 bg-gradient-to-r from-red-500 via-rose-400 to-amber-200 bg-clip-text text-transparent">
                 Dispatched in Under 3 Hours.
               </span>
             </h2>
             
-            <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed line-clamp-2 sm:line-clamp-none">
-              Factory-collimated cinema bodies, matched cine lenses, and 100% pre-charged power systems—delivered in Pelican Air flight cases directly to your Mumbai set.
+            <p className="mt-1 sm:mt-1.5 text-[11px] sm:text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+              Factory-collimated cinema bodies & matched primes, flight-cased for instant Mumbai set call.
             </p>
 
-            {/* Quality Pass Telemetry Badges */}
-            <div className="mt-2.5 sm:mt-4 grid grid-cols-3 gap-1.5 sm:gap-2 font-mono text-[8.5px] sm:text-xs">
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
-                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">COLLIMATION</span>
-                <span className="text-emerald-400 font-bold">±0.010mm</span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
-                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">CLEANROOM</span>
-                <span className="text-white font-bold">ISO Class 5</span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
-                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">STAGE ETA</span>
-                <span className="text-red-400 font-bold">&lt; 3 Hours</span>
-              </div>
+            {/* Precision Telemetry Capsule Pill */}
+            <div className="mt-2.5 sm:mt-3 inline-flex items-center justify-center gap-2 sm:gap-3.5 rounded-full border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-1 font-mono text-[9px] sm:text-[10px]">
+              <span className="text-zinc-400">FFD <strong className="text-emerald-400">±0.010mm</strong></span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-400">CLEANROOM <strong className="text-white">ISO 5</strong></span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-400">STAGE <strong className="text-red-400">&lt;3h</strong></span>
             </div>
 
-            <div className="mt-3 sm:mt-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+            {/* Quick Actions */}
+            <div className="mt-3 sm:mt-4 flex flex-col xs:flex-row items-center justify-center gap-2 sm:gap-3">
               <a
                 href="#catalog"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white tracking-wide shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 px-5 sm:px-6 py-2 text-xs sm:text-sm font-semibold text-white tracking-wide shadow-lg shadow-red-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Explore Fleet Catalog</span>
                 <span className="font-mono text-xs">→</span>
               </a>
               <a
                 href="#faq"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 transition-all cursor-pointer"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 transition-all cursor-pointer"
               >
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 <span>₹0 Deposit Waiver</span>
@@ -706,7 +700,7 @@ function renderKinematicCameraFlow(
     const caseW = width * caseFitScale;
     const caseH = caseW / caseAspect;
     const caseX = (width - caseW) / 2;
-    const caseY = (height - caseH) / 2 + (isMobile ? 100 : height > 700 ? 140 : 80);
+    const caseY = (height - caseH) / 2 + (isMobile ? 75 : height > 700 ? 120 : 65);
 
     ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
     ctx.restore();
