@@ -388,7 +388,7 @@ function Index() {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       return 0; // featured default
     });
-  }, [selectedCat, selectedMount, searchQuery, sortBy]);
+  }, [catalogItems, selectedCat, selectedMount, searchQuery, sortBy]);
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
