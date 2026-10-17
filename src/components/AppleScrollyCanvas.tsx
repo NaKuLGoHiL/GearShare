@@ -111,55 +111,6 @@ export function AppleScrollyCanvas({
 
     let time = 0;
 
-    // Helper to draw an image scaled cleanly and centered with tilt & spatial shift
-    const drawCinemaFrame = (
-      img: HTMLImageElement,
-      alpha: number,
-      width: number,
-      height: number,
-      mx: number,
-      scaleMod = 1,
-      shiftX = 0,
-      shiftY = 0
-    ) => {
-      if (!img || !img.complete || img.naturalWidth === 0 || alpha <= 0.001) {
-        return;
-      }
-
-      const imgAspect = img.naturalWidth / img.naturalHeight;
-      const canvasAspect = width / height;
-
-      let baseW = width;
-      let baseH = height;
-
-      if (canvasAspect > imgAspect) {
-        baseH = width / imgAspect;
-      } else {
-        baseW = height * imgAspect;
-      }
-
-      // Contain cleanly inside viewport with ample breathing room
-      const fitScale =
-        Math.min(1, Math.min((width * 0.86) / baseW, (height * 0.72) / baseH)) *
-        scaleMod;
-      const finalW = baseW * fitScale;
-      const finalH = baseH * fitScale;
-
-      const drawX = (width - finalW) / 2 + shiftX;
-      const drawY = (height - finalH) / 2 + shiftY;
-
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-
-      // Subtle mouse tilt rotation
-      ctx.translate(drawX + finalW / 2, drawY + finalH / 2);
-      ctx.rotate(mx * 0.02);
-      ctx.translate(-(drawX + finalW / 2), -(drawY + finalH / 2));
-
-      ctx.drawImage(img, drawX, drawY, finalW, finalH);
-      ctx.restore();
-    };
-
     const render = () => {
       time += 0.015;
 
@@ -194,71 +145,36 @@ export function AppleScrollyCanvas({
       // Soft radial cinema illumination glow centered behind the camera
       const glowGrad = ctx.createRadialGradient(
         width / 2,
-        height / 2 + 30,
+        height / 2 + 50,
         40,
         width / 2,
-        height / 2 + 30,
-        Math.min(width, height) * 0.55
+        height / 2 + 50,
+        Math.min(width, height) * 0.6
       );
-      glowGrad.addColorStop(0, "rgba(239, 68, 68, 0.09)");
-      glowGrad.addColorStop(0.4, "rgba(255, 255, 255, 0.02)");
+      glowGrad.addColorStop(0, "rgba(239, 68, 68, 0.12)");
+      glowGrad.addColorStop(0.4, "rgba(255, 255, 255, 0.025)");
       glowGrad.addColorStop(1, "rgba(5, 5, 5, 0)");
       ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, width, height);
 
       const masters = masterImagesRef.current;
-      const anyImageReady =
+      const heroReady =
         masters &&
-        (masters.beat1.complete ||
-          masters.beat2.complete ||
-          masters.beat3.complete ||
-          masters.beat4.complete);
+        masters.beat1.complete &&
+        masters.beat1.naturalWidth > 0;
 
-      if (anyImageReady && masters) {
-        // Continuous partition of unity for silky smooth transitions across 4 beats
-        let alpha1 = 0;
-        let alpha2 = 0;
-        let alpha3 = 0;
-        let alpha4 = 0;
-
-        if (p <= 0.22) {
-          alpha1 = 1;
-        } else if (p < 0.32) {
-          const t = (p - 0.22) / 0.1;
-          alpha1 = 1 - t;
-          alpha2 = t;
-        } else if (p <= 0.52) {
-          alpha2 = 1;
-        } else if (p < 0.62) {
-          const t = (p - 0.52) / 0.1;
-          alpha2 = 1 - t;
-          alpha3 = t;
-        } else if (p <= 0.80) {
-          alpha3 = 1;
-        } else if (p < 0.88) {
-          const t = (p - 0.80) / 0.08;
-          alpha3 = 1 - t;
-          alpha4 = t;
-        } else {
-          alpha4 = 1;
-        }
-
-        // Slight breathing zoom scale based on scrub
-        const s1 = 1.0 + p * 0.03;
-        const s2 = 1.02 + Math.sin(p * Math.PI) * 0.02;
-        const s3 = 1.02 + Math.cos(p * Math.PI) * 0.02;
-        const s4 = 1.0;
-
-        // Spatial offsets: offset Beat 1 & 4 downward, offset Beat 2 right & Beat 3 left on wide screens
-        const offsetY1 = height > 700 ? 120 : 70;
-        const offsetY4 = height > 700 ? 110 : 70;
-        const shiftX2 = width > 1024 ? 90 : 0;
-        const shiftX3 = width > 1024 ? -90 : 0;
-
-        if (alpha1 > 0) drawCinemaFrame(masters.beat1, alpha1, width, height, mx, s1, 0, offsetY1);
-        if (alpha2 > 0) drawCinemaFrame(masters.beat2, alpha2, width, height, mx, s2, shiftX2, 10);
-        if (alpha3 > 0) drawCinemaFrame(masters.beat3, alpha3, width, height, mx, s3, shiftX3, 10);
-        if (alpha4 > 0) drawCinemaFrame(masters.beat4, alpha4, width, height, mx, s4, 0, offsetY4);
+      if (heroReady && masters) {
+        // CONTINUOUS KINEMATIC CAMERA FLOW ENGINE
+        renderKinematicCameraFlow(
+          ctx,
+          masters,
+          width,
+          height,
+          p,
+          mx,
+          my,
+          time
+        );
       } else {
         // High-precision procedural exploded cinema camera engine fallback
         renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
@@ -451,6 +367,284 @@ export function AppleScrollyCanvas({
       </div>
     </div>
   );
+}
+
+// Pre-calculated cleanroom micro-dust particles for cinematic depth
+const CLEANROOM_PARTICLES = Array.from({ length: 32 }, (_, i) => ({
+  x: ((i * 137.5) % 100) / 100,
+  y: ((i * 219.3) % 100) / 100,
+  size: 0.8 + ((i * 3.7) % 2.4),
+  speed: 0.15 + ((i * 0.7) % 0.4),
+  drift: Math.sin(i * 1.5),
+  alpha: 0.08 + ((i * 5) % 0.22),
+}));
+
+function smoothstep(min: number, max: number, value: number) {
+  const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  return x * x * (3 - 2 * x);
+}
+
+/**
+ * Continuous Kinematic Disassembly Engine
+ * Blends perspective-locked frames of the EXACT SAME Sony FX3 cinema rig
+ * as it mechanically expands along the 15mm carbon rods and optical laser axis,
+ * revealing the titanium PL mount, illuminated Exmor R sensor, and floating
+ * chromatic cinema glass optics, before sealing into the Pelican flight case.
+ */
+function renderKinematicCameraFlow(
+  ctx: CanvasRenderingContext2D,
+  masters: MasterImages,
+  width: number,
+  height: number,
+  p: number,
+  mx: number,
+  my: number,
+  time: number
+) {
+  const { beat1, beat2, beat3, beat4 } = masters;
+  const imgW = 1376;
+  const imgH = 768;
+  const imgAspect = imgW / imgH;
+
+  // Contain cleanly inside viewport with breathing room for top and bottom typography
+  const fitScale = Math.min(
+    1,
+    Math.min((width * 0.88) / width, (height * 0.72) / (width / imgAspect))
+  );
+  const finalW = width * fitScale;
+  const finalH = finalW / imgAspect;
+  const scaleRatio = finalW / imgW;
+
+  const origX = (width - finalW) / 2;
+  const origY = (height - finalH) / 2 + (height > 700 ? 115 : 65);
+
+  // Subtle 3D perspective parallax from cursor
+  const tiltAngle = mx * 0.018;
+  const tiltShiftX = mx * 20;
+  const tiltShiftY = my * 12;
+
+  ctx.save();
+  const centerX = width / 2;
+  const centerY = origY + finalH / 2;
+  ctx.translate(centerX + tiltShiftX, centerY + tiltShiftY);
+  ctx.rotate(tiltAngle);
+  ctx.translate(-centerX, -centerY);
+
+  // 1. STAGE PROGRESS & CONTINUOUS BLENDING WEIGHTS
+  // Stage 1 (0.00 -> 0.20): Assembled Hero Rig (beat1)
+  // Stage 2 (0.20 -> 0.52): Lens forward on rods, revealing sensor die & PL mount (beat1 -> beat2)
+  // Stage 3 (0.52 -> 0.80): Lens further forward, optical glass elements & iris bloom (beat2 -> beat3)
+  // Stage 4 (0.80 -> 1.00): Camera sealed in custom Pelican Air flight case (beat3 -> beat4)
+
+  const t12 = smoothstep(0.18, 0.44, p); // 0 -> 1 as lens slides out
+  const t23 = smoothstep(0.48, 0.74, p); // 0 -> 1 as optics bloom
+  const t34 = smoothstep(0.78, 0.88, p); // 0 -> 1 as flight case seals
+
+  const cameraAlpha = 1 - t34;
+  const caseAlpha = t34;
+
+  // 2. RENDER PERSPECTIVE-LOCKED CAMERA RIG
+  if (cameraAlpha > 0.001) {
+    ctx.save();
+    ctx.globalAlpha = cameraAlpha;
+
+    // Draw base layer:
+    if (t23 <= 0.001) {
+      // Transitioning between Beat 1 and Beat 2
+      if (beat1.complete && beat1.naturalWidth > 0) {
+        ctx.drawImage(beat1, origX, origY, finalW, finalH);
+      }
+      if (t12 > 0.001 && beat2.complete && beat2.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = cameraAlpha * t12;
+        ctx.drawImage(beat2, origX, origY, finalW, finalH);
+        ctx.restore();
+      }
+    } else {
+      // Transitioning between Beat 2 and Beat 3
+      if (beat2.complete && beat2.naturalWidth > 0) {
+        ctx.drawImage(beat2, origX, origY, finalW, finalH);
+      }
+      if (t23 > 0.001 && beat3.complete && beat3.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = cameraAlpha * t23;
+        ctx.drawImage(beat3, origX, origY, finalW, finalH);
+        ctx.restore();
+      }
+    }
+
+    // 3. UNBROKEN RED LASER COLLIMATION AXIS (Active when disassembled)
+    const expansion = Math.max(t12, t23);
+    if (expansion > 0.08 && cameraAlpha > 0.15) {
+      const laserY = origY + 390 * scaleRatio;
+      const laserStartX = origX + 140 * scaleRatio;
+      const laserEndX = origX + 620 * scaleRatio;
+
+      ctx.save();
+      // Outer neon red glow beam
+      ctx.strokeStyle = `rgba(239, 68, 68, ${0.4 + expansion * 0.45})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(laserStartX, laserY);
+      ctx.lineTo(laserEndX, laserY);
+      ctx.stroke();
+
+      // Sharp white laser core
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.85 * expansion})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(laserStartX + 20 * scaleRatio, laserY);
+      ctx.lineTo(laserEndX - 20 * scaleRatio, laserY);
+      ctx.stroke();
+
+      // Sensor plane focal ping
+      const sensorX = origX + 565 * scaleRatio;
+      const pingPulse = Math.sin(time * 6);
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.arc(sensorX, laserY, 3.5 + pingPulse * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Focal point reticle on sensor die
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.75)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(sensorX, laserY, 8 + pingPulse * 2, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Specular glints on floating optical glass discs (Beat 3)
+      if (t23 > 0.1) {
+        const glintPoints = [190, 240, 285, 330];
+        glintPoints.forEach((gx, idx) => {
+          const px = origX + gx * scaleRatio;
+          const glintAlpha = Math.max(0, Math.sin(time * 4 + idx * 1.2));
+          ctx.fillStyle = `rgba(56, 189, 248, ${glintAlpha * 0.9 * t23})`;
+          ctx.beginPath();
+          ctx.arc(px, laserY, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      ctx.restore();
+    }
+
+    // 4. SENSOR COPPER VAPOR CHAMBER THERMAL DISSIPATION GLOW (Beat 2)
+    if (t12 > 0.1 && t23 < 0.7) {
+      const sensorX = origX + 565 * scaleRatio;
+      const sensorY = origY + 390 * scaleRatio;
+      const sensorWarmth = t12 * (1 - t23 * 0.6);
+
+      ctx.save();
+      const heatGrad = ctx.createRadialGradient(
+        sensorX,
+        sensorY,
+        10 * scaleRatio,
+        sensorX,
+        sensorY,
+        120 * scaleRatio
+      );
+      heatGrad.addColorStop(0, `rgba(239, 68, 68, ${0.2 * sensorWarmth})`);
+      heatGrad.addColorStop(0.5, `rgba(249, 115, 22, ${0.08 * sensorWarmth})`);
+      heatGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = heatGrad;
+      ctx.fillRect(sensorX - 130 * scaleRatio, sensorY - 130 * scaleRatio, 260 * scaleRatio, 260 * scaleRatio);
+      ctx.restore();
+    }
+
+    // 5. FLOATING TELEMETRY HUD (Placed above lens, clear of left/right text cards)
+    if (expansion > 0.15 && cameraAlpha > 0.25) {
+      ctx.save();
+      const hudX = origX + 330 * scaleRatio;
+      const hudY = origY + 160 * scaleRatio;
+      const hudW = 210 * scaleRatio;
+      const hudH = 50 * scaleRatio;
+
+      // Glass HUD background pill
+      ctx.fillStyle = "rgba(10, 10, 12, 0.85)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(hudX, hudY, hudW, hudH, 6 * scaleRatio);
+      ctx.fill();
+      ctx.stroke();
+
+      // Red status pip
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.arc(hudX + 12 * scaleRatio, hudY + 14 * scaleRatio, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Telemetry Text
+      ctx.font = `${Math.max(9, Math.round(10 * scaleRatio))}px monospace`;
+      ctx.fillStyle = "#ef4444";
+      const ffdCurrent = (52.0 + t12 * 18.25 + t23 * 16.15).toFixed(3);
+      ctx.fillText(
+        `OPTICAL AXIS // FFD: ${ffdCurrent}mm`,
+        hudX + 22 * scaleRatio,
+        hudY + 18 * scaleRatio
+      );
+
+      ctx.font = `${Math.max(8, Math.round(9 * scaleRatio))}px monospace`;
+      ctx.fillStyle = "#10b981";
+      ctx.fillText(
+        `TOLERANCE: ±0.010mm [PASS]`,
+        hudX + 22 * scaleRatio,
+        hudY + 32 * scaleRatio
+      );
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillText(
+        `EXMOR R FULL FRAME • 16-BIT RAW`,
+        hudX + 22 * scaleRatio,
+        hudY + 44 * scaleRatio
+      );
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  // 6. SEALED FLIGHT CASE OVERLAY (Beat 4 Wrap Time)
+  if (caseAlpha > 0.001 && beat4.complete && beat4.naturalWidth > 0) {
+    ctx.save();
+    ctx.globalAlpha = caseAlpha;
+
+    const caseAspect = beat4.naturalWidth / beat4.naturalHeight;
+    const caseFitScale = Math.min(
+      1,
+      Math.min((width * 0.88) / width, (height * 0.72) / (width / caseAspect))
+    );
+    const caseW = width * caseFitScale;
+    const caseH = caseW / caseAspect;
+    const caseX = (width - caseW) / 2;
+    const caseY = (height - caseH) / 2 + (height > 700 ? 115 : 65);
+
+    ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
+
+    // Subtle case latch indicator glow
+    ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(caseX + 20, caseY + 20, caseW - 40, caseH - 40);
+    ctx.setLineDash([]);
+
+    ctx.restore();
+  }
+
+  // 7. CINEMATIC CLEANROOM MICRO-DUST MOTES (Ambient depth)
+  ctx.save();
+  CLEANROOM_PARTICLES.forEach((p) => {
+    const px = origX + ((p.x * finalW + time * 12 * p.speed + p.drift * 20) % finalW);
+    const py = origY + ((p.y * finalH + Math.sin(time * 0.8 + p.drift) * 15) % finalH);
+    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+    ctx.beginPath();
+    ctx.arc(px, py, p.size * scaleRatio, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+
+  ctx.restore();
 }
 
 /**
