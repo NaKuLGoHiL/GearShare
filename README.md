@@ -46,9 +46,10 @@ GearShare is designed with an **ultra-dark matte carbon aesthetic** (`#000000`, 
                               └─────────────────────────────────────────────────────────┘
 ```
 
-### Tech Stack
+### Tech Stack & Design System
+- **Design System**: Framer-inspired architecture (Deep matte obsidian `#08080a`, 24px x 24px geometric grid with radial mask, rounded-3xl bento cards, anodized-red `#ef4444` highlights)
 - **Framework**: React 19 + TanStack Start (Nitro SSR Engine) + TanStack Router
-- **Styling**: Tailwind CSS v4 with custom OKLCH matte carbon palette and hardware rim lighting
+- **Styling**: Tailwind CSS v4 with custom OKLCH matte carbon palette, hardware rim lighting, and glassmorphism
 - **Data Persistence**: Supabase (PostgreSQL 15 + PostgREST with strict Row Level Security)
 - **Validation**: Zod schema with dual-casing support (`camelCase` & `snake_case`)
 - **Icons & Motion**: Lucide React + GPU-accelerated CSS 3D Matrix & requestAnimationFrame inertial damping
@@ -56,52 +57,47 @@ GearShare is designed with an **ultra-dark matte carbon aesthetic** (`#000000`, 
 
 ---
 
-## 7 Landing Page Sections
+## 7 Framer-Style Sections
 
-1. **Sticky Navigation Header**:
-   - Pulsing cinema-red tally mark (`REC` indicator).
-   - High-contrast monospaced brand typography with `MUMBAI HQ · INDIA` badge.
-   - Smooth navigation anchors (`#hero-bench`, `#catalog`, `#hardware`, `#pipeline`, `#faq`).
-   - National dispatch hub status (`MUMBAI · HYD · NCR · BLR`).
-   - Primary "Rent Kit" CTA with mobile-responsive slide-down drawer.
+1. **Floating Pill Header**:
+   - Signature centered floating pill navbar with glassmorphism (`backdrop-blur-xl bg-zinc-950/70 border border-zinc-800/80 rounded-full`).
+   - Brand mark with glowing red tally dot: `● GEARSHARE`.
+   - Links: Catalog, Bento Features, Workflow, Damage Shield, FAQ, and Track Dispatch.
+   - CTA button: Anodized-red rounded pill button "Rent Equipment".
 
-2. **3D Interactive Hero Section**:
-   - Dynamic 3D perspective camera showcase with inertial lerp smoothing (`requestAnimationFrame`).
-   - Anodized cinema-red rim lighting responding to cursor coordinates.
-   - Real-time gloss specular reflection sheen that slides across lens elements.
-   - 3D Z-axis telemetry layers: live 24fps running timecode counter (`01:24:18:14`), focal dimensions, and sensor latitude.
-   - Interactive model hot-swap toggle between **RED V-Raptor 8K VV** and **ARRI Alexa Mini LF**.
-   - Dual CTAs: "Browse Rental Catalog" and "How It Works".
+2. **Framer-Style Hero Section**:
+   - Floating micro-badge: `V2.6 CINEMA FLEET • DISPATCHING READY`.
+   - Giant centered title: `The Hardware Behind Cinema-Grade Frames.` (gradient text white to slate-400, tight tracking `-0.04em`).
+   - Subtitle: `Reserve bench-calibrated cinema bodies, anamorphic primes, and lighting rigs with zero-friction checkout and full production insurance.`
+   - Dual CTAs: Red pill "Explore Inventory" + Secondary glass pill "View Damage Shield".
+   - Centered Interactive 3D/Tilt Visual: Cinema camera rig resting on a subtle reflective plane that tilts smoothly with cursor movement (CSS 3D perspective / transform) with reflection fade beneath.
+   - Interactive 3-way LUT switch: `Kodak 500T`, `Anamorphic Cyan`, `Silver Noir` embedded cleanly as an optical simulation preview pill bar.
 
-3. **Interactive Equipment Catalog**:
-   - Filterable categories: `All`, `Cinema Bodies`, `Anamorphic & Primes`, `Lighting & Grip`, `Audio`.
-   - Real-time search query filtering by equipment name, mount, or sensor specs.
-   - **Duration Calculator Switcher**: `[1 Day | 3 Days (-10%) | 7 Days (-25%)]` dynamically recalculating package totals with smooth numeric transitions in Indian Rupees (`₹`).
-   - Interactive 3D perspective hover cards with shadow expansion and red edge highlights.
-   - Modal trigger that passes equipment details and selected duration into the booking engine.
+3. **Framer-Style Bento Grid Catalog (Interactive Core)**:
+   - Header with micro-badge: `INSTANT INVENTORY ACCESS`.
+   - Title: `Precision Cinema Fleet Ready for Set Call.`
+   - Filter bar: `[All, Cinema Bodies, Anamorphic & Primes, Lighting, Audio]` with count badges.
+   - Duration switch: `[1 Day | 3 Days (-10%) | 7 Days (-25%)]` that recalibrates pricing numbers in real-time in Indian Rupees (`₹`).
+   - Search bar + Lens mount filter (`All`, `PL Mount`, `LPL`, `RF`, `E Mount`).
+   - Equipment Cards with Framer aesthetics: high-res hardware photos, technical spec tags, daily rate badge, instant "Reserve" trigger button, and "Quick Specs" modal.
 
-4. **4-Block Bento Specification Grid**:
-   - **01 / Bench-Calibrated Optics**: Flange focal distance verified on collimator (`FFD ±0.01mm`) in Class-100 cleanroom.
-   - **02 / Production Damage Shield**: Zero security deposit (`₹0 DEPOSIT`) for verified productions and WICA/SICA crew.
-   - **03 / Immediate Metro Set Dispatch**: Flight-ready Pelican Air cases dispatched to sets in `< 3H METRO` across Film City Goregaon, Bandra, Andheri, and Ramoji Film City.
-   - **04 / Power & Rig Ready**: Four 150Wh high-load V-mount lithium packs, quad-charger, and carbon 15mm rods standard.
+4. **4-Block Framer Bento Advantage Grid**:
+   - **Block 1 (Large 2-col)**: "Optics Bench-Calibrated" with interactive lens flange focal distance diagram (collimation scale, ±0.010mm tolerance indicator, micrometer laser bench graphic).
+   - **Block 2 (1-col)**: "Zero-Deposit Damage Shield" (100% in-transit and on-set accidental coverage, WICA & GSTIN instant waiver).
+   - **Block 3 (1-col)**: "3-Hour Metro Set Dispatch" (Flight-ready Pelican cases delivered directly to Mumbai studio sets with live tracking link).
+   - **Block 4 (2-col)**: "Production-Ready Power Packs" (Pre-charged quad 150Wh V-mount batteries, dual fast-chargers, 15mm carbon rods, and Arri bridgeplates included standard).
 
-5. **Rental Pipeline Workflow**:
-   - 3-step zero-downtime timeline:
+5. **Interactive Workflow Timeline**:
+   - 3-step minimalist Framer step card layout:
      - `01 / Select Hardware & Shoot Window`
-     - `02 / Fast ID & GSTIN Clearance` (< 60 min clearance)
-     - `03 / Calibrated Direct Studio Dispatch` (charged to 100%, collimation sheet signed)
+     - `02 / 15-Min Fast ID & GSTIN Check` (< 15 min clearance, ₹0 deposit waiver)
+     - `03 / Flight-Case Direct Studio Delivery` (charged to 100%, collimation sheet signed, delivered < 3 hours to sets)
 
-6. **Operational FAQ Accordion**:
-   - Expandable questions addressing damage coverage, emergency 3-hour hot-swap protocols, GSTIN and Aadhaar/PAN verification, custom lens shims, and wrap logistics across Film City, Andheri West, and Jubilee Hills.
+6. **Framer Collapsible FAQ Accordion**:
+   - Clean, rounded graphite containers with smooth expand/collapse transitions covering insurance, emergency gear hot-swaps, deposit policies, lens mount shims, wrap day returns.
 
-7. **Technical Footer**:
-   - 24/7 National Dispatch Hub telemetry:
-     - Hub 01: Mumbai HQ (Goregaon Film City & Andheri West)
-     - Hub 02: Hyderabad (Jubilee Hills & Ramoji Film City)
-     - Hub 03: Delhi NCR (Noida Film City & DLF Cyber City)
-     - Hub 04: Bengaluru (Indiranagar & Koramangala)
-   - Prototype attribution, legal trademark disclaimer, and database status indicator.
+7. **Technical Framer-Style Footer**:
+   - Dark grid footer with sitemap links, status indicator `All Rental Hubs Operational` (glowing emerald dot), and attribution: `Prototype Engineered for ZooTechX Cinema R&D • GearShare Platform`.
 
 ---
 

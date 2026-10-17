@@ -37,28 +37,28 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0 0 0);
-  --carbon: oklch(0.13 0.004 286);
-  --foreground: oklch(0.97 0 0);
-  --card: oklch(0.141 0.005 286 / 70%);
-  --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.13 0.004 286);
-  --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.586 0.222 17.6);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.21 0.006 286);
-  --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.21 0.006 286);
-  --muted-foreground: oklch(0.705 0.015 286);
-  --accent: oklch(0.274 0.006 286);
-  --accent-foreground: oklch(0.97 0 0);
-  --destructive: oklch(0.637 0.237 25.3);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.72 0.17 150);
-  --border: oklch(0.274 0.006 286 / 80%);
-  --input: oklch(0.274 0.006 286);
-  --ring: oklch(0.586 0.222 17.6);
-  --shadow-tally: 0 0 12px oklch(0.586 0.222 17.6 / 70%);
+  --background: #08080a;
+  --carbon: #0e0e12;
+  --foreground: #f8fafc;
+  --card: rgba(14, 14, 18, 0.7);
+  --card-foreground: #f8fafc;
+  --popover: #0e0e12;
+  --popover-foreground: #f8fafc;
+  --primary: #ef4444;
+  --primary-foreground: #ffffff;
+  --secondary: #18181b;
+  --secondary-foreground: #f8fafc;
+  --muted: #18181b;
+  --muted-foreground: #94a3b8;
+  --accent: #27272a;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: #10b981;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #18181b;
+  --ring: #ef4444;
+  --shadow-tally: 0 0 14px rgba(239, 68, 68, 0.75);
 }
 
 @layer base {
@@ -77,12 +77,76 @@
   box-shadow: var(--shadow-tally);
   animation: tally 1.6s ease-in-out infinite;
 }
-@utility grid-lines {
+
+/* Framer 24px x 24px Grid Backdrop */
+@utility framer-grid-lines {
   background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 64px 64px;
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
+
+@utility framer-grid-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.framer-grid-mask {
+  mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, black 20%, transparent 80%);
+}
+
+/* Framer Bento Card Architecture */
+.framer-bento-card {
+  border-radius: 1.75rem;
+  background: rgba(14, 14, 18, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.framer-bento-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.95), 0 0 40px -10px rgba(239, 68, 68, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Framer Pill Buttons */
+.framer-pill-primary {
+  background: #ef4444;
+  color: #ffffff;
+  border-radius: 9999px;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.framer-pill-primary:hover {
+  background: #dc2626;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+.framer-pill-primary:active {
+  transform: scale(0.98);
+}
+
+.framer-pill-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.framer-pill-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.framer-pill-secondary:active {
+  transform: scale(0.98);
+}
+
 @keyframes tally { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 
 /* 3D Hero Perspective Showcase */
