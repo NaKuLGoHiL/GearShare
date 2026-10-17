@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import cameraRed from "@/assets/camera.jpg";
 import cameraArri from "@/assets/arri_camera.jpg";
 import cameraSony from "@/assets/sony_fx9.jpg";
@@ -313,6 +313,39 @@ function Index() {
   const [quickSpecsGear, setQuickSpecsGear] = useState<DetailedGear | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cinemaLook, setCinemaLook] = useState<CinemaLookMode>("kodak-500t");
+  const [catalogItems, setCatalogItems] = useState<CatalogItem[]>(GEAR_CATALOG);
+
+  // Synchronize dynamic catalog rates and stock telemetry with Supabase database
+  useEffect(() => {
+    let active = true;
+    fetch("/api/inventory")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active || !data?.ok || !Array.isArray(data.inventory) || data.inventory.length === 0) return;
+        setCatalogItems((prev) => {
+          return prev.map((item) => {
+            const firstWord = item.name.split(" ")[0] || "";
+            const match = data.inventory.find(
+              (dbItem: { name: string; rate: number; inStockCount?: number }) =>
+                dbItem.name.toLowerCase().includes(firstWord.toLowerCase()) ||
+                item.name.toLowerCase().includes((dbItem.name.split(" ")[0] ?? "").toLowerCase())
+            );
+            if (!match) return item;
+            return {
+              ...item,
+              rate: match.rate || item.rate,
+              inStockCount: match.inStockCount ?? item.inStockCount,
+            };
+          });
+        });
+      })
+      .catch((err) => {
+        console.warn("[catalog] Live inventory sync note:", err);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const activeDuration = DURATIONS[durationIdx] ?? DURATIONS[0];
 
@@ -325,17 +358,17 @@ function Index() {
   }, []);
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: GEAR_CATALOG.length };
+    const counts: Record<string, number> = { All: catalogItems.length };
     for (const c of CATS) {
       if (c !== "All") {
-        counts[c] = GEAR_CATALOG.filter((item) => item.category === c).length;
+        counts[c] = catalogItems.filter((item) => item.category === c).length;
       }
     }
     return counts;
-  }, []);
+  }, [catalogItems]);
 
   const filteredGear = useMemo(() => {
-    return GEAR_CATALOG.filter((item) => {
+    return catalogItems.filter((item) => {
       const matchCat = selectedCat === "All" || item.category === selectedCat;
       const matchMount =
         selectedMount === "All" ||
@@ -408,6 +441,13 @@ function Index() {
               className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/10 hover:text-foreground"
             >
               FAQ
+            </a>
+            <a
+              href="/track"
+              className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-primary/90 font-medium transition-all duration-200 hover:bg-white/10 hover:text-primary"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              <span>Track Dispatch</span>
             </a>
           </nav>
 
@@ -482,6 +522,17 @@ function Index() {
                 className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
               >
                 05 / Operational FAQ
+              </a>
+              <a
+                href="/track"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-lg px-3 py-2 text-primary font-medium hover:bg-secondary/60"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                  <span>06 / Track Stage Dispatch</span>
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">Live Telemetry</span>
               </a>
               <div className="pt-2">
                 <a

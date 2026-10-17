@@ -73,7 +73,9 @@ export const Route = createFileRoute("/api/inquiries")({
 
         // Format rates into notes for complete persistence audit trail
         const rateTag = `[Rate: ₹${d.daily_rate.toLocaleString("en-IN")}/day]`;
-        const compiledNotes = d.notes ? `${rateTag} ${d.notes}` : rateTag;
+        let compiledNotes = d.notes ? `${rateTag} ${d.notes}` : rateTag;
+        if (d.wica_card) compiledNotes += ` [WICA: ${d.wica_card}]`;
+        if (d.gstin) compiledNotes += ` [GSTIN: ${d.gstin}]`;
 
         const startDt = new Date(d.start_date + "T00:00:00");
         const endDt = new Date(d.end_date + "T00:00:00");
@@ -95,6 +97,7 @@ export const Route = createFileRoute("/api/inquiries")({
           stage_destination: "Film City Studio 5 / Mumbai Stage",
           metro_hub: "Mumbai",
           status: "hold_requested",
+          deposit_waiver_applied: Boolean(d.wica_card || d.gstin),
           notes: compiledNotes,
         });
 

@@ -10,12 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TrackRouteImport } from './routes/track'
 import { Route as ApiAvailabilityRouteImport } from './routes/api/availability'
+import { Route as ApiBookingsRouteImport } from './routes/api/bookings'
 import { Route as ApiInquiriesRouteImport } from './routes/api/inquiries'
+import { Route as ApiInventoryRouteImport } from './routes/api/inventory'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAvailabilityRoute = ApiAvailabilityRouteImport.update({
@@ -23,40 +31,81 @@ const ApiAvailabilityRoute = ApiAvailabilityRouteImport.update({
   path: '/api/availability',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBookingsRoute = ApiBookingsRouteImport.update({
+  id: '/api/bookings',
+  path: '/api/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiInquiriesRoute = ApiInquiriesRouteImport.update({
   id: '/api/inquiries',
   path: '/api/inquiries',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInventoryRoute = ApiInventoryRouteImport.update({
+  id: '/api/inventory',
+  path: '/api/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/track': typeof TrackRoute
   '/api/availability': typeof ApiAvailabilityRoute
+  '/api/bookings': typeof ApiBookingsRoute
   '/api/inquiries': typeof ApiInquiriesRoute
+  '/api/inventory': typeof ApiInventoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/track': typeof TrackRoute
   '/api/availability': typeof ApiAvailabilityRoute
+  '/api/bookings': typeof ApiBookingsRoute
   '/api/inquiries': typeof ApiInquiriesRoute
+  '/api/inventory': typeof ApiInventoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/track': typeof TrackRoute
   '/api/availability': typeof ApiAvailabilityRoute
+  '/api/bookings': typeof ApiBookingsRoute
   '/api/inquiries': typeof ApiInquiriesRoute
+  '/api/inventory': typeof ApiInventoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/availability' | '/api/inquiries'
+  fullPaths:
+    | '/'
+    | '/track'
+    | '/api/availability'
+    | '/api/bookings'
+    | '/api/inquiries'
+    | '/api/inventory'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/availability' | '/api/inquiries'
-  id: '__root__' | '/' | '/api/availability' | '/api/inquiries'
+  to:
+    | '/'
+    | '/track'
+    | '/api/availability'
+    | '/api/bookings'
+    | '/api/inquiries'
+    | '/api/inventory'
+  id:
+    | '__root__'
+    | '/'
+    | '/track'
+    | '/api/availability'
+    | '/api/bookings'
+    | '/api/inquiries'
+    | '/api/inventory'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TrackRoute: typeof TrackRoute
   ApiAvailabilityRoute: typeof ApiAvailabilityRoute
+  ApiBookingsRoute: typeof ApiBookingsRoute
   ApiInquiriesRoute: typeof ApiInquiriesRoute
+  ApiInventoryRoute: typeof ApiInventoryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +117,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/availability': {
       id: '/api/availability'
       path: '/api/availability'
       fullPath: '/api/availability'
       preLoaderRoute: typeof ApiAvailabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bookings': {
+      id: '/api/bookings'
+      path: '/api/bookings'
+      fullPath: '/api/bookings'
+      preLoaderRoute: typeof ApiBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/inquiries': {
@@ -82,13 +145,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInquiriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/inventory': {
+      id: '/api/inventory'
+      path: '/api/inventory'
+      fullPath: '/api/inventory'
+      preLoaderRoute: typeof ApiInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TrackRoute: TrackRoute,
   ApiAvailabilityRoute: ApiAvailabilityRoute,
+  ApiBookingsRoute: ApiBookingsRoute,
   ApiInquiriesRoute: ApiInquiriesRoute,
+  ApiInventoryRoute: ApiInventoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

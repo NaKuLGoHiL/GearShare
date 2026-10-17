@@ -30,6 +30,8 @@ export const rawInquirySchema = z
     end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please select a valid return date (YYYY-MM-DD)").optional(),
     returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please select a valid return date (YYYY-MM-DD)").optional(),
     notes: z.string().trim().max(1000, "Notes must not exceed 1000 characters").optional().default(""),
+    wica_card: z.string().trim().max(100).optional(),
+    gstin: z.string().trim().max(50).optional(),
   })
   .transform((val) => {
     const gearName = val.gear_name || val.gear || "";
@@ -57,6 +59,8 @@ export const rawInquirySchema = z
       end_date: endDate,
       returnDate: endDate,
       notes: val.notes ?? "",
+      wica_card: val.wica_card ?? "",
+      gstin: val.gstin ?? "",
     };
   })
   .refine((d) => Boolean(d.gear_name), {

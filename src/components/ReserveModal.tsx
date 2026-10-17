@@ -24,6 +24,8 @@ import {
   ChevronRight,
   RotateCcw,
   Lock,
+  Truck,
+  FileCheck2,
 } from "lucide-react";
 
 export type Gear = {
@@ -313,6 +315,8 @@ export function ReserveModal({
       end_date: returnDate,
       returnDate: returnDate,
       notes: String(fd.get("notes") ?? "").trim(),
+      wica_card: String(fd.get("wica_card") ?? "").trim(),
+      gstin: String(fd.get("gstin") ?? "").trim(),
     };
 
     // 1. Dual Client-side validation via Zod
@@ -527,14 +531,21 @@ export function ReserveModal({
                   </p>
                 </div>
 
-                <div className="flex justify-end pt-2">
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-95 active:scale-95 sm:w-auto sm:px-8 cursor-pointer"
+                    className="w-full sm:w-auto rounded-full border border-border/80 bg-white/5 px-6 py-3 font-mono text-xs text-muted-foreground transition hover:bg-white/10 hover:text-foreground cursor-pointer"
                   >
                     Close & Return to Catalog
                   </button>
+                  <a
+                    href={`/track?ref=${encodeURIComponent(confirmation.reference)}`}
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-95 hover:shadow-primary/40 active:scale-95 cursor-pointer"
+                  >
+                    <Truck className="h-4 w-4" />
+                    <span>Track Soundstage Dispatch →</span>
+                  </a>
                 </div>
               </div>
             ) : (
@@ -660,6 +671,43 @@ export function ReserveModal({
                         />
                       </div>
                       <FieldError field="customer_phone" />
+                    </div>
+                  </div>
+
+                  {/* WICA Union Card # & GSTIN for Instant Zero-Deposit Waiver */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block font-mono text-xs text-muted-foreground">
+                          WICA / SICA Union Card # (Optional)
+                        </label>
+                        <span className="font-mono text-[10px] text-emerald-400 font-medium">₹0 Deposit Waiver</span>
+                      </div>
+                      <div className="relative">
+                        <ShieldCheck className="pointer-events-none absolute left-3.5 top-3.5 h-4 w-4 text-emerald-400" />
+                        <input
+                          name="wica_card"
+                          placeholder="e.g. WICA-MUM-2024-884"
+                          className={inputBase}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block font-mono text-xs text-muted-foreground">
+                          Production GSTIN (Optional)
+                        </label>
+                        <span className="font-mono text-[10px] text-muted-foreground">Input Tax Credit</span>
+                      </div>
+                      <div className="relative">
+                        <FileCheck2 className="pointer-events-none absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
+                        <input
+                          name="gstin"
+                          placeholder="e.g. 27AABCG1234F1Z5"
+                          className={inputBase}
+                        />
+                      </div>
                     </div>
                   </div>
 
