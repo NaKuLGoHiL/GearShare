@@ -15,89 +15,96 @@
 
 ---
 
+---
+
 ## Architectural Overview
 
-GearShare is designed with an **ultra-dark matte carbon aesthetic** (`#000000`, `#0a0a0c`, `#121214`) punctuated by **anodized cinema-red accents** (`#ef4444` / `#e11d48`) and high-contrast monospaced technical telemetry (`JetBrains Mono`).
+GearShare is designed with an **ultra-dark pitch-black void aesthetic** (`#050505` to `#070709`) punctuated by **anodized cinema-red accents** (`#ef4444` / `#e11d48`) and high-contrast monospaced technical telemetry (`JetBrains Mono`).
 
 ```
-                              ┌─────────────────────────────────────────────────────────┐
-                              │                 Client Browser Layer                    │
-                              │  - 3D Inertial Flagship Bench (RED / ARRI Switcher)      │
-                              │  - Dynamic Duration Pricing Toggle (1D / 3D / 7D)        │
-                              │  - Real-Time Search & Category Filters                  │
-                              │  - ReserveModal with Dual-Validation & Telemetry        │
-                              └────────────────────────────┬────────────────────────────┘
-                                                           │
-                                             HTTP JSON     ▼
-                              ┌─────────────────────────────────────────────────────────┐
-                              │             TanStack Start / Nitro SSR Layer            │
-                              │  - Server Route: POST /api/inquiries                    │
-                              │  - Dual Zod Schema Validation (Phone, Email, Dates)     │
-                              │  - Reference Code Generator (GS-XXXXXXXX)               │
-                              │  - Safe Environment Access (Service Role / Publishable) │
-                              └────────────────────────────┬────────────────────────────┘
-                                                           │
-                                        PostgREST HTTPS    ▼
-                              ┌─────────────────────────────────────────────────────────┐
-                              │                 Supabase PostgreSQL 15                  │
-                              │  - Table: public.rental_inquiries                       │
-                              │  - Row-Level Security (RLS) Policy                      │
-                              │  - Public Privacy: Non-selectable anonymized hold log   │
-                              └─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 Client Browser Layer                                        │
+│  - Apple-Style Scroll-Linked Exploded Cinema Camera HTML5 Canvas (~350vh Pinned Engine)    │
+│  - 4 Synchronized Storytelling Beats (Hero Body -> Sensor Block -> Optical Flange -> Wrap) │
+│  - 3D Optical LUT Benchmark & Perspective Tilt Rig                                         │
+│  - Dynamic Duration Pricing Toggle [1 Day | 3 Days (-10%) | 7 Days (-25%)]                 │
+│  - ReserveModal with Seat-Matrix Stage Calendar, Zod Validation, and Supabase Persistence   │
+└──────────────────────────────────────────────┬──────────────────────────────────────────────┘
+                                               │ HTTP JSON
+                                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              TanStack Start / Nitro SSR Layer                               │
+│  - Server Route: POST /api/inquiries                                                        │
+│  - Dual Zod Schema Validation (Customer Name, Email, Phone, Start Date, End Date, Notes)   │
+│  - Unique Reference Generator (GS-MUM-XXXXXX)                                               │
+│  - Direct Insert into public.rental_inquiries & public.rental_bookings                      │
+└──────────────────────────────────────────────┬──────────────────────────────────────────────┘
+                                               │ PostgREST HTTPS
+                                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   Supabase PostgreSQL 15                                    │
+│  - Table: public.rental_inquiries (gear_name, category, start_date, end_date, etc.)          │
+│  - Row-Level Security (RLS) Policy for public pending holds                                 │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Tech Stack & Design System
-- **Design System**: Framer-inspired architecture (Deep matte obsidian `#08080a`, 24px x 24px geometric grid with radial mask, rounded-3xl bento cards, anodized-red `#ef4444` highlights)
-- **Framework**: React 19 + TanStack Start (Nitro SSR Engine) + TanStack Router
-- **Styling**: Tailwind CSS v4 with custom OKLCH matte carbon palette, hardware rim lighting, and glassmorphism
-- **Data Persistence**: Supabase (PostgreSQL 15 + PostgREST with strict Row Level Security)
-- **Validation**: Zod schema with dual-casing support (`camelCase` & `snake_case`)
-- **Icons & Motion**: Lucide React + GPU-accelerated CSS 3D Matrix & requestAnimationFrame inertial damping
-- **Testing**: Vitest + Testing Library
+- **Core Engine**: Apple-Style Scroll-Linked HTML5 Canvas Scrollytelling (~350vh sticky viewport, 60fps image-sequence scrubbing, and procedural exploded cinema rig fallback)
+- **Framework**: React 19 + TanStack Start (Nitro SSR Engine) + TanStack Router (100% TypeScript)
+- **Styling**: Tailwind CSS v4 with pitch-black void palette (`#050505`), translucent charcoal surfaces (`#0d0d11`), graphite borders, and anodized cinema-red accents (strictly no gold/yellow)
+- **Database & Persistence**: Supabase PostgreSQL 15 + PostgREST with Row Level Security (RLS)
+- **Validation**: Zod schema with client and server enforcement (`end_date >= start_date`, E.164 phone, RFC email)
+- **Icons & Motion**: Lucide React + requestAnimationFrame inertial lerp + CSS 3D perspectives
 
 ---
 
-## 7 Framer-Style Sections
+## 7 Core Landing Page Sections
 
-1. **Floating Pill Header**:
-   - Signature centered floating pill navbar with glassmorphism (`backdrop-blur-xl bg-zinc-950/70 border border-zinc-800/80 rounded-full`).
-   - Brand mark with glowing red tally dot: `● GEARSHARE`.
-   - Links: Catalog, Bento Features, Workflow, Damage Shield, FAQ, and Track Dispatch.
-   - CTA button: Anodized-red rounded pill button "Rent Equipment".
+1. **Fixed Apple-Style Navbar**:
+   - Slim translucent glassmorphic bar (`backdrop-blur-xl bg-[#050505]/75 border-b border-zinc-800/50`).
+   - Brand mark: `● GEARSHARE` with pulsing red tally light.
+   - Navigation links: `Overview`, `Hardware`, `Scrollytech`, `Pricing`, `FAQ`, and `Track Dispatch`.
+   - Call-to-action button: Anodized-red rounded pill `Rent Kit`.
 
-2. **Framer-Style Hero Section**:
-   - Floating micro-badge: `V2.6 CINEMA FLEET • DISPATCHING READY`.
-   - Giant centered title: `The Hardware Behind Cinema-Grade Frames.` (gradient text white to slate-400, tight tracking `-0.04em`).
-   - Subtitle: `Reserve bench-calibrated cinema bodies, anamorphic primes, and lighting rigs with zero-friction checkout and full production insurance.`
-   - Dual CTAs: Red pill "Explore Inventory" + Secondary glass pill "View Damage Shield".
-   - Centered Interactive 3D/Tilt Visual: Cinema camera rig resting on a subtle reflective plane that tilts smoothly with cursor movement (CSS 3D perspective / transform) with reflection fade beneath.
-   - Interactive 3-way LUT switch: `Kodak 500T`, `Anamorphic Cyan`, `Silver Noir` embedded cleanly as an optical simulation preview pill bar.
+2. **Scroll-Linked Hero Canvas Engine (Apple Scrollytelling)**:
+   - Sticky full-screen HTML5 `<canvas>` inside a `~350vh` container.
+   - Preloaded image sequence scrubbing (`/frames/frame_[index].jpg` up to 120 frames) with procedural exploded cinema assembly fallback (chassis, heatsink, Exmor R sensor block, titanium mount, floating chromatic glass elements, front housing, laser telemetry).
+   - **4 Synchronized Storytelling Beats**:
+     - *0% - 20% (Hero Shot)*: Assembled cinema camera body. Headline: `"GearShare • Precision Optics. Uncompromised Sensor Power."` Subcopy: `"The cinema hardware behind award-winning frames. Calibrated, cased, and dispatched to your set."`
+     - *20% - 50% (Internal Breakdown)*: Camera body smoothly disassembles into exploded components. Headline: `"Exmor R Full-Frame Sensor Block. 16-Bit RAW Output."`
+     - *50% - 80% (Optical Rig & Flange)*: Exploded PL/E-mount glass and anamorphic paths. Headline: `"Bench-Calibrated Flange & Optic Tolerances."`
+     - *80% - 100% (Reassembly & Transition)*: Components snap back into the sealed magnesium body. CTA: `"Ready for Wrap Time. Rent the Fleet Below."`
 
-3. **Framer-Style Bento Grid Catalog (Interactive Core)**:
-   - Header with micro-badge: `INSTANT INVENTORY ACCESS`.
-   - Title: `Precision Cinema Fleet Ready for Set Call.`
-   - Filter bar: `[All, Cinema Bodies, Anamorphic & Primes, Lighting, Audio]` with count badges.
-   - Duration switch: `[1 Day | 3 Days (-10%) | 7 Days (-25%)]` that recalibrates pricing numbers in real-time in Indian Rupees (`₹`).
-   - Search bar + Lens mount filter (`All`, `PL Mount`, `LPL`, `RF`, `E Mount`).
-   - Equipment Cards with Framer aesthetics: high-res hardware photos, technical spec tags, daily rate badge, instant "Reserve" trigger button, and "Quick Specs" modal.
+3. **Interactive Equipment Catalog**:
+   - Filter pills: `All`, `Cinema Bodies`, `Anamorphic & Primes`, `Lighting & Grip`, `Audio`.
+   - Segmented Duration Switcher: `[1 Day | 3 Days (-10%) | 7 Days (-25%)]` that dynamically recalibrates rates across all cards in real time in Indian Rupees (`₹`).
+   - Flagship gear cards:
+     - **Sony FX3 Full-Frame Cinema** (4K 120p, 16-bit RAW HDMI, active cooling)
+     - **Canon R5 C Cinema Line** (8K 60p RAW, RF Mount, Dual Pixel CMOS AF II)
+     - **ARRI Alexa Mini LF Mock** (Large Format 4.5K ALEV III, LPL/PL Mount)
+     - **Sony FE 24-70mm f/2.8 GM II** (Constant f/2.8, XD Linear Motors, de-clicked iris)
+     - **Aputure Light Storm 300d II Kit** (5500K Daylight, Bowens Mount, 55,000 lux)
+     - Along with RED V-Raptor 8K VV, Zeiss Master Prime, Cooke S4/i, Astera Titan Tubes, and Sound Devices 833.
+   - Interactive "Specs" modal and instant "Reserve" trigger button.
 
-4. **4-Block Framer Bento Advantage Grid**:
-   - **Block 1 (Large 2-col)**: "Optics Bench-Calibrated" with interactive lens flange focal distance diagram (collimation scale, ±0.010mm tolerance indicator, micrometer laser bench graphic).
-   - **Block 2 (1-col)**: "Zero-Deposit Damage Shield" (100% in-transit and on-set accidental coverage, WICA & GSTIN instant waiver).
-   - **Block 3 (1-col)**: "3-Hour Metro Set Dispatch" (Flight-ready Pelican cases delivered directly to Mumbai studio sets with live tracking link).
-   - **Block 4 (2-col)**: "Production-Ready Power Packs" (Pre-charged quad 150Wh V-mount batteries, dual fast-chargers, 15mm carbon rods, and Arri bridgeplates included standard).
+4. **4-Block Bento Hardware Specs**:
+   - **Block 1**: `"Sub-Micron Sensor Bench Testing"` with interactive digital collimator (ARRI PL, ARRI LPL, Sony E, Canon RF presets, ±0.010mm tolerance pass gauge).
+   - **Block 2**: `"Production Damage Shield (Zero Deposit for verified DPs)"` (100% in-transit and on-set accidental coverage, WICA & GSTIN instant waiver).
+   - **Block 3**: `"3-Hour Studio Set Dispatch Across Mumbai"` (Pelican Air hardcases dispatched directly to Film City, Mehboob, Yash Raj, and national studios).
+   - **Block 4**: `"Pre-Charged V-Mount Batteries & Flight Pelican Cases"` (Pre-charged quad 150Wh V-mount cells, dual fast-chargers, 15mm carbon rods).
 
-5. **Interactive Workflow Timeline**:
-   - 3-step minimalist Framer step card layout:
-     - `01 / Select Hardware & Shoot Window`
-     - `02 / 15-Min Fast ID & GSTIN Check` (< 15 min clearance, ₹0 deposit waiver)
-     - `03 / Flight-Case Direct Studio Delivery` (charged to 100%, collimation sheet signed, delivered < 3 hours to sets)
+5. **Rental Pipeline Workflow**:
+   - 3-step timeline:
+     - `01 / Select Hardware`
+     - `02 / 15-min ID Check`
+     - `03 / Studio Delivery`
 
-6. **Framer Collapsible FAQ Accordion**:
-   - Clean, rounded graphite containers with smooth expand/collapse transitions covering insurance, emergency gear hot-swaps, deposit policies, lens mount shims, wrap day returns.
+6. **Operational FAQ Accordion**:
+   - Clean expandable dark cards covering deposit policies, accidental damage waivers, extensions, emergency hot-swaps mid-shoot, and soundstage return protocols.
 
-7. **Technical Framer-Style Footer**:
-   - Dark grid footer with sitemap links, status indicator `All Rental Hubs Operational` (glowing emerald dot), and attribution: `Prototype Engineered for ZooTechX Cinema R&D • GearShare Platform`.
+7. **Technical Footer**:
+   - Complete platform sitemap, operational cinema depot hubs (Film City, Andheri, Bandra, Hyderabad, Delhi NCR, Bengaluru), legal disclaimers, and required prototype credit:
+     `"ZootechX Technical Assessment Prototype • Topic 02: GearShare"`.
 
 ---
 
@@ -238,6 +245,19 @@ npm run preview
 
 ---
 
+## Mandatory AI Reference Disclosures
+
+In accordance with transparent engineering disclosure requirements for the ZootechX Technical Assessment:
+1. **AI Pair Programming & Architecture Assistance**:
+   - Claude 3.7 Sonnet / Google DeepMind Antigravity was utilized for scaffolding TypeScript type definitions, optimizing HTML5 2D canvas procedural exploded rendering loops, refactoring Tailwind CSS v4 design tokens, and generating Vitest test suites.
+2. **Asset Generation**:
+   - High-resolution studio product renders of cinema bodies and equipment (`Sony FX3`, `Canon R5 C`, `Sony 24-70mm GM II`, `Aputure 300d II`) were generated using AI generative imaging models under strict technical dark mode art direction (`#050505` pitch-black background, 2.39:1 cinema framing, studio rim lighting).
+3. **Engineering Integrity**:
+   - All client and server code, Zod validation schemas, Supabase PostgreSQL RLS policies, and TanStack Start Nitro endpoints were reviewed, tested, and validated with zero runtime or compilation errors.
+
+---
+
 ## License
 
-Built for technical demonstration and assessment. All cinema camera brands (RED, ARRI, Sony, Cooke, Zeiss) are trademarks of their respective owners.
+Built for technical demonstration and assessment (ZootechX Technical Assessment Prototype • Topic 02: GearShare). All cinema camera brands (Sony, Canon, ARRI, RED, Cooke, Zeiss, Aputure, Sound Devices) are trademarks of their respective owners.
+

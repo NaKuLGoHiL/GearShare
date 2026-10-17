@@ -37,26 +37,26 @@
 
 :root {
   --radius: 0.75rem;
-  --background: #08080a;
-  --carbon: #0e0e12;
+  --background: #050505;
+  --carbon: #0d0d11;
   --foreground: #f8fafc;
-  --card: rgba(14, 14, 18, 0.7);
+  --card: rgba(13, 13, 17, 0.75);
   --card-foreground: #f8fafc;
-  --popover: #0e0e12;
+  --popover: #0d0d11;
   --popover-foreground: #f8fafc;
   --primary: #ef4444;
   --primary-foreground: #ffffff;
-  --secondary: #18181b;
+  --secondary: #121216;
   --secondary-foreground: #f8fafc;
-  --muted: #18181b;
+  --muted: #121216;
   --muted-foreground: #94a3b8;
-  --accent: #27272a;
+  --accent: #1f1f24;
   --accent-foreground: #f8fafc;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --success: #10b981;
   --border: rgba(255, 255, 255, 0.08);
-  --input: #18181b;
+  --input: #121216;
   --ring: #ef4444;
   --shadow-tally: 0 0 14px rgba(239, 68, 68, 0.75);
 }

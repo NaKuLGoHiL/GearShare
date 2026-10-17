@@ -1,0 +1,899 @@
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ShieldCheck, Zap, Aperture, ChevronDown } from "lucide-react";
+
+interface ScrollyBeat {
+  id: string;
+  startProgress: number;
+  endProgress: number;
+}
+
+export function AppleScrollyCanvas({
+  onRentClick,
+}: {
+  onRentClick?: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Preloaded image frames buffer
+  const framesRef = useRef<HTMLImageElement[]>([]);
+  const hasLocalFramesRef = useRef(false);
+
+  // Track inertial lerp progress for silky smooth 60fps scrubbing
+  const currentProgressRef = useRef(0);
+  const targetProgressRef = useRef(0);
+  const mouseLerpRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const animFrameIdRef = useRef(0);
+
+  // Attempt to preload local frame sequence up to 120 frames
+  useEffect(() => {
+    let isCancelled = false;
+    const TOTAL_FRAMES = 120;
+    const loadedImages: HTMLImageElement[] = [];
+    let loadedCount = 0;
+
+    const testImg = new Image();
+    testImg.src = "/frames/frame_001.jpg";
+    testImg.onload = () => {
+      if (isCancelled) return;
+      hasLocalFramesRef.current = true;
+      for (let i = 1; i <= TOTAL_FRAMES; i++) {
+        const img = new Image();
+        const padIndex = String(i).padStart(3, "0");
+        img.src = `/frames/frame_${padIndex}.jpg`;
+        img.onload = () => {
+          loadedCount++;
+          if (loadedCount >= 10 && !isCancelled) {
+            setImagesLoaded(true);
+          }
+        };
+        loadedImages.push(img);
+      }
+      framesRef.current = loadedImages;
+    };
+    testImg.onerror = () => {
+      // Local frames folder not populated - fallback to high-detail procedural exploded view
+      hasLocalFramesRef.current = false;
+      setImagesLoaded(true);
+    };
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  // Window scroll listener to calculate normalized [0, 1] scrollytelling progress
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      if (totalScrollable <= 0) return;
+
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
+      targetProgressRef.current = progress;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Mouse tilt tracking
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseLerpRef.current.tx = x;
+    mouseLerpRef.current.ty = y;
+    setMousePos({ x, y });
+  }, []);
+
+  // Main Canvas Render Loop (Scrubbing + High-Detail Exploded Cinema Assembly Fallback)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let time = 0;
+
+    const render = () => {
+      time += 0.015;
+
+      // Lerp progress for ultra-buttery Apple momentum
+      currentProgressRef.current +=
+        (targetProgressRef.current - currentProgressRef.current) * 0.12;
+      mouseLerpRef.current.x +=
+        (mouseLerpRef.current.tx - mouseLerpRef.current.x) * 0.08;
+      mouseLerpRef.current.y +=
+        (mouseLerpRef.current.ty - mouseLerpRef.current.y) * 0.08;
+
+      const p = currentProgressRef.current;
+      const mx = mouseLerpRef.current.x;
+      const my = mouseLerpRef.current.y;
+
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      // Pitch black void (#050505) seamlessly matching background
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, width, height);
+
+      // Check if image frame sequence is available
+      const frames = framesRef.current;
+      if (hasLocalFramesRef.current && frames.length > 0) {
+        const frameIdx = Math.min(
+          frames.length - 1,
+          Math.floor(p * (frames.length - 1))
+        );
+        const img = frames[frameIdx];
+        if (img && img.complete && img.naturalWidth > 0) {
+          // Draw letterboxed / covered frame
+          const imgAspect = img.naturalWidth / img.naturalHeight;
+          const canvasAspect = width / height;
+          let drawW = width;
+          let drawH = height;
+          let drawX = 0;
+          let drawY = 0;
+
+          if (canvasAspect > imgAspect) {
+            drawH = width / imgAspect;
+            drawY = (height - drawH) / 2;
+          } else {
+            drawW = height * imgAspect;
+            drawX = (width - drawW) / 2;
+          }
+
+          // Subtle cursor tilt transform on the image
+          ctx.save();
+          ctx.translate(width / 2, height / 2);
+          ctx.rotate(mx * 0.03);
+          ctx.translate(-width / 2, -height / 2);
+          ctx.drawImage(img, drawX, drawY, drawW, drawH);
+          ctx.restore();
+        }
+      } else {
+        // PROCEDURAL EXPLODED CINEMA CAMERA ENGINE (Sony FX3 / RED Cinema Body Architecture)
+        renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
+      }
+
+      ctx.restore();
+      animFrameIdRef.current = requestAnimationFrame(render);
+    };
+
+    animFrameIdRef.current = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animFrameIdRef.current);
+  }, []);
+
+  return (
+    <div
+      id="scrollytech"
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-[350vh] bg-[#050505] select-none"
+    >
+      {/* Sticky Fullscreen Canvas Viewport */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ width: "100%", height: "100%" }}
+        />
+
+        {/* 24px Background Grid Overlay that blends into canvas */}
+        <div className="pointer-events-none absolute inset-0 framer-grid-lines framer-grid-mask opacity-60" />
+
+        {/* Cinematic Viewfinder Framing Brackets */}
+        <div className="pointer-events-none absolute inset-8 sm:inset-16 flex flex-col justify-between z-20 opacity-40">
+          <div className="flex justify-between items-start">
+            <span className="font-mono text-[10px] text-zinc-500 tracking-widest uppercase flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              <span>RAW REC • 4K 120P</span>
+            </span>
+            <span className="font-mono text-[10px] text-zinc-500 tracking-wider">
+              2.39:1 VIEWPORT
+            </span>
+          </div>
+          <div className="flex justify-between items-end font-mono text-[10px] text-zinc-600">
+            <span>SCROLL PROGRESS: {Math.round(scrollProgress * 100)}%</span>
+            <span>SHUTTER 1/48 • DUAL ISO 800/12800</span>
+          </div>
+        </div>
+
+        {/* SYNCHRONIZED SCROLL STORYTELLING BEATS */}
+
+        {/* BEAT 1 (0% - 20%): Fully Assembled Hero Shot */}
+        <div
+          className={`absolute inset-x-6 top-1/2 -translate-y-1/2 max-w-3xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress < 0.22
+              ? "opacity-100 translate-y-[-50%] scale-100"
+              : "opacity-0 translate-y-[-70%] scale-95"
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 backdrop-blur-md mb-6 shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+            <span>GEARSHARE CINEMA ARCHITECTURE</span>
+          </div>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-[-0.04em] text-white leading-[1.04]">
+            Precision Optics.
+            <br />
+            <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
+              Uncompromised Sensor Power.
+            </span>
+          </h1>
+          <p className="mt-5 text-base sm:text-lg text-slate-400 max-w-xl mx-auto font-normal leading-relaxed">
+            The cinema hardware behind award-winning frames. Calibrated, cased, and dispatched directly to your set.
+          </p>
+
+          <div className="mt-8 flex items-center justify-center gap-2 font-mono text-xs text-zinc-500 animate-bounce">
+            <ChevronDown className="h-4 w-4 text-red-500" />
+            <span>Scroll to disassemble camera architecture</span>
+          </div>
+        </div>
+
+        {/* BEAT 2 (20% - 50%): Internal Breakdown & Full-Frame Sensor Block */}
+        <div
+          className={`absolute left-6 sm:left-16 md:left-24 top-1/2 -translate-y-1/2 max-w-lg z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress >= 0.22 && scrollProgress < 0.52
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-12"
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-400 mb-4">
+            <span>01 / INTERNAL BREAKDOWN</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.03em] text-white leading-tight">
+            Exmor R Full-Frame Sensor Block. 16-Bit RAW Output.
+          </h2>
+          <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed">
+            Back-illuminated 35mm full-frame CMOS sensor with 15+ stops of dynamic latitude. Active copper vapor chamber heatsink and silent turbine fan deliver continuous recording with zero thermal throttling.
+          </p>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 font-mono text-xs">
+            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 backdrop-blur-md">
+              <span className="text-[10px] text-zinc-500 block">SENSOR SIZE</span>
+              <span className="text-white font-bold">35.7 × 23.8 mm</span>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 backdrop-blur-md">
+              <span className="text-[10px] text-zinc-500 block">BASE DUAL ISO</span>
+              <span className="text-red-400 font-bold">800 / 12,800</span>
+            </div>
+          </div>
+        </div>
+
+        {/* BEAT 3 (50% - 80%): Optical Rig & Flange Tolerances */}
+        <div
+          className={`absolute right-6 sm:right-16 md:right-24 top-1/2 -translate-y-1/2 max-w-lg text-right z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress >= 0.52 && scrollProgress < 0.82
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 translate-x-12"
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 mb-4 ml-auto">
+            <span>02 / OPTICAL GLASS & FLANGE</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.03em] text-white leading-tight">
+            Bench-Calibrated Flange & Optic Tolerances.
+          </h2>
+          <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed">
+            Laser autocollimation holds Flange Focal Distance (FFD) within ±0.010mm. Floating chromatic glass element groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
+          </p>
+
+          <div className="mt-6 flex justify-end gap-3 font-mono text-xs">
+            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 text-left backdrop-blur-md">
+              <span className="text-[10px] text-zinc-500 block">FFD TOLERANCE</span>
+              <span className="text-emerald-400 font-bold">±0.010 mm Pass</span>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 text-left backdrop-blur-md">
+              <span className="text-[10px] text-zinc-500 block">IRIS MECHANISM</span>
+              <span className="text-white font-bold">11-Blade Circular</span>
+            </div>
+          </div>
+        </div>
+
+        {/* BEAT 4 (80% - 100%): Reassembly & Fleet CTA */}
+        <div
+          className={`absolute inset-x-6 top-1/2 -translate-y-1/2 max-w-2xl mx-auto text-center z-30 transition-all duration-700 ${
+            scrollProgress >= 0.82
+              ? "opacity-100 translate-y-[-50%] scale-100"
+              : "opacity-0 translate-y-[-30%] scale-95 pointer-events-none"
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-6">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>REASSEMBLED • FLIGHT-CASE SEALED</span>
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-black tracking-[-0.04em] text-white leading-tight">
+            Ready for Wrap Time.
+            <br />
+            <span className="text-red-500">Rent the Fleet Below.</span>
+          </h2>
+          <p className="mt-4 text-base text-slate-400 max-w-lg mx-auto leading-relaxed">
+            Magnesium alloy body sealed, batteries charged to 100%, and dispatched directly to your Mumbai soundstage in under 3 hours.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#catalog"
+              className="framer-pill-primary inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.4)]"
+            >
+              <span>Explore Fleet Catalog</span>
+              <span className="font-mono text-xs">→</span>
+            </a>
+            <a
+              href="#damage-shield"
+              className="framer-pill-secondary inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium cursor-pointer"
+            >
+              <ShieldCheck className="h-4 w-4 text-red-400" />
+              <span>₹0 Deposit Waiver</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Procedural Apple/Sony-Grade Exploded Cinema Rig Renderer
+ * Draws high-precision camera components that smoothly explode and reassemble with parallax.
+ */
+function renderExplodedCinemaRig(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  progress: number,
+  mx: number,
+  my: number,
+  time: number
+) {
+  const cx = width / 2;
+  const cy = height / 2;
+  const baseScale = Math.min(width / 1100, height / 750);
+
+  // Parallax translation
+  const px = mx * 35;
+  const py = my * 25;
+
+  ctx.save();
+  ctx.translate(cx + px, cy + py);
+  ctx.scale(baseScale, baseScale);
+
+  // Sub-progress explosion curve:
+  // 0.0 -> 0.2: fully assembled
+  // 0.2 -> 0.5: expanding out
+  // 0.5 -> 0.8: peak explosion & optical breakdown
+  // 0.8 -> 1.0: converging and snapping back together
+  let explode = 0;
+  if (progress <= 0.2) {
+    explode = (progress / 0.2) * 0.15;
+  } else if (progress <= 0.5) {
+    explode = 0.15 + ((progress - 0.2) / 0.3) * 0.85;
+  } else if (progress <= 0.8) {
+    explode = 1.0;
+  } else {
+    explode = 1.0 - ((progress - 0.8) / 0.2);
+  }
+
+  // Smooth easing on explosion distance
+  const easeExplode = Math.sin((explode * Math.PI) / 2);
+
+  // Optical laser grid lines & depth indicators
+  drawLaserTelemetry(ctx, easeExplode, time);
+
+  // LAYER 1: REAR MAGNESIUM INTERFACE & COOLING TURBINE (-Z, moves left/back)
+  const rearShift = -160 * easeExplode;
+  ctx.save();
+  ctx.translate(rearShift - 60 * easeExplode, 0);
+  drawRearCoolingChassis(ctx, easeExplode, time);
+  ctx.restore();
+
+  // LAYER 2: COPPER VAPOR CHAMBER & HEATSINK FINS
+  const heatShift = -80 * easeExplode;
+  ctx.save();
+  ctx.translate(heatShift, 0);
+  drawCopperVaporChamber(ctx, easeExplode);
+  ctx.restore();
+
+  // LAYER 3: CORE SENSOR DIE & IRIDESCENT BAYER ARRAY (Center focal point)
+  ctx.save();
+  drawFullFrameSensor(ctx, easeExplode, time);
+  ctx.restore();
+
+  // LAYER 4: TITANIUM LOCKING MOUNT RING (+Z, moves right)
+  const mountShift = 100 * easeExplode;
+  ctx.save();
+  ctx.translate(mountShift, 0);
+  drawTitaniumMount(ctx, easeExplode);
+  ctx.restore();
+
+  // LAYER 5: EXPLODED CHROMATIC OPTICAL GLASS STACK (+Z, moves further right)
+  const lensShift = 220 * easeExplode;
+  ctx.save();
+  ctx.translate(lensShift, 0);
+  drawExplodedOptics(ctx, easeExplode, time);
+  ctx.restore();
+
+  // LAYER 6: FRONT MAGNESIUM BARREL HOUSING & TOP HANDLE
+  const frontShift = 340 * easeExplode;
+  ctx.save();
+  ctx.translate(frontShift, -15 * easeExplode);
+  drawFrontHousing(ctx, easeExplode);
+  ctx.restore();
+
+  // Draw technical leader lines & labels when exploded
+  if (easeExplode > 0.35) {
+    drawExplodedCallouts(ctx, easeExplode);
+  }
+
+  ctx.restore();
+}
+
+/**
+ * Laser Telemetry Reticles & Cleanroom Grid
+ */
+function drawLaserTelemetry(
+  ctx: CanvasRenderingContext2D,
+  explode: number,
+  time: number
+) {
+  ctx.save();
+  ctx.strokeStyle = "rgba(239, 68, 68, 0.15)";
+  ctx.lineWidth = 1;
+
+  // Horizontal datum center axis
+  ctx.setLineDash([4, 8]);
+  ctx.beginPath();
+  ctx.moveTo(-500, 0);
+  ctx.lineTo(500, 0);
+  ctx.stroke();
+
+  // Center optical crosshair
+  ctx.beginPath();
+  ctx.arc(0, 0, 160 + explode * 60, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.strokeStyle = "rgba(239, 68, 68, 0.4)";
+  ctx.beginPath();
+  ctx.moveTo(-20, 0);
+  ctx.lineTo(20, 0);
+  ctx.moveTo(0, -20);
+  ctx.lineTo(0, 20);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Rear Magnesium Chassis with Turbine Heat Sinks
+ */
+function drawRearCoolingChassis(
+  ctx: CanvasRenderingContext2D,
+  explode: number,
+  time: number
+) {
+  ctx.save();
+
+  // Main chassis block
+  const w = 180;
+  const h = 210;
+  const x = -w / 2;
+  const y = -h / 2;
+
+  // Metallic gradient
+  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+  grad.addColorStop(0, "#1f2026");
+  grad.addColorStop(0.5, "#14151a");
+  grad.addColorStop(1, "#0a0a0d");
+
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.lineWidth = 2;
+  roundRect(ctx, x, y, w, h, 18);
+  ctx.fill();
+  ctx.stroke();
+
+  // Cooling vent grill slats
+  ctx.fillStyle = "#070709";
+  for (let i = 0; i < 7; i++) {
+    const vy = y + 25 + i * 22;
+    roundRect(ctx, x + 20, vy, w - 40, 12, 4);
+    ctx.fill();
+  }
+
+  // Active micro-turbine fan
+  ctx.save();
+  ctx.translate(x + w / 2, y + 100);
+  ctx.rotate(time * 3);
+  ctx.strokeStyle = "rgba(239, 68, 68, 0.35)";
+  ctx.lineWidth = 2;
+  for (let b = 0; b < 6; b++) {
+    ctx.rotate(Math.PI / 3);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(35, 5);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.restore();
+}
+
+/**
+ * Copper Vapor Chamber Heat Pipe
+ */
+function drawCopperVaporChamber(
+  ctx: CanvasRenderingContext2D,
+  explode: number
+) {
+  ctx.save();
+  const w = 150;
+  const h = 180;
+  const x = -w / 2;
+  const y = -h / 2;
+
+  // Pure copper metallic sheen
+  const copGrad = ctx.createLinearGradient(x, y, x + w, y);
+  copGrad.addColorStop(0, "#b85d34");
+  copGrad.addColorStop(0.4, "#e08456");
+  copGrad.addColorStop(1, "#8a3a18");
+
+  ctx.fillStyle = copGrad;
+  ctx.strokeStyle = "rgba(255, 180, 140, 0.3)";
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, x, y, w, h, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  // Heat pipe channels
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x + 30, y + 20);
+  ctx.lineTo(x + 30, y + h - 20);
+  ctx.moveTo(x + 75, y + 20);
+  ctx.lineTo(x + 75, y + h - 20);
+  ctx.moveTo(x + 120, y + 20);
+  ctx.lineTo(x + 120, y + h - 20);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * 35mm Full-Frame BSI Sensor with Iridescent Silicon Shimmer
+ */
+function drawFullFrameSensor(
+  ctx: CanvasRenderingContext2D,
+  explode: number,
+  time: number
+) {
+  ctx.save();
+
+  // Gold bond wire surround
+  const carrierW = 160;
+  const carrierH = 130;
+  ctx.fillStyle = "#16171b";
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.4)";
+  ctx.lineWidth = 2;
+  roundRect(ctx, -carrierW / 2, -carrierH / 2, carrierW, carrierH, 8);
+  ctx.fill();
+  ctx.stroke();
+
+  // 35.7 x 23.8 mm active Silicon Pixel Array
+  const sensorW = 120;
+  const sensorH = 80;
+  const sx = -sensorW / 2;
+  const sy = -sensorH / 2;
+
+  // Iridescent AR coating gradient (Cyan / Green / Purple cinema silicon)
+  const sGrad = ctx.createLinearGradient(
+    sx + Math.sin(time) * 30,
+    sy,
+    sx + sensorW,
+    sy + sensorH
+  );
+  sGrad.addColorStop(0, "#082f49"); // deep navy
+  sGrad.addColorStop(0.3, "#047857"); // emerald flare
+  sGrad.addColorStop(0.7, "#4338ca"); // royal indigo
+  sGrad.addColorStop(1, "#701a75"); // magenta shimmer
+
+  ctx.fillStyle = sGrad;
+  roundRect(ctx, sx, sy, sensorW, sensorH, 4);
+  ctx.fill();
+
+  // Micro-pixel grid texture
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+  ctx.lineWidth = 0.5;
+  for (let x = sx + 8; x < sx + sensorW; x += 10) {
+    ctx.beginPath();
+    ctx.moveTo(x, sy);
+    ctx.lineTo(x, sy + sensorH);
+    ctx.stroke();
+  }
+  for (let y = sy + 8; y < sy + sensorH; y += 10) {
+    ctx.beginPath();
+    ctx.moveTo(sx, y);
+    ctx.lineTo(sx + sensorW, y);
+    ctx.stroke();
+  }
+
+  // Active Tally Indicator on sensor corner
+  ctx.fillStyle = "#ef4444";
+  ctx.beginPath();
+  ctx.arc(sx + 10, sy + 10, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/**
+ * Titanium Locking Lens Mount Ring
+ */
+function drawTitaniumMount(ctx: CanvasRenderingContext2D, explode: number) {
+  ctx.save();
+  const radius = 95;
+
+  // Titanium brushed rim
+  const tGrad = ctx.createRadialGradient(0, 0, radius - 20, 0, 0, radius);
+  tGrad.addColorStop(0, "#27272a");
+  tGrad.addColorStop(0.6, "#52525b");
+  tGrad.addColorStop(1, "#18181b");
+
+  ctx.fillStyle = tGrad;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.arc(0, 0, radius - 28, 0, Math.PI * 2, true);
+  ctx.fill();
+  ctx.stroke();
+
+  // 4 Locking Bayonet Flanges
+  ctx.fillStyle = "#e4e4e7";
+  for (let i = 0; i < 4; i++) {
+    ctx.save();
+    ctx.rotate((i * Math.PI) / 2);
+    roundRect(ctx, radius - 26, -10, 16, 20, 3);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Anodized red index pin
+  ctx.fillStyle = "#ef4444";
+  ctx.beginPath();
+  ctx.arc(0, -radius + 14, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/**
+ * Exploded Chromatic Optical Glass Elements
+ */
+function drawExplodedOptics(
+  ctx: CanvasRenderingContext2D,
+  explode: number,
+  time: number
+) {
+  ctx.save();
+
+  // 3 Floating Glass Elements separated along Z
+  const elements = [
+    { offset: -40, radius: 75, color: "rgba(56, 189, 248, 0.25)" },
+    { offset: 0, radius: 82, color: "rgba(168, 85, 247, 0.22)" },
+    { offset: 45, radius: 88, color: "rgba(239, 68, 68, 0.2)" },
+  ];
+
+  elements.forEach((elem) => {
+    ctx.save();
+    ctx.translate(elem.offset * explode, 0);
+
+    // Glass rim ring
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.lineWidth = 2;
+    ctx.fillStyle = elem.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 20, elem.radius, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Specular lens flare reflection
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(2, -elem.radius * 0.4, 6, 24, Math.PI / 8, 0, Math.PI);
+    ctx.stroke();
+
+    ctx.restore();
+  });
+
+  // 11-Blade Circular Iris in between elements
+  ctx.save();
+  ctx.strokeStyle = "#ef4444";
+  ctx.lineWidth = 2;
+  for (let blade = 0; blade < 11; blade++) {
+    ctx.rotate((Math.PI * 2) / 11);
+    ctx.beginPath();
+    ctx.moveTo(25, 0);
+    ctx.lineTo(65, 12);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.restore();
+}
+
+/**
+ * Front Magnesium Barrel Housing & Rigging Points
+ */
+function drawFrontHousing(ctx: CanvasRenderingContext2D, explode: number) {
+  ctx.save();
+  const w = 170;
+  const h = 200;
+  const x = -w / 2;
+  const y = -h / 2;
+
+  // Front camera body shell with lens aperture opening
+  const fGrad = ctx.createLinearGradient(x, y, x + w, y);
+  fGrad.addColorStop(0, "#1f2026");
+  fGrad.addColorStop(0.5, "#101114");
+  fGrad.addColorStop(1, "#27272a");
+
+  ctx.fillStyle = fGrad;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+  ctx.lineWidth = 2;
+  roundRect(ctx, x, y, w, h, 20);
+  ctx.fill();
+  ctx.stroke();
+
+  // Front lens opening cutout
+  ctx.fillStyle = "#070709";
+  ctx.beginPath();
+  ctx.arc(0, 0, 75, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Rigging cold shoe and 1/4"-20 threaded mounting points
+  ctx.fillStyle = "#3f3f46";
+  [-40, 0, 40].forEach((ox) => {
+    ctx.beginPath();
+    ctx.arc(ox, y + 16, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Anodized red REC tally button on top corner
+  ctx.fillStyle = "#ef4444";
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(x + w - 24, y + 24, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Exploded Leader Lines & Technical Callouts
+ */
+function drawExplodedCallouts(
+  ctx: CanvasRenderingContext2D,
+  explode: number
+) {
+  const alpha = Math.min(1, (explode - 0.35) / 0.4);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = "bold 10px JetBrains Mono, monospace";
+
+  // Callout 1: Sensor block (Bottom-center)
+  drawLeaderLine(ctx, 0, 70, 0, 160, "[01] 35.7 x 23.8mm EXMOR R SENSOR", "#ef4444");
+
+  // Callout 2: Copper vapor chamber (Top-left)
+  drawLeaderLine(
+    ctx,
+    -80 * explode,
+    -95,
+    -120 * explode,
+    -170,
+    "[02] COPPER VAPOR CHAMBER HEATSINK",
+    "#e08456"
+  );
+
+  // Callout 3: Titanium PL/E mount (Top-right)
+  drawLeaderLine(
+    ctx,
+    100 * explode,
+    -95,
+    140 * explode,
+    -170,
+    "[03] TITANIUM LOCKING MOUNT (±0.010mm FFD)",
+    "#38bdf8"
+  );
+
+  // Callout 4: Optical glass stack (Bottom-right)
+  drawLeaderLine(
+    ctx,
+    220 * explode,
+    90,
+    260 * explode,
+    160,
+    "[04] CHROMATIC LENS ELEMENT GROUP",
+    "#a855f7"
+  );
+
+  ctx.restore();
+}
+
+function drawLeaderLine(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  text: string,
+  color: string
+) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1;
+
+  // Origin pip
+  ctx.beginPath();
+  ctx.arc(x1, y1, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Leader line
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+
+  // Label text with subtle black pill backdrop
+  const textW = ctx.measureText(text).width;
+  ctx.fillStyle = "rgba(5, 5, 5, 0.85)";
+  ctx.fillRect(x2 - textW / 2 - 6, y2 - 7, textW + 12, 14);
+
+  ctx.fillStyle = color;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, x2, y2);
+
+  ctx.restore();
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}

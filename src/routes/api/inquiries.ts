@@ -82,40 +82,45 @@ export const Route = createFileRoute("/api/inquiries")({
         const totalDays = Math.max(1, Math.round((endDt.getTime() - startDt.getTime()) / (1000 * 60 * 60 * 24)) + 1);
         const subtotal = d.daily_rate * totalDays;
 
-        // Primary: Insert into rental_bookings
-        const { error: bookingError } = await sb.from("rental_bookings").insert({
+        // Primary: Insert into rental_inquiries table as specified
+        const { error: inquiryError } = await sb.from("rental_inquiries").insert({
           id: inquiryId,
-          reference_code: reference,
+          gear_name: d.gear_name,
+          category: d.category,
+          start_date: d.start_date,
+          end_date: d.end_date,
           customer_name: d.customer_name,
           customer_email: d.customer_email,
           customer_phone: d.customer_phone,
-          shoot_start_date: d.start_date,
-          shoot_return_date: d.end_date,
-          total_days: totalDays,
-          subtotal_inr: subtotal,
-          total_amount_inr: subtotal,
-          stage_destination: "Film City Studio 5 / Mumbai Stage",
-          metro_hub: "Mumbai",
-          status: "hold_requested",
-          deposit_waiver_applied: Boolean(d.wica_card || d.gstin),
           notes: compiledNotes,
+          status: "pending",
         });
 
-        if (bookingError) {
-          console.warn("[inquiry] rental_bookings notice:", bookingError.message);
-          // Fallback to rental_inquiries if table exists
-          await sb.from("rental_inquiries").insert({
+        if (inquiryError) {
+          console.warn("[inquiry] rental_inquiries notice:", inquiryError.message);
+        }
+
+        // Secondary: Also record into rental_bookings for operational tracking & live timeline
+        try {
+          await sb.from("rental_bookings").insert({
             id: inquiryId,
-            gear_name: d.gear_name,
-            category: d.category,
-            start_date: d.start_date,
-            end_date: d.end_date,
+            reference_code: reference,
             customer_name: d.customer_name,
             customer_email: d.customer_email,
             customer_phone: d.customer_phone,
+            shoot_start_date: d.start_date,
+            shoot_return_date: d.end_date,
+            total_days: totalDays,
+            subtotal_inr: subtotal,
+            total_amount_inr: subtotal,
+            stage_destination: "Film City Studio 5 / Mumbai Stage",
+            metro_hub: "Mumbai",
+            status: "hold_requested",
+            deposit_waiver_applied: Boolean(d.wica_card || d.gstin),
             notes: compiledNotes,
-            status: "pending",
           });
+        } catch (bookingErr) {
+          console.warn("[inquiry] rental_bookings notice:", bookingErr);
         }
 
         // Lock booked dates in inventory_blocks so the seat-style calendar matrix locks in real-time

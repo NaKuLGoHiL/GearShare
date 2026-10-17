@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import cameraSonyFX3 from "@/assets/sony_fx3.jpg";
+import cameraCanonR5C from "@/assets/canon_r5c.jpg";
 import cameraRed from "@/assets/camera.jpg";
 import cameraArri from "@/assets/arri_camera.jpg";
 import cameraSony from "@/assets/sony_fx9.jpg";
+import lensSonyGM from "@/assets/sony_24_70_gm.jpg";
 import lensAnamorphic from "@/assets/lens.jpg";
 import lensZeiss from "@/assets/zeiss_master_prime.jpg";
 import lensCooke from "@/assets/cooke_s4i_prime.jpg";
+import lightAputure300d from "@/assets/aputure_300d.jpg";
 import lightTubes from "@/assets/lighting_kit.jpg";
 import lightPanel from "@/assets/aputure_nova_panel.jpg";
 import audioSoundDevices from "@/assets/sound_devices_833.jpg";
@@ -16,6 +20,7 @@ import { Tilt } from "@/components/Tilt";
 import { ReserveModal, type Gear } from "@/components/ReserveModal";
 import { QuickSpecsModal, type DetailedGear } from "@/components/QuickSpecsModal";
 import { Hero3DShowcase } from "@/components/Hero3DShowcase";
+import { AppleScrollyCanvas } from "@/components/AppleScrollyCanvas";
 import { CinemaOpticalShader, type CinemaLookMode } from "@/components/CinemaOpticalShader";
 import {
   Aperture,
@@ -82,6 +87,76 @@ type CatalogItem = DetailedGear;
 
 const GEAR_CATALOG: CatalogItem[] = [
   {
+    name: "Sony FX3 Full-Frame Cinema",
+    category: "Cinema Bodies",
+    rate: 12000,
+    img: cameraSonyFX3,
+    specs: ["4K 120p 10-bit", "16-Bit RAW HDMI", "Dual Base ISO 800/12800", "Active Cooling"],
+    mount: "Sony E Mount",
+    highlight: "FLAGSHIP CINEMA",
+    sensor: "12.1MP Full-Frame Back-Illuminated Exmor R CMOS",
+    fps: "4K 120fps, FHD 240fps High-Speed",
+    packageIncludes: "Top XLR Audio Handle, 4x NP-FZ100 Batteries, 2x 160GB CFexpress Type A, Dual Charger, Pelican Air 1485",
+    hub: "Mumbai Film City Bay 1",
+    inStockCount: 4,
+  },
+  {
+    name: "Canon R5 C Cinema Line",
+    category: "Cinema Bodies",
+    rate: 15000,
+    img: cameraCanonR5C,
+    specs: ["8K 60p Cinema RAW", "RF Mount", "Dual Pixel CMOS AF II", "Active Fan Exhaust"],
+    mount: "Canon RF Mount",
+    highlight: "8K HYBRID CINE",
+    sensor: "45MP Full-Frame CMOS Sensor (8K DCI 8192 x 4320)",
+    fps: "8K 60fps RAW, 4K 120fps High Frame Rate",
+    packageIncludes: "Pelican 1510 Hardcase, 4x LP-E6NH, 2x 512GB CFexpress Type B, Anker 65W PD Bank, SmallRig Cage",
+    hub: "Andheri West Depot",
+    inStockCount: 3,
+  },
+  {
+    name: "ARRI Alexa Mini LF Mock",
+    category: "Cinema Bodies",
+    rate: 60000,
+    img: cameraArri,
+    specs: ["Large Format 4.5K", "LPL / PL Mount", "ARRIRAW 90fps", "Internal FSND"],
+    mount: "LPL / PL",
+    highlight: "INDUSTRY BENCHMARK",
+    sensor: "Large Format ALEV III 4.5K (36.70 x 25.54 mm)",
+    fps: "ARRIRAW 90fps, ProRes 4444 XQ 60fps",
+    packageIncludes: "Pelican Air 1535, 4x Core SWX 150Wh V-Mounts, 3x Codex Compact 1TB, MVF-2 OLED Viewfinder, Cage & Rods",
+    hub: "Mumbai Film City Bay 2",
+    inStockCount: 3,
+  },
+  {
+    name: "Sony FE 24-70mm f/2.8 GM II",
+    category: "Anamorphic & Primes",
+    rate: 4500,
+    img: lensSonyGM,
+    specs: ["Constant f/2.8", "4x XD Linear Motors", "De-Clickable Aperture", "Nano AR II"],
+    mount: "Sony E Mount",
+    highlight: "G MASTER ZOOM",
+    sensor: "Full-Frame 35mm Format",
+    fps: "f/2.8 to f/22 11-Blade Circular Iris",
+    packageIncludes: "Weatherproof Hard Pouch, Front/Rear Caps, Petal Hood with Filter Door, 82mm Circular Polarizer",
+    hub: "Andheri West Depot",
+    inStockCount: 6,
+  },
+  {
+    name: "Aputure Light Storm 300d II Kit",
+    category: "Lighting & Grip",
+    rate: 5500,
+    img: lightAputure300d,
+    specs: ["5500K Daylight", "55,000 Lux @ 0.5m", "Bowens Mount", "Wireless Sidus Link"],
+    mount: "Baby 5/8\" Pin",
+    highlight: "COB DAYLIGHT PRO",
+    sensor: "CRI 96+, TLCI 97+, 350W Maximum Draw",
+    fps: "0-100% Stepless Dimming, 8 Built-in Lighting FX",
+    packageIncludes: "Heavy-Duty Wheeled Flight Case, 55° Hyper Reflector, All-in-One Control Box, 20-Foot Header Cable, C-Stand & Sandbag",
+    hub: "Goregaon Stage Depot",
+    inStockCount: 5,
+  },
+  {
     name: "RED V-Raptor 8K VV",
     category: "Cinema Bodies",
     rate: 45000,
@@ -94,20 +169,6 @@ const GEAR_CATALOG: CatalogItem[] = [
     packageIncludes: "Pelican 1510 Air, 4x Micro-V 150Wh Batteries, 2TB RED PRO CFexpress, DSMC3 Touch 7.0 Monitor, Top Handle",
     hub: "Mumbai Film City Bay 1",
     inStockCount: 2,
-  },
-  {
-    name: "ARRI Alexa Mini LF",
-    category: "Cinema Bodies",
-    rate: 60000,
-    img: cameraArri,
-    specs: ["Large Format 4.5K", "LPL / PL Mount", "ARRIRAW 90fps", "Internal FSND"],
-    mount: "LPL / PL",
-    highlight: "INDUSTRY STANDARD",
-    sensor: "Large Format ALEV III 4.5K (36.70 x 25.54 mm)",
-    fps: "ARRIRAW 90fps, ProRes 4444 XQ 60fps",
-    packageIncludes: "Pelican Air 1535, 4x Core SWX 150Wh V-Mounts, 3x Codex Compact 1TB, MVF-2 OLED Viewfinder, Cage & Rods",
-    hub: "Mumbai Film City Bay 2",
-    inStockCount: 3,
   },
   {
     name: "Sony FX9 Full-Frame",
@@ -226,19 +287,19 @@ const GEAR_CATALOG: CatalogItem[] = [
 const PIPELINE_STEPS = [
   {
     step: "01",
-    title: "Select Hardware & Shoot Window",
-    desc: "Choose camera bodies, prime glass, lighting fixtures, and power. Select your shoot duration with automatic volume discount calculations in Indian Rupees.",
+    title: "Select Hardware",
+    desc: "Choose cinema bodies, prime glass, lighting fixtures, and power. Select your shoot duration with automatic volume discount calculations in Indian Rupees.",
     badge: "INSTANT INVENTORY",
   },
   {
     step: "02",
-    title: "15-Min Fast ID & GSTIN Check",
+    title: "15-min ID Check",
     desc: "Our automated dispatch desk clears GSTIN, Aadhaar/PAN, and production paperwork within 15 minutes. Verified filmmakers pay zero deposit.",
     badge: "< 15 MIN CLEARANCE",
   },
   {
     step: "03",
-    title: "Flight-Case Direct Studio Delivery",
+    title: "Studio Delivery",
     desc: "Your kit arrives on set in flight-ready Pelican Air cases—batteries at 100%, collimation sheets signed, ready to roll at call time across Mumbai and national hubs.",
     badge: "< 3H DISPATCH",
   },
@@ -371,156 +432,144 @@ function Index() {
   const currentFfd = FFD_PRESETS[selectedFfdIdx] ?? FFD_PRESETS[0]!;
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-foreground relative selection:bg-red-500/30 selection:text-white antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#050505] text-foreground relative selection:bg-red-500/30 selection:text-white antialiased overflow-x-hidden">
       {/* BACKGROUND: Framer 24px x 24px Subtle Geometric Dot/Line Grid with Radial Edge Fade */}
       <div className="pointer-events-none fixed inset-0 framer-grid-lines framer-grid-mask z-0 opacity-80" />
       
-      {/* SOFT RADIAL ILLUMINATION GRADIENTS (Framer Signature Lighting) */}
+      {/* SOFT RADIAL ILLUMINATION GRADIENTS */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(239,68,68,0.14),transparent_65%)] blur-3xl z-0" />
       <div className="pointer-events-none absolute top-[900px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03),transparent_70%)] blur-3xl z-0" />
       <div className="pointer-events-none absolute top-[2200px] left-1/3 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.08),transparent_70%)] blur-3xl z-0" />
 
-      {/* SECTION 1: SIGNATURE FRAMER FLOATING PILL HEADER */}
-      <header className="fixed top-5 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-        <div className="pointer-events-auto flex h-13 items-center justify-between gap-4 md:gap-7 rounded-full border border-zinc-800/80 bg-zinc-950/75 px-4 sm:px-6 backdrop-blur-xl shadow-2xl shadow-black/80 ring-1 ring-white/5 transition-all">
-          {/* Brand mark with glowing red tally dot: ● GEARSHARE */}
+      {/* SECTION 1: FIXED APPLE-STYLE TRANSLUCENT NAVBAR */}
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-[#050505]/75 border-b border-zinc-800/50 transition-all">
+        <div className="mx-auto max-w-7xl h-14 px-4 sm:px-6 flex items-center justify-between">
+          {/* Brand mark with pulsing red tally light: ● GEARSHARE */}
           <a
-            href="#top"
+            href="#overview"
             className="group flex items-center gap-2.5 font-mono text-xs font-bold tracking-[0.22em] text-white transition"
           >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-60" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
             </span>
             <span className="transition group-hover:text-red-400">GEARSHARE</span>
           </a>
 
-          {/* Framer Navigation Capsule Links */}
-          <nav className="hidden lg:flex items-center gap-1 font-mono text-xs text-zinc-400">
-            <a
-              href="#catalog"
-              className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
-            >
-              Catalog
+          {/* Links: Overview, Hardware, Scrollytech, Pricing, FAQ */}
+          <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-zinc-400">
+            <a href="#overview" className="transition hover:text-white">
+              Overview
             </a>
-            <a
-              href="#bento-features"
-              className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
-            >
-              Bento Features
+            <a href="#hardware" className="transition hover:text-white">
+              Hardware
             </a>
-            <a
-              href="#workflow"
-              className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
-            >
-              Workflow
+            <a href="#scrollytech" className="transition hover:text-white">
+              Scrollytech
             </a>
-            <a
-              href="#damage-shield"
-              className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
-            >
-              Damage Shield
+            <a href="#catalog" className="transition hover:text-white">
+              Pricing
             </a>
-            <a
-              href="#faq"
-              className="rounded-full px-3.5 py-1.5 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
-            >
+            <a href="#faq" className="transition hover:text-white">
               FAQ
             </a>
             <a
               href="/track"
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-red-400 font-medium transition-all duration-200 hover:bg-white/[0.08]"
+              className="flex items-center gap-1.5 text-red-400 transition hover:text-red-300"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>Track Dispatch</span>
             </a>
           </nav>
 
-          {/* Right Action: Framer Pill Button "Rent Equipment" */}
+          {/* Right Action: Anodized-red rounded pill "Rent Kit" */}
           <div className="flex items-center gap-3">
             <a
               href="#catalog"
-              className="framer-pill-primary inline-flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold"
+              className="inline-flex items-center justify-center rounded-full bg-red-600 hover:bg-red-500 px-5 py-2 text-xs font-semibold text-white tracking-wide transition shadow-[0_0_20px_rgba(239,68,68,0.35)] hover:shadow-[0_0_25px_rgba(239,68,68,0.5)] cursor-pointer"
             >
-              <span>Rent Equipment</span>
-              <span className="font-mono text-[10px]">→</span>
+              <span>Rent Kit</span>
+              <span className="ml-1 font-mono text-[10px]">→</span>
             </a>
 
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation Menu"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-400 transition hover:border-white/20 hover:text-white lg:hidden cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-400 transition hover:border-white/20 hover:text-white md:hidden cursor-pointer"
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Dropdown Card */}
+        {/* Mobile Navigation Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="pointer-events-auto fixed top-20 inset-x-4 max-w-lg mx-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl backdrop-blur-2xl lg:hidden animate-in fade-in slide-in-from-top-3 z-50">
+          <div className="border-t border-zinc-800/80 bg-[#050505]/95 px-6 py-4 md:hidden animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center justify-between border-b border-white/10 pb-3 font-mono text-xs">
               <span className="flex items-center gap-2 text-zinc-400">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span>MUMBAI FLEET ACTIVE</span>
               </span>
               <span className="text-[10px] text-zinc-500">24/7 METRO DISPATCH</span>
             </div>
-            <nav className="mt-3 flex flex-col gap-1.5 font-mono text-xs">
+            <nav className="mt-3 flex flex-col gap-2 font-mono text-xs">
+              <a
+                href="#overview"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1.5 text-zinc-300 hover:text-white"
+              >
+                01 / Overview
+              </a>
+              <a
+                href="#scrollytech"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1.5 text-zinc-300 hover:text-white"
+              >
+                02 / Scrollytech Breakdown
+              </a>
               <a
                 href="#catalog"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-3.5 py-2.5 text-zinc-300 hover:bg-white/5 hover:text-white"
+                className="py-1.5 text-zinc-300 hover:text-white"
               >
-                01 / Equipment Catalog
+                03 / Pricing & Fleet Catalog
               </a>
               <a
-                href="#bento-features"
+                href="#hardware"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-3.5 py-2.5 text-zinc-300 hover:bg-white/5 hover:text-white"
+                className="py-1.5 text-zinc-300 hover:text-white"
               >
-                02 / Bento Advantage Grid
+                04 / Hardware Bento Specs
               </a>
               <a
                 href="#workflow"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-3.5 py-2.5 text-zinc-300 hover:bg-white/5 hover:text-white"
+                className="py-1.5 text-zinc-300 hover:text-white"
               >
-                03 / Production Workflow
-              </a>
-              <a
-                href="#damage-shield"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-3.5 py-2.5 text-zinc-300 hover:bg-white/5 hover:text-white"
-              >
-                04 / Damage Shield & Insurance
+                05 / Rental Workflow
               </a>
               <a
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-3.5 py-2.5 text-zinc-300 hover:bg-white/5 hover:text-white"
+                className="py-1.5 text-zinc-300 hover:text-white"
               >
-                05 / Operational FAQ
+                06 / Operational FAQ
               </a>
               <a
                 href="/track"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-red-400 font-semibold hover:bg-white/5"
+                className="py-1.5 text-red-400 font-semibold"
               >
-                <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                  <span>06 / Track Soundstage Dispatch</span>
-                </span>
-                <span className="text-[10px] text-zinc-500">Live</span>
+                ● 07 / Track Soundstage Dispatch
               </a>
               <div className="pt-2">
                 <a
                   href="#catalog"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="framer-pill-primary block w-full py-3 text-center text-xs font-semibold"
+                  className="block w-full text-center rounded-full bg-red-600 hover:bg-red-500 py-2.5 text-xs font-semibold text-white shadow-lg"
                 >
-                  Browse Catalog & Reserve Kit
+                  Rent Kit →
                 </a>
               </div>
             </nav>
@@ -528,49 +577,32 @@ function Index() {
         )}
       </header>
 
-      {/* SECTION 2: FRAMER-STYLE HERO SECTION (CENTERED TYPOGRAPHY & REFLECTIVE 3D TILT BENCH) */}
-      <section id="top" className="relative pt-32 sm:pt-40 pb-20 px-6 text-center z-10">
+      {/* SECTION 2: SCROLL-LINKED HERO CANVAS ENGINE (APPLE SCROLLYTELLING) */}
+      <div id="overview" className="scroll-mt-14" />
+      <AppleScrollyCanvas
+        onRentClick={() => handleOpenReserve(catalogItems[0] ?? GEAR_CATALOG[0]!)}
+      />
+
+      {/* OPTICAL LUT SHADER TEST BENCH & 3D RIG SHOWCASE */}
+      <section className="relative pt-16 pb-20 px-6 text-center z-10 border-t border-white/[0.06]">
         <div className="mx-auto max-w-5xl">
-          {/* Floating Monospaced Micro-Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 shadow-sm backdrop-blur-md">
             <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span>V2.6 CINEMA FLEET • DISPATCHING READY</span>
+            <span>CALIBRATED CINEMA FLEET • READY FOR SOUNDSTAGE DISPATCH</span>
           </div>
 
-          {/* Giant Centered Display Heading (Ultra-bold, -0.04em tracking, smooth white-to-slate gradient) */}
-          <h1 className="mt-6 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.04em] leading-[1.04] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent">
-            The Hardware Behind Cinema-Grade Frames.
-          </h1>
+          <h2 className="mt-6 text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] leading-[1.04] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent">
+            Real-Time Optical Physics & Sensor Rigging.
+          </h2>
 
-          {/* Subtitle */}
-          <p className="mt-5 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
-            Reserve bench-calibrated cinema bodies, anamorphic primes, and lighting rigs with zero-friction checkout and full production insurance.
+          <p className="mt-4 text-base text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
+            Test custom chromatic anamorphic LUTs, inspect multi-axis rig tilt physics, and reserve zero-deposit cinema packages below.
           </p>
 
-          {/* Dual CTAs (Red Pill + Secondary Glass Pill) */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-            <a
-              href="#catalog"
-              className="framer-pill-primary inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold cursor-pointer"
-            >
-              <span>Explore Inventory</span>
-              <span className="font-mono text-xs">→</span>
-            </a>
-            <a
-              href="#damage-shield"
-              className="framer-pill-secondary inline-flex items-center gap-2 px-7 py-3.5 text-sm font-medium cursor-pointer"
-            >
-              <ShieldCheck className="h-4 w-4 text-red-400" />
-              <span>View Damage Shield</span>
-            </a>
-          </div>
-
-          {/* Interactive 3D/Tilt Visual: Centered Cinema Camera Rig on Reflective Plane */}
-          <div className="relative mx-auto mt-14 max-w-5xl">
-            {/* Subtle Reflective Pedestal Plane Blur */}
+          {/* Optical LUT Shader Switcher & Interactive 3D Showcase */}
+          <div className="relative mx-auto mt-12 max-w-5xl">
             <div className="pointer-events-none absolute -bottom-10 inset-x-12 h-24 bg-gradient-to-b from-white/[0.05] via-red-500/[0.04] to-transparent blur-xl rounded-full transform scale-y-50" />
 
-            {/* Container Chassis with 2.39:1 Viewfinder Corner Reticles */}
             <div className="relative rounded-3xl border border-white/[0.08] bg-zinc-900/35 p-2 sm:p-3 shadow-2xl backdrop-blur-2xl ring-1 ring-white/5">
               <div className="pointer-events-none absolute -top-1.5 -left-1.5 h-4 w-4 border-t-2 border-l-2 border-red-500 z-20" />
               <div className="pointer-events-none absolute -top-1.5 -right-1.5 h-4 w-4 border-t-2 border-r-2 border-red-500 z-20" />
@@ -580,7 +612,7 @@ function Index() {
               <Hero3DShowcase onSelectGear={handleOpenReserve} className="p-0" />
             </div>
 
-            {/* Framer Optical Simulation Switcher Pill */}
+            {/* Optical LUT Switcher */}
             <div className="mt-6 flex items-center justify-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/80 px-4 py-2 font-mono text-xs backdrop-blur-xl shadow-lg">
                 <Sparkles className="h-3.5 w-3.5 text-red-400" />
@@ -603,6 +635,7 @@ function Index() {
           </div>
         </div>
       </section>
+
 
       {/* SECTION 3: FRAMER-STYLE BENTO GRID CATALOG (INTERACTIVE CORE) */}
       <section id="catalog" className="relative mx-auto max-w-7xl px-6 pt-20 pb-32 z-10 scroll-mt-28">
@@ -842,8 +875,8 @@ function Index() {
         </div>
       </section>
 
-      {/* SECTION 4: 4-BLOCK FRAMER BENTO ADVANTAGE GRID */}
-      <section id="bento-features" className="relative mx-auto max-w-7xl px-6 py-24 z-10 scroll-mt-28">
+      {/* SECTION 4: 4-BLOCK BENTO HARDWARE SPECS */}
+      <section id="hardware" className="relative mx-auto max-w-7xl px-6 py-24 z-10 scroll-mt-20">
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 uppercase">
             <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
@@ -860,12 +893,12 @@ function Index() {
         {/* 4 Bento Advantage Blocks */}
         <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {/* Block 1 (Large 2-column span): Optics Bench-Calibrated with Interactive Flange Focal Distance Diagram */}
+          {/* Block 1 (Large 2-column span): Sub-Micron Sensor Bench Testing with Interactive Flange Focal Distance Diagram */}
           <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between font-mono text-xs">
                 <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 uppercase tracking-wider text-red-400 font-bold">
-                  01 / OPTICS BENCH CALIBRATION
+                  01 / BENCH TESTING
                 </span>
                 <span className="text-emerald-400 flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4" />
@@ -874,7 +907,7 @@ function Index() {
               </div>
 
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
-                Sub-Micron Laser Flange Collimation.
+                Sub-Micron Sensor Bench Testing
               </h3>
               <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 Back-focus drift destroys 8K anamorphic sharpness. Every lens and mount is calibrated on our digital autocollimator before rolling onto set.
@@ -935,14 +968,14 @@ function Index() {
             </div>
           </div>
 
-          {/* Block 2: Zero-Deposit Damage Shield */}
+          {/* Block 2: Production Damage Shield (Zero Deposit for verified DPs) */}
           <div id="damage-shield" className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between scroll-mt-28">
             <div>
               <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-400 font-bold">
-                02 / ZERO-DEPOSIT SHIELD
+                02 / DAMAGE SHIELD
               </span>
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
-                ₹0 Deposit Production Protection.
+                Production Damage Shield (Zero Deposit for verified DPs)
               </h3>
               <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 Full on-set and transit accidental damage coverage. Instant deposit waivers for GSTIN holders and WICA / SICA members.
@@ -960,14 +993,14 @@ function Index() {
             </div>
           </div>
 
-          {/* Block 3: 3-Hour Metro Set Dispatch */}
+          {/* Block 3: 3-Hour Studio Set Dispatch Across Mumbai */}
           <div className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-400 font-bold">
-                03 / METRO SET VELOCITY
+                03 / METRO SET DISPATCH
               </span>
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
-                &lt; 3-Hour Direct Soundstage Transit.
+                3-Hour Studio Set Dispatch Across Mumbai
               </h3>
               <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 Flight-ready Pelican Air hardcases dispatched in dedicated sprinter vans across Film City, Mehboob, Yash Raj, and national studios.
@@ -988,18 +1021,18 @@ function Index() {
             </div>
           </div>
 
-          {/* Block 4: Production-Ready Power Packs */}
+          {/* Block 4: Pre-Charged V-Mount Batteries & Flight Pelican Cases */}
           <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between font-mono text-xs">
                 <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 uppercase tracking-wider text-red-400 font-bold">
-                  04 / TURNKEY POWER & RIGGING
+                  04 / TURNKEY POWER & HARDCASES
                 </span>
                 <span className="text-zinc-400">4x 150Wh V-Mount Standard</span>
               </div>
 
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
-                Pre-Charged Dual V-Mount Power Packs Included.
+                Pre-Charged V-Mount Batteries & Flight Pelican Cases
               </h3>
               <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 No half-charged surprises. Every body ships with four 150Wh high-draw V-mount bricks, quad fast-charger, 15mm carbon rods, and Arri standard bridgeplates.
@@ -1165,9 +1198,9 @@ function Index() {
 
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-white/[0.08] pt-8 font-mono text-xs text-zinc-500 gap-4">
             <p>© 2026 GearShare Technologies Inc. All rights reserved.</p>
-            {/* ZooTechX Prototype Attribution */}
+            {/* ZootechX Prototype Attribution */}
             <p className="text-zinc-400">
-              Prototype Engineered for <strong className="text-white">ZooTechX Cinema R&D</strong> • GearShare Platform
+              ZootechX Technical Assessment Prototype • Topic 02: GearShare
             </p>
           </div>
         </div>
