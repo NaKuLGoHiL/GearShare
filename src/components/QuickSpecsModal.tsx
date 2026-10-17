@@ -70,14 +70,14 @@ export function QuickSpecsModal({
           role="dialog"
           aria-modal="true"
           aria-label={`Detailed specifications for ${gear.name}`}
-          className="relative my-4 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-2xl backdrop-blur-2xl ring-1 ring-slate-900/5 animate-in zoom-in-95 duration-200"
+          className="relative my-4 flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-white text-left shadow-2xl backdrop-blur-2xl ring-1 ring-slate-900/5 animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Ambient Glow */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
 
           {/* Modal Header */}
-          <div className="flex-none flex items-start justify-between gap-4 border-b border-slate-200 bg-white/95 px-6 pt-5 pb-4 sm:px-8 sm:pt-6 z-10 backdrop-blur-md">
+          <div className="flex-none flex items-start justify-between gap-3 sm:gap-4 border-b border-slate-200 bg-white/95 px-4 pt-4 pb-3 sm:px-8 sm:pt-6 sm:pb-4 z-10 backdrop-blur-md">
             <div className="flex items-center gap-3 min-w-0">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-primary">
                 <Camera className="h-5 w-5" />
@@ -92,7 +92,7 @@ export function QuickSpecsModal({
                     {gear.hub ?? "MUMBAI DISPATCH DEPOT"}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight text-slate-900 truncate">
+                <h3 className="text-base sm:text-xl font-bold tracking-tight text-slate-900 truncate">
                   {gear.name}
                 </h3>
               </div>
@@ -109,7 +109,7 @@ export function QuickSpecsModal({
           </div>
 
           {/* Modal Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-5 space-y-5 sm:space-y-6 custom-scrollbar overscroll-contain pb-safe">
             {/* Gear Hero Banner */}
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-md">
               {gear.img ? (
@@ -125,18 +125,18 @@ export function QuickSpecsModal({
               )}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
               
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between font-mono">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-end justify-between font-mono">
                 <div>
-                  <span className="rounded-md bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+                  <span className="rounded-md bg-primary px-2 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
                     {gear.highlight ?? "BENCH READY"}
                   </span>
-                  <p className="mt-1.5 text-xs text-white/90">
+                  <p className="mt-1 sm:mt-1.5 text-[11px] sm:text-xs text-white/90">
                     Mount: <strong className="text-white">{gear.mount ?? "Standard Cinema"}</strong>
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">Daily Base</span>
-                  <p className="text-2xl font-bold text-white">₹{gear.rate.toLocaleString("en-IN")}<span className="text-xs font-normal text-white/80">/day</span></p>
+                  <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-300 font-semibold">Daily Base</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white">₹{gear.rate.toLocaleString("en-IN")}<span className="text-xs font-normal text-white/80">/day</span></p>
                 </div>
               </div>
             </div>

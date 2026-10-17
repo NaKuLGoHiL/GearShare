@@ -159,39 +159,43 @@ function TrackPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-foreground antialiased selection:bg-red-500/20 selection:text-red-900">
       {/* Top Industrial Telemetry Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
+      {/* FLOATING ISLAND NAVBAR WITH MIRROR BLURRED EFFECT */}
+      <header className="fixed top-2.5 sm:top-5 inset-x-0 z-50 flex justify-center px-3 sm:px-6 pointer-events-none">
+        <div className="pointer-events-auto w-full max-w-5xl rounded-full h-13 sm:h-14 px-3.5 sm:px-6 flex items-center justify-between bg-white/80 border border-white/90 shadow-[0_16px_40px_-10px_rgba(15,23,42,0.14),0_4px_16px_rgba(15,23,42,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.95)] backdrop-blur-2xl ring-1 ring-slate-900/5 relative">
+          {/* Specular Mirror Top Sheen */}
+          <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent" />
+
+          <div className="flex items-center gap-2.5 sm:gap-4">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 font-mono text-xs text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-slate-200 bg-white/90 px-3 sm:px-3.5 py-1.5 font-mono text-[11px] sm:text-xs text-slate-700 transition hover:border-slate-300 hover:text-slate-900 shadow-sm"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Catalog</span>
+              <span className="hidden xs:inline">Fleet</span>
             </Link>
 
             <div className="flex items-center gap-2">
-              <span className="tally h-2.5 w-2.5 rounded-full" />
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-slate-900">
-                GEARSHARE <span className="text-red-600 font-normal">STAGE DISPATCH</span>
+              <span className="tally h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full" />
+              <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-900">
+                GEARSHARE <span className="text-red-600 font-normal hidden sm:inline">STAGE DISPATCH</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-xs">
-            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] text-emerald-800 font-semibold">
+          <div className="flex items-center gap-2 sm:gap-3 font-mono text-xs">
+            <span className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] text-emerald-800 font-semibold">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>MUMBAI DISPATCH DESK ACTIVE</span>
+              <span>MUMBAI DISPATCH ACTIVE</span>
             </span>
 
             {booking && (
               <button
                 type="button"
                 onClick={handlePrint}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 transition hover:bg-slate-50 shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 sm:px-3.5 py-1.5 text-[11px] sm:text-xs text-slate-700 transition hover:bg-slate-50 shadow-sm cursor-pointer"
               >
                 <Printer className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Print Dispatch Slip</span>
+                <span className="hidden sm:inline">Print Slip</span>
               </button>
             )}
           </div>
@@ -199,36 +203,36 @@ function TrackPage() {
       </header>
 
       {/* Main Container */}
-      <main className="mx-auto max-w-5xl px-6 py-10 sm:py-16">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 pt-20 sm:pt-28 pb-16">
         {/* Title and Search Bar */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1 font-mono text-xs text-red-600 shadow-sm font-semibold">
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1 font-mono text-[10px] sm:text-xs text-red-600 shadow-sm font-semibold">
             <span className="tally h-2 w-2 rounded-full" />
             <span>REAL-TIME HARDWARE TELEMETRY</span>
           </div>
 
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900">
+          <h1 className="mt-3 sm:mt-4 text-2xl xs:text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900">
             Track Soundstage Equipment Dispatch
           </h1>
-          <p className="mt-2 text-sm text-slate-600 max-w-xl mx-auto">
+          <p className="mt-2 text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
             Monitor optical collimation, cleanroom sensor inspection, flight-case prep, and sprinter van stage transit across Mumbai and national production hubs.
           </p>
 
           {/* Reference Lookup Form */}
-          <form onSubmit={handleSearchSubmit} className="mt-8 mx-auto max-w-xl">
+          <form onSubmit={handleSearchSubmit} className="mt-6 sm:mt-8 mx-auto max-w-xl">
             <div className="relative flex items-center">
-              <Search className="absolute left-4 h-4 w-4 text-slate-400 pointer-events-none" />
+              <Search className="absolute left-3.5 sm:left-4 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={refInput}
                 onChange={(e) => setRefInput(e.target.value)}
-                placeholder="Enter Booking Reference (e.g. GS-MUM-B6DB89)"
-                className="w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-28 py-4 font-mono text-sm text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-400/40 shadow-sm backdrop-blur-xl"
+                placeholder="Enter Reference (e.g. GS-MUM-B6DB89)"
+                className="w-full rounded-2xl border border-slate-200 bg-white pl-9 sm:pl-11 pr-24 sm:pr-28 py-3.5 sm:py-4 font-mono text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-400/40 shadow-sm backdrop-blur-xl"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="absolute right-2 inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-5 py-2.5 font-mono text-xs font-semibold text-white shadow-md transition hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                className="absolute right-1.5 sm:right-2 inline-flex items-center gap-1 sm:gap-1.5 rounded-xl bg-red-600 px-3.5 sm:px-5 py-2 sm:py-2.5 font-mono text-xs font-semibold text-white shadow-md transition hover:bg-red-700 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? "Locating..." : "Track Rig →"}
               </button>

@@ -205,7 +205,7 @@ export function Hero3DShowcase({
           className="hero-3d-chassis group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-carbon to-background shadow-2xl transition-all"
         >
           {/* Main Showcase Image Layer */}
-          <div className="relative aspect-[16/10] w-full overflow-hidden bg-black md:aspect-[16/9]">
+          <div className="relative aspect-[4/3] xs:aspect-[16/10] md:aspect-[16/9] w-full overflow-hidden bg-black">
             <img
               src={activeCamera.img}
               alt={activeCamera.name}
@@ -228,53 +228,76 @@ export function Hero3DShowcase({
             </div>
 
             {/* Top Telemetry Bar (translateZ 60px) */}
-            <div className="hero-hud-layer pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-4 sm:p-6">
-              <div className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-black/70 px-3 py-1.5 font-mono text-xs backdrop-blur-md">
+            <div className="hero-hud-layer pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3 sm:p-6">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg border border-white/15 bg-black/75 px-2.5 sm:px-3 py-1 sm:py-1.5 font-mono text-[11px] sm:text-xs backdrop-blur-md">
                 <span className="tally h-2 w-2 rounded-full" />
-                <span className="font-semibold text-foreground">REC</span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-primary">{timecode}</span>
+                <span className="font-semibold text-white">REC</span>
+                <span className="text-zinc-400">·</span>
+                <span className="text-red-400 font-semibold">{timecode}</span>
               </div>
-              <div className="hidden items-center gap-3 font-mono text-xs sm:flex">
-                <span className="rounded-lg border border-border/70 bg-black/70 px-3 py-1.5 text-foreground backdrop-blur-md">
+              <div className="flex items-center gap-2 sm:gap-3 font-mono text-[11px] sm:text-xs">
+                <span className="rounded-lg border border-white/15 bg-black/75 px-2.5 sm:px-3 py-1 sm:py-1.5 text-white font-semibold backdrop-blur-md">
                   {activeCamera.specs.resolution.split(" ")[0]}
                 </span>
-                <span className="rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 font-semibold text-primary backdrop-blur-md">
+                <span className="rounded-lg border border-primary/40 bg-primary/20 px-2.5 sm:px-3 py-1 sm:py-1.5 font-semibold text-red-300 backdrop-blur-md">
                   FLIGHT READY
                 </span>
               </div>
             </div>
 
             {/* Floating Technical Telemetry Card (translateZ 70px) */}
-            <div className="hero-hud-floating pointer-events-none absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md">
-              <div className="rounded-xl border border-border/80 bg-black/80 p-4 shadow-2xl backdrop-blur-xl">
+            <div className="hero-hud-floating absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md pointer-events-auto sm:pointer-events-none">
+              <div className="rounded-xl border border-white/15 bg-black/90 p-3.5 sm:p-4 shadow-2xl backdrop-blur-xl text-white">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-primary">
+                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-red-400 font-semibold">
                     {activeCamera.brand}
                   </p>
-                  <p className="font-mono text-xs text-muted-foreground">
+                  <p className="font-mono text-[11px] sm:text-xs text-zinc-300">
                     ₹{activeCamera.rate.toLocaleString("en-IN")}/day
                   </p>
                 </div>
-                <h3 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
+                <h3 className="mt-0.5 sm:mt-1 text-base sm:text-lg font-bold tracking-tight text-white">
                   {activeCamera.name}
                 </h3>
-                <p className="mt-1 text-xs text-muted-foreground">{activeCamera.subtitle}</p>
+                <p className="mt-0.5 text-[11px] sm:text-xs text-zinc-300 line-clamp-1">{activeCamera.subtitle}</p>
 
-                <div className="mt-3 flex items-center gap-2 font-mono text-[11px]">
-                  <span className="rounded bg-secondary px-2 py-0.5 text-foreground">
-                    {activeCamera.specs.dynamicRange.split(" ")[0]}
-                  </span>
-                  <span className="rounded bg-secondary px-2 py-0.5 text-muted-foreground">
-                    {activeCamera.specs.mount.split(" ")[0]}
-                  </span>
-                  <span className="text-primary">BENCH CERTIFIED ✓</span>
+                <div className="mt-2.5 sm:mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-[10px] sm:text-[11px]">
+                    <span className="rounded bg-white/15 border border-white/10 px-2 py-0.5 text-white font-medium">
+                      {activeCamera.specs.dynamicRange.split(" ")[0]}
+                    </span>
+                    <span className="rounded bg-white/10 border border-white/10 px-2 py-0.5 text-zinc-300 font-medium">
+                      {activeCamera.specs.mount.split(" ")[0]}
+                    </span>
+                    <span className="text-red-400 font-medium hidden xs:inline">BENCH CERTIFIED ✓</span>
+                  </div>
+
+                  {/* Embedded Mobile Reserve Button */}
+                  <button
+                    onClick={() =>
+                      onSelectGear({
+                        name: activeCamera.name,
+                        category: "Cinema Bodies",
+                        rate: activeCamera.rate,
+                        img: activeCamera.img,
+                        specs: [
+                          activeCamera.specs.resolution.split(" ")[0] ?? "",
+                          activeCamera.specs.dynamicRange.split(" ")[0] ?? "",
+                          activeCamera.specs.mount.split(" ")[0] ?? "",
+                        ],
+                      })
+                    }
+                    className="sm:hidden shrink-0 flex items-center gap-1.5 rounded-lg bg-primary hover:bg-primary/90 px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-lg shadow-red-500/25 transition active:scale-95 cursor-pointer"
+                  >
+                    <span>Reserve</span>
+                    <span className="font-mono text-[10px]">→</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Quick Action Hold Button */}
-            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+            {/* Quick Action Hold Button (Desktop Only) */}
+            <div className="hidden sm:block absolute bottom-6 right-6 z-20">
               <button
                 onClick={() =>
                   onSelectGear({
@@ -289,7 +312,7 @@ export function Hero3DShowcase({
                     ],
                   })
                 }
-                className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-xl shadow-primary/30 transition hover:opacity-90"
+                className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-xl shadow-primary/30 transition hover:opacity-90 cursor-pointer"
               >
                 <span>Reserve This Kit</span>
                 <span className="font-mono text-xs">→</span>

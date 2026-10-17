@@ -163,20 +163,25 @@ export function AppleScrollyCanvas({
         masters.beat1.complete &&
         masters.beat1.naturalWidth > 0;
 
-      if (heroReady && masters) {
-        // CONTINUOUS KINEMATIC CAMERA FLOW ENGINE
-        renderKinematicCameraFlow(
-          ctx,
-          masters,
-          width,
-          height,
-          p,
-          mx,
-          my,
-          time
-        );
-      } else {
-        // High-precision procedural exploded cinema camera engine fallback
+      try {
+        if (heroReady && masters) {
+          // CONTINUOUS KINEMATIC CAMERA FLOW ENGINE
+          renderKinematicCameraFlow(
+            ctx,
+            masters,
+            width,
+            height,
+            p,
+            mx,
+            my,
+            time
+          );
+        } else {
+          // High-precision procedural exploded cinema camera engine fallback
+          renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
+        }
+      } catch (err) {
+        console.warn("[renderKinematicCameraFlow] Render recovered:", err);
         renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
       }
 
@@ -193,10 +198,10 @@ export function AppleScrollyCanvas({
       id="scrollytech"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full h-[350vh] bg-[#050505] select-none"
+      className="relative w-full h-[350vh] bg-[#050505] select-none touch-pan-y"
     >
-      {/* Sticky Fullscreen Canvas Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+      {/* Sticky Fullscreen Canvas Viewport with 100dvh for iOS Safari stability */}
+      <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden relative">
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
@@ -206,20 +211,18 @@ export function AppleScrollyCanvas({
         {/* 24px Background Grid Overlay that blends into canvas */}
         <div className="pointer-events-none absolute inset-0 framer-grid-lines framer-grid-mask opacity-60" />
 
-        {/* Cinematic Viewfinder Framing Brackets */}
-        <div className="pointer-events-none absolute inset-8 sm:inset-14 flex flex-col justify-between z-20 opacity-40">
-          <div className="flex justify-between items-start">
-            <span className="font-mono text-[10px] text-zinc-500 tracking-widest uppercase flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+        {/* Cinematic Viewfinder Framing Brackets (Responsive Inset) */}
+        <div className="pointer-events-none absolute inset-3 sm:inset-6 md:inset-12 flex flex-col justify-between z-20 opacity-40">
+          <div className="flex justify-between items-start font-mono text-[9px] sm:text-[10px] text-zinc-500 tracking-wider">
+            <span className="flex items-center gap-1.5 sm:gap-2">
+              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse" />
               <span>RAW REC • 4K 120P</span>
             </span>
-            <span className="font-mono text-[10px] text-zinc-500 tracking-wider">
-              2.39:1 VIEWPORT
-            </span>
+            <span className="hidden xs:inline">2.39:1 VIEWPORT</span>
           </div>
-          <div className="flex justify-between items-end font-mono text-[10px] text-zinc-600">
+          <div className="flex justify-between items-end font-mono text-[9px] sm:text-[10px] text-zinc-600">
             <span>SCROLL DISASSEMBLY: {Math.round(scrollProgress * 100)}%</span>
-            <span>SHUTTER 1/48 • DUAL ISO 800/12800</span>
+            <span className="hidden sm:inline">SHUTTER 1/48 • DUAL ISO 800/12800</span>
           </div>
         </div>
 
@@ -227,67 +230,73 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 1 (0% - 25%): Fully Assembled Hero Shot */}
         <div
-          className={`absolute inset-x-6 top-10 sm:top-12 md:top-14 max-w-4xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-24 md:top-28 max-w-4xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
             scrollProgress <= 0.25
               ? "opacity-100 translate-y-0 scale-100"
               : "opacity-0 -translate-y-8 scale-95"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 backdrop-blur-md mb-4 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span>GEARSHARE CINEMA ARCHITECTURE</span>
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/70 px-3 sm:px-4 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 backdrop-blur-xl mb-3 sm:mb-4 shadow-lg ring-1 ring-white/10 max-w-[95vw]">
+            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+            <span className="hidden sm:inline">01 / CINEMA HARDWARE ARCHITECTURE • </span>
+            <span className="sm:hidden">01 / CINEMA RIG • </span>
+            <span>MUMBAI STAGE DESK</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] text-white leading-[1.06]">
+          <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.035em] text-white leading-[1.08] text-balance">
             Precision Optics.{" "}
             <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
               Uncompromised Sensor Power.
             </span>
           </h1>
-          <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-xl mx-auto font-normal leading-relaxed drop-shadow-md">
+          <p className="mt-2.5 sm:mt-3.5 text-xs sm:text-base text-slate-300 max-w-xl mx-auto font-normal leading-relaxed drop-shadow-md text-balance px-2 sm:px-0">
             The cinema hardware behind award-winning frames. Calibrated to ±0.010mm FFD, flight-cased, and dispatched directly to your set.
           </p>
         </div>
 
         {/* Scroll Prompt at Viewport Bottom (Fades out when user starts scrolling) */}
         <div
-          className={`absolute inset-x-0 bottom-8 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-500 ${
+          className={`absolute inset-x-0 bottom-6 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-500 ${
             scrollProgress < 0.1
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/70 px-4 py-1.5 font-mono text-[11px] text-zinc-300 backdrop-blur-md shadow-lg">
-            <ChevronDown className="h-3.5 w-3.5 text-red-500 animate-bounce" />
-            <span>Scroll to disassemble camera architecture</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-950/80 px-3.5 sm:px-4 py-1 sm:py-1.5 font-mono text-[10px] sm:text-[11px] text-zinc-300 backdrop-blur-xl shadow-xl ring-1 ring-white/10">
+            <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-red-500 animate-bounce" />
+            <span>Scroll to disassemble camera</span>
           </div>
         </div>
 
         {/* BEAT 2 (25% - 55%): Internal Breakdown & Full-Frame Sensor Block */}
         <div
-          className={`absolute left-6 sm:left-12 md:left-16 top-1/2 -translate-y-1/2 max-w-md z-30 transition-all duration-700 pointer-events-none ${
+          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:left-8 md:left-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md z-30 transition-all duration-700 pointer-events-none ${
             scrollProgress > 0.22 && scrollProgress <= 0.54
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 -translate-x-12"
+              ? "opacity-100 translate-y-0 sm:translate-x-0"
+              : "opacity-0 translate-y-8 sm:-translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-400 mb-4">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
+            <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-red-400 mb-1.5 sm:mb-3.5">
               <span>01 / INTERNAL BREAKDOWN</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-[-0.03em] text-white leading-tight">
-              Exmor R Full-Frame Sensor Block. 16-Bit RAW.
+            <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+              Exmor R Full-Frame Sensor Block.
+              <span className="block text-red-400 text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+                16-Bit RAW • 15+ Stops Latitude
+              </span>
             </h2>
-            <p className="mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Back-illuminated 35mm full-frame CMOS sensor with 15+ stops of dynamic latitude. Active copper vapor chamber heatsink and silent turbine fan deliver continuous recording with zero thermal throttling.
+            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed line-clamp-3 sm:line-clamp-none">
+              Back-illuminated 35mm full-frame CMOS sensor with active copper vapor chamber heatsink and silent turbine cooling for continuous high-framerate shooting with zero thermal throttling.
             </p>
 
-            <div className="mt-5 grid grid-cols-2 gap-3 font-mono text-xs">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                <span className="text-[10px] text-zinc-500 block">SENSOR SIZE</span>
+            <div className="mt-2.5 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3">
+                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">SENSOR FORMAT</span>
                 <span className="text-white font-bold">35.7 × 23.8 mm</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                <span className="text-[10px] text-zinc-500 block">BASE DUAL ISO</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3">
+                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">DUAL BASE ISO</span>
                 <span className="text-red-400 font-bold">800 / 12,800</span>
               </div>
             </div>
@@ -296,90 +305,98 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 3 (55% - 82%): Optical Rig & Flange Tolerances */}
         <div
-          className={`absolute right-6 sm:right-12 md:right-16 top-1/2 -translate-y-1/2 max-w-md text-right z-30 transition-all duration-700 pointer-events-none ${
+          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:right-8 md:right-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md text-left sm:text-right z-30 transition-all duration-700 pointer-events-none ${
             scrollProgress > 0.52 && scrollProgress <= 0.82
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 translate-x-12"
+              ? "opacity-100 translate-y-0 sm:translate-x-0"
+              : "opacity-0 translate-y-8 sm:translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 mb-4 ml-auto">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
+            <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.05] px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 mb-1.5 sm:mb-3.5 sm:ml-auto">
               <span>02 / OPTICAL GLASS & FLANGE</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-[-0.03em] text-white leading-tight">
-              Bench-Calibrated Flange & Optic Tolerances.
+            <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+              Bench-Calibrated Flange Tolerances.
+              <span className="block text-emerald-400 text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+                FFD Precision ±0.010mm
+              </span>
             </h2>
-            <p className="mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed text-right">
-              Laser autocollimation holds Flange Focal Distance (FFD) within ±0.010mm. Floating chromatic glass element groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
+            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed text-left sm:text-right line-clamp-3 sm:line-clamp-none">
+              Laser autocollimation holds Flange Focal Distance within ±0.010mm. Floating chromatic glass groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
             </p>
 
-            <div className="mt-5 flex justify-end gap-3 font-mono text-xs">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left">
-                <span className="text-[10px] text-zinc-500 block">FFD TOLERANCE</span>
+            <div className="mt-2.5 sm:mt-5 flex justify-start sm:justify-end gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
+                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">FFD TOLERANCE</span>
                 <span className="text-emerald-400 font-bold">±0.010 mm Pass</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left">
-                <span className="text-[10px] text-zinc-500 block">IRIS MECHANISM</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
+                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">IRIS MECHANISM</span>
                 <span className="text-white font-bold">11-Blade Circular</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* BEAT 4 (80% - 100%): Reassembly & Fleet CTA */}
+        {/* BEAT 4 (80% - 100%): Turnkey Stage Dispatch */}
         <div
-          className={`absolute inset-x-4 sm:inset-x-6 top-6 sm:top-8 md:top-10 max-w-xl mx-auto z-30 transition-all duration-500 ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-24 sm:top-28 md:top-32 max-w-xl mx-auto z-30 transition-all duration-500 ${
             scrollProgress >= 0.80
-              ? "opacity-100 translate-y-0 scale-100"
+              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
               : "opacity-0 translate-y-6 scale-95 pointer-events-none"
           }`}
         >
-          {/* Framer Frosted Glass Blurred Container Box */}
-          <div className="rounded-3xl border border-white/12 bg-zinc-950/85 p-5 sm:p-7 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(239,68,68,0.15)] text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-2.5 shadow-sm">
+          {/* Framer Frosted Glass Mirror Blurred Container Box */}
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/20 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-center text-white">
+            {/* Top Specular Mirror Sheen Highlight */}
+            <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-1.5 sm:mb-3 shadow-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>03 / DISPATCH CALIBRATION • FLIGHT-CASE SEALED</span>
+              <span>03 / TURNKEY DISPATCH • PELICAN SEALED</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.03em] text-white leading-tight">
-              Ready for Wrap Time.
-              <br />
-              <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
-                Rent the Fleet Below.
+            
+            <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-[1.12]">
+              Soundstage-Ready Fleet.
+              <span className="block mt-0.5 sm:mt-1 bg-gradient-to-r from-red-500 via-rose-400 to-amber-200 bg-clip-text text-transparent">
+                Dispatched in Under 3 Hours.
               </span>
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              Magnesium alloy body sealed, batteries charged to 100%, and dispatched directly to your Mumbai soundstage in under 3 hours.
+            
+            <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed line-clamp-2 sm:line-clamp-none">
+              Factory-collimated cinema bodies, matched cine lenses, and 100% pre-charged power systems—delivered in Pelican Air flight cases directly to your Mumbai set.
             </p>
 
-            {/* Quality Pass Badges */}
-            <div className="mt-3.5 grid grid-cols-3 gap-2 font-mono text-[10px]">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-                <span className="text-[9px] text-zinc-500 block">COLLIMATION</span>
-                <span className="text-emerald-400 font-bold">±0.010mm Pass</span>
+            {/* Quality Pass Telemetry Badges */}
+            <div className="mt-2.5 sm:mt-4 grid grid-cols-3 gap-1.5 sm:gap-2 font-mono text-[8.5px] sm:text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
+                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">COLLIMATION</span>
+                <span className="text-emerald-400 font-bold">±0.010mm</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-                <span className="text-[9px] text-zinc-500 block">CLEANROOM</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
+                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">CLEANROOM</span>
                 <span className="text-white font-bold">ISO Class 5</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-                <span className="text-[9px] text-zinc-500 block">DISPATCH</span>
-                <span className="text-red-400 font-bold">Pelican Air Case</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 sm:p-2.5 text-center">
+                <span className="text-[7.5px] sm:text-[9px] text-zinc-400 block tracking-wider">STAGE ETA</span>
+                <span className="text-red-400 font-bold">&lt; 3 Hours</span>
               </div>
             </div>
 
-            <div className="mt-4.5 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-3 sm:mt-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <a
                 href="#catalog"
-                className="framer-pill-primary inline-flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer shadow-[0_0_25px_rgba(239,68,68,0.4)]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white tracking-wide shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Explore Fleet Catalog</span>
                 <span className="font-mono text-xs">→</span>
               </a>
               <a
-                href="#damage-shield"
-                className="framer-pill-secondary inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-medium cursor-pointer border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200"
+                href="#faq"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 transition-all cursor-pointer"
               >
-                <ShieldCheck className="h-3.5 w-3.5 text-red-400" />
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 <span>₹0 Deposit Waiver</span>
               </a>
             </div>
@@ -427,17 +444,34 @@ function renderKinematicCameraFlow(
   const imgH = 768;
   const imgAspect = imgW / imgH;
 
+  const isPortrait = height > width;
+  const isMobile = width < 640;
+  const isTabletPortrait = isPortrait && width < 1024;
+
   // Contain cleanly inside viewport with breathing room for top and bottom typography
   const fitScale = Math.min(
     1,
-    Math.min((width * 0.88) / width, (height * 0.72) / (width / imgAspect))
+    Math.min(
+      (width * (isMobile ? 0.94 : 0.88)) / width,
+      (height * (isMobile ? 0.46 : isTabletPortrait ? 0.54 : 0.72)) / (width / imgAspect)
+    )
   );
   const finalW = width * fitScale;
   const finalH = finalW / imgAspect;
   const scaleRatio = finalW / imgW;
 
   const origX = (width - finalW) / 2;
-  const origY = (height - finalH) / 2 + (height > 700 ? 115 : 65);
+  const beat4Offset = p >= 0.78 ? Math.min(32, (p - 0.78) * 130) : 0;
+
+  // Adaptive camera position: On mobile/tablet portrait, smoothly lift camera to top ~28% of screen
+  // during Beats 2 and 3 so the text card docking at bottom doesn't block the camera!
+  let targetY = (height - finalH) / 2 + (isMobile ? 75 : height > 700 ? 115 : 65);
+  if (isMobile || isTabletPortrait) {
+    const disassembleLift = smoothstep(0.18, 0.30, p) * (1 - smoothstep(0.78, 0.90, p));
+    const portraitTopY = Math.max(70, height * 0.22 - finalH / 2);
+    targetY = targetY * (1 - disassembleLift) + portraitTopY * disassembleLift;
+  }
+  const origY = targetY + beat4Offset;
 
   // Subtle 3D perspective parallax from cursor
   const tiltAngle = mx * 0.018;
@@ -575,49 +609,49 @@ function renderKinematicCameraFlow(
     // 5. FLOATING TELEMETRY HUD (Placed above lens, clear of left/right text cards)
     if (expansion > 0.15 && cameraAlpha > 0.25) {
       ctx.save();
-      const hudX = origX + 330 * scaleRatio;
-      const hudY = origY + 160 * scaleRatio;
-      const hudW = 210 * scaleRatio;
-      const hudH = 50 * scaleRatio;
+      const hudW = Math.max(195, 230 * scaleRatio);
+      const hudH = 48;
+      const hudX = Math.max(12, origX + 310 * scaleRatio);
+      const hudY = Math.max(20, origY + 155 * scaleRatio);
 
       // Glass HUD background pill
-      ctx.fillStyle = "rgba(10, 10, 12, 0.85)";
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.fillStyle = "rgba(10, 10, 12, 0.88)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(hudX, hudY, hudW, hudH, 6 * scaleRatio);
+      ctx.roundRect(hudX, hudY, hudW, hudH, 8);
       ctx.fill();
       ctx.stroke();
 
       // Red status pip
       ctx.fillStyle = "#ef4444";
       ctx.beginPath();
-      ctx.arc(hudX + 12 * scaleRatio, hudY + 14 * scaleRatio, 3, 0, Math.PI * 2);
+      ctx.arc(hudX + 10, hudY + 15, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Telemetry Text
-      ctx.font = `${Math.max(9, Math.round(10 * scaleRatio))}px monospace`;
+      ctx.font = `600 9px monospace`;
       ctx.fillStyle = "#ef4444";
       const ffdCurrent = (52.0 + t12 * 18.25 + t23 * 16.15).toFixed(3);
       ctx.fillText(
         `OPTICAL AXIS // FFD: ${ffdCurrent}mm`,
-        hudX + 22 * scaleRatio,
-        hudY + 18 * scaleRatio
+        hudX + 18,
+        hudY + 16
       );
 
-      ctx.font = `${Math.max(8, Math.round(9 * scaleRatio))}px monospace`;
+      ctx.font = `500 8.5px monospace`;
       ctx.fillStyle = "#10b981";
       ctx.fillText(
         `TOLERANCE: ±0.010mm [PASS]`,
-        hudX + 22 * scaleRatio,
-        hudY + 32 * scaleRatio
+        hudX + 18,
+        hudY + 28
       );
 
       ctx.fillStyle = "#94a3b8";
       ctx.fillText(
         `EXMOR R FULL FRAME • 16-BIT RAW`,
-        hudX + 22 * scaleRatio,
-        hudY + 44 * scaleRatio
+        hudX + 18,
+        hudY + 40
       );
 
       ctx.restore();
@@ -634,12 +668,15 @@ function renderKinematicCameraFlow(
     const caseAspect = beat4.naturalWidth / beat4.naturalHeight;
     const caseFitScale = Math.min(
       1,
-      Math.min((width * 0.88) / width, (height * 0.72) / (width / caseAspect))
+      Math.min(
+        (width * (isMobile ? 0.92 : 0.88)) / width,
+        (height * (isMobile ? 0.48 : isTabletPortrait ? 0.58 : 0.72)) / (width / caseAspect)
+      )
     );
     const caseW = width * caseFitScale;
     const caseH = caseW / caseAspect;
     const caseX = (width - caseW) / 2;
-    const caseY = (height - caseH) / 2 + (height > 700 ? 140 : 80);
+    const caseY = (height - caseH) / 2 + (isMobile ? 100 : height > 700 ? 140 : 80);
 
     ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
     ctx.restore();
@@ -673,9 +710,13 @@ function renderExplodedCinemaRig(
   my: number,
   time: number
 ) {
+  const isPortrait = height > width;
+  const isMobile = width < 640;
   const cx = width / 2;
-  const cy = height / 2;
-  const baseScale = Math.min(width / 1100, height / 750);
+  const cy = (isMobile || isPortrait)
+    ? (height * 0.32 + (progress < 0.2 || progress > 0.82 ? 50 : 0))
+    : height / 2;
+  const baseScale = Math.min(width / (isMobile ? 650 : 1100), height / 750);
 
   // Parallax translation
   const px = mx * 35;

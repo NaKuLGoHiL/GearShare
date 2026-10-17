@@ -332,13 +332,6 @@ const FAQS = [
   },
 ];
 
-const FFD_PRESETS = [
-  { mount: "ARRI PL", targetFfd: 52.000, measuredFfd: 52.002, dev: "+0.002mm", standard: "ARRI / Cooke Standard" },
-  { mount: "ARRI LPL", targetFfd: 44.000, measuredFfd: 43.999, dev: "-0.001mm", standard: "Large Format ALEV Standard" },
-  { mount: "Sony E", targetFfd: 18.000, measuredFfd: 18.003, dev: "+0.003mm", standard: "Mirrorless Cinema Standard" },
-  { mount: "Canon RF", targetFfd: 20.000, measuredFfd: 20.000, dev: "0.000mm", standard: "Locking RF Cine Standard" },
-];
-
 function Index() {
   const [selectedCat, setSelectedCat] = useState<(typeof CATS)[number]>("All");
   const [durationIdx, setDurationIdx] = useState(0);
@@ -352,7 +345,22 @@ function Index() {
   const [cinemaLook, setCinemaLook] = useState<CinemaLookMode>("kodak-500t");
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>(GEAR_CATALOG);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
-  const [selectedFfdIdx, setSelectedFfdIdx] = useState(0);
+
+  // Dynamic Floating Island scroll and section backdrop tracking
+  const [scrollY, setScrollY] = useState(0);
+  const [isOverDarkHero, setIsOverDarkHero] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sy = window.scrollY;
+      setScrollY(sy);
+      const heroThreshold = (window.innerHeight || 800) * 2.5;
+      setIsOverDarkHero(sy < heroThreshold);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Synchronize dynamic catalog rates and stock telemetry with Supabase database
   useEffect(() => {
@@ -429,53 +437,121 @@ function Index() {
     });
   }, [catalogItems, selectedCat, selectedMount, searchQuery, sortBy]);
 
-  const currentFfd = FFD_PRESETS[selectedFfdIdx] ?? FFD_PRESETS[0]!;
-
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-foreground relative selection:bg-red-500/20 selection:text-red-900 antialiased overflow-x-clip">
+    <div className="min-h-screen bg-[#f8fafc] text-foreground relative selection:bg-red-500/20 selection:text-red-900 antialiased overflow-x-clip w-full max-w-full">
       {/* BACKGROUND: Framer 24px x 24px Subtle Geometric Dot/Line Grid with Radial Edge Fade */}
       <div className="pointer-events-none fixed inset-0 framer-grid-lines framer-grid-mask z-0 opacity-80" />
       
       {/* SOFT RADIAL ILLUMINATION GRADIENTS */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.06),transparent_65%)] blur-3xl z-0" />
-      <div className="pointer-events-none absolute top-[900px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.02),transparent_70%)] blur-3xl z-0" />
-      <div className="pointer-events-none absolute top-[2200px] left-1/3 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.05),transparent_70%)] blur-3xl z-0" />
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.06),transparent_65%)] blur-3xl z-0 overflow-hidden" />
+      <div className="pointer-events-none absolute top-[900px] left-1/2 -translate-x-1/2 w-full max-w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.02),transparent_70%)] blur-3xl z-0 overflow-hidden" />
+      <div className="pointer-events-none absolute top-[2200px] left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.05),transparent_70%)] blur-3xl z-0 overflow-hidden" />
 
-      {/* SECTION 1: FIXED APPLE-STYLE TRANSLUCENT NAVBAR */}
-      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-white/85 border-b border-slate-200/80 shadow-sm transition-all">
-        <div className="mx-auto max-w-7xl h-14 px-4 sm:px-6 flex items-center justify-between">
-          {/* Brand mark with pulsing red tally light: ● GEARSHARE */}
-          <a
-            href="#overview"
-            className="group flex items-center gap-2.5 font-mono text-xs font-bold tracking-[0.22em] text-slate-900 transition"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
+      {/* SECTION 1: DYNAMIC FLOATING ISLAND NAVBAR WITH MIRROR BLURRED EFFECT */}
+      <header className="fixed top-2.5 sm:top-5 inset-x-0 z-50 flex flex-col items-center px-2.5 sm:px-6 pointer-events-none transition-all duration-500">
+        <div
+          className={`relative pointer-events-auto w-full max-w-5xl rounded-full transition-all duration-500 ease-out flex items-center justify-between px-3 sm:px-6 shadow-2xl backdrop-blur-2xl ${
+            scrollY > 40 ? "h-12 sm:h-13 py-1 sm:py-1.5" : "h-13 sm:h-14 py-1.5 sm:py-2"
+          } ${
+            isOverDarkHero
+              ? "bg-zinc-950/75 border border-white/20 text-white shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10"
+              : "bg-white/80 border border-white/90 text-slate-900 shadow-[0_16px_40px_-10px_rgba(15,23,42,0.14),0_4px_16px_rgba(15,23,42,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.95)] ring-1 ring-slate-900/5"
+          }`}
+        >
+          {/* Specular Mirror Top Sheen */}
+          <div
+            className={`pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent ${
+              isOverDarkHero ? "via-white/70" : "via-white"
+            } to-transparent`}
+          />
+
+          {/* Left Brand Mark with Pulsing Tally */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <a
+              href="#overview"
+              className={`group flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold tracking-[0.16em] sm:tracking-[0.22em] transition ${
+                isOverDarkHero ? "text-white" : "text-slate-900"
+              }`}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.9)]" />
+              </span>
+              <span className="transition group-hover:text-red-500">GEARSHARE</span>
+            </a>
+
+            {/* Dynamic Island Telemetry Capsule */}
+            <span
+              className={`hidden lg:inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-mono tracking-wider transition-colors ${
+                isOverDarkHero
+                  ? "border border-white/15 bg-white/5 text-zinc-300"
+                  : "border border-slate-200/90 bg-slate-100/80 text-slate-700"
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{isOverDarkHero ? "4K 120P RAW" : "MUMBAI DISPATCH ACTIVE"}</span>
             </span>
-            <span className="transition group-hover:text-red-600">GEARSHARE</span>
-          </a>
+          </div>
 
-          {/* Links: Overview, Hardware, Scrollytech, Pricing, FAQ */}
-          <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-slate-600">
-            <a href="#overview" className="transition hover:text-slate-900">
+          {/* Navigation Links: Overview, Scrollytech, Hardware, Pricing, FAQ, Track */}
+          <nav
+            className={`hidden md:flex items-center gap-1 lg:gap-1.5 font-mono text-xs transition-colors ${
+              isOverDarkHero ? "text-zinc-300" : "text-slate-600"
+            }`}
+          >
+            <a
+              href="#overview"
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                isOverDarkHero
+                  ? "hover:text-white hover:bg-white/10"
+                  : "hover:text-slate-900 hover:bg-slate-900/5"
+              }`}
+            >
               Overview
             </a>
-            <a href="#hardware" className="transition hover:text-slate-900">
-              Hardware
-            </a>
-            <a href="#scrollytech" className="transition hover:text-slate-900">
+            <a
+              href="#scrollytech"
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                isOverDarkHero
+                  ? "hover:text-white hover:bg-white/10"
+                  : "hover:text-slate-900 hover:bg-slate-900/5"
+              }`}
+            >
               Scrollytech
             </a>
-            <a href="#catalog" className="transition hover:text-slate-900">
+            <a
+              href="#hardware"
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                isOverDarkHero
+                  ? "hover:text-white hover:bg-white/10"
+                  : "hover:text-slate-900 hover:bg-slate-900/5"
+              }`}
+            >
+              Hardware
+            </a>
+            <a
+              href="#catalog"
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                isOverDarkHero
+                  ? "hover:text-white hover:bg-white/10"
+                  : "hover:text-slate-900 hover:bg-slate-900/5"
+              }`}
+            >
               Pricing
             </a>
-            <a href="#faq" className="transition hover:text-slate-900">
+            <a
+              href="#faq"
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                isOverDarkHero
+                  ? "hover:text-white hover:bg-white/10"
+                  : "hover:text-slate-900 hover:bg-slate-900/5"
+              }`}
+            >
               FAQ
             </a>
             <a
               href="/track"
-              className="flex items-center gap-1.5 text-red-600 transition hover:text-red-700 font-semibold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-red-600 hover:text-red-500 font-semibold transition-all hover:bg-red-500/10"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>Track Dispatch</span>
@@ -483,10 +559,10 @@ function Index() {
           </nav>
 
           {/* Right Action: Anodized-red rounded pill "Rent Kit" */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <a
               href="#catalog"
-              className="inline-flex items-center justify-center rounded-full bg-red-600 hover:bg-red-700 px-5 py-2 text-xs font-semibold text-white tracking-wide transition shadow-[0_4px_14px_rgba(225,29,72,0.35)] hover:shadow-[0_6px_20px_rgba(225,29,72,0.45)] cursor-pointer"
+              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 px-3.5 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-white tracking-wide shadow-[0_4px_14px_rgba(225,29,72,0.4),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_6px_22px_rgba(225,29,72,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               <span>Rent Kit</span>
               <span className="ml-1 font-mono text-[10px]">→</span>
@@ -496,63 +572,91 @@ function Index() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation Menu"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-600 transition hover:border-slate-300 hover:text-slate-900 md:hidden cursor-pointer"
+              className={`flex h-8 w-8 items-center justify-center rounded-full border transition md:hidden cursor-pointer ${
+                isOverDarkHero
+                  ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                  : "border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Dropdown Menu */}
+        {/* Mobile Navigation Dropdown Menu (Floating Glass Card) */}
         {mobileMenuOpen && (
-          <div className="border-t border-slate-200 bg-white/95 px-6 py-4 md:hidden animate-in fade-in slide-in-from-top-2 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3 font-mono text-xs">
-              <span className="flex items-center gap-2 text-slate-700">
+          <div
+            className={`pointer-events-auto mt-2 w-full max-w-5xl rounded-3xl p-4 sm:p-5 shadow-2xl backdrop-blur-2xl border transition-all md:hidden animate-in fade-in slide-in-from-top-2 max-h-[80dvh] overflow-y-auto custom-scrollbar overscroll-contain ${
+              isOverDarkHero
+                ? "bg-zinc-950/90 border-white/20 text-white shadow-[0_20px_50px_rgba(0,0,0,0.9)]"
+                : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-between border-b pb-3 font-mono text-xs ${
+                isOverDarkHero ? "border-white/10 text-zinc-300" : "border-slate-200 text-slate-700"
+              }`}
+            >
+              <span className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span>MUMBAI FLEET ACTIVE</span>
               </span>
-              <span className="text-[10px] text-slate-500">24/7 METRO DISPATCH</span>
+              <span className={`text-[10px] ${isOverDarkHero ? "text-zinc-500" : "text-slate-500"}`}>
+                24/7 METRO DISPATCH
+              </span>
             </div>
             <nav className="mt-3 flex flex-col gap-2 font-mono text-xs">
               <a
                 href="#overview"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 01 / Overview
               </a>
               <a
                 href="#scrollytech"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 02 / Scrollytech Breakdown
               </a>
               <a
                 href="#catalog"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 03 / Pricing & Fleet Catalog
               </a>
               <a
                 href="#hardware"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 04 / Hardware Bento Specs
               </a>
               <a
                 href="#workflow"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 05 / Rental Workflow
               </a>
               <a
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-slate-700 hover:text-slate-900"
+                className={`py-1.5 transition ${
+                  isOverDarkHero ? "text-zinc-300 hover:text-white" : "text-slate-700 hover:text-slate-900"
+                }`}
               >
                 06 / Operational FAQ
               </a>
@@ -567,7 +671,7 @@ function Index() {
                 <a
                   href="#catalog"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full text-center rounded-full bg-red-600 hover:bg-red-700 py-2.5 text-xs font-semibold text-white shadow-md"
+                  className="block w-full text-center rounded-full bg-gradient-to-r from-red-600 to-rose-600 py-2.5 text-xs font-semibold text-white shadow-md"
                 >
                   Rent Kit →
                 </a>
@@ -613,23 +717,27 @@ function Index() {
             </div>
 
             {/* Optical LUT Switcher */}
-            <div className="mt-6 flex items-center justify-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 font-mono text-xs shadow-md">
-                <Sparkles className="h-3.5 w-3.5 text-red-500" />
-                <span className="text-slate-500 uppercase text-[10px] tracking-wider font-semibold">3-WAY OPTICAL LUT:</span>
-                {(["kodak-500t", "anamorphic-cyan", "silver-noir"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setCinemaLook(mode)}
-                    className={`rounded-full px-3.5 py-1 text-[11px] font-medium transition cursor-pointer ${
-                      cinemaLook === mode
-                        ? "bg-slate-900 text-white font-semibold shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                    }`}
-                  >
-                    {mode === "kodak-500t" ? "Kodak 500T" : mode === "anamorphic-cyan" ? "Anamorphic Cyan" : "Silver Noir"}
-                  </button>
-                ))}
+            <div className="mt-6 flex items-center justify-center px-2">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 rounded-2xl sm:rounded-full border border-slate-200 bg-white p-1.5 sm:px-4 sm:py-2 font-mono text-xs shadow-md max-w-full">
+                <div className="flex items-center gap-1.5 px-1.5 py-0.5">
+                  <Sparkles className="h-3.5 w-3.5 text-red-500" />
+                  <span className="text-slate-500 uppercase text-[9px] sm:text-[10px] tracking-wider font-semibold">LUT:</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {(["kodak-500t", "anamorphic-cyan", "silver-noir"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setCinemaLook(mode)}
+                      className={`rounded-full px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-[11px] font-medium transition cursor-pointer ${
+                        cinemaLook === mode
+                          ? "bg-slate-900 text-white font-semibold shadow-sm"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      }`}
+                    >
+                      {mode === "kodak-500t" ? "Kodak 500T" : mode === "anamorphic-cyan" ? "Cyan" : "Noir"}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -637,7 +745,7 @@ function Index() {
       </section>
 
       {/* SECTION 3: FRAMER-STYLE BENTO GRID CATALOG (INTERACTIVE CORE) */}
-      <section id="catalog" className="relative mx-auto max-w-7xl px-6 pt-20 pb-32 z-10 scroll-mt-28">
+      <section id="catalog" className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-28 sm:pb-32 z-10 scroll-mt-28">
         {/* Catalog Header & Command Deck */}
         <div className="flex flex-col justify-between gap-6 border-b border-slate-200 pb-8 lg:flex-row lg:items-end">
           <div>
@@ -645,26 +753,26 @@ function Index() {
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>INSTANT INVENTORY ACCESS</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900">
+            <h2 className="mt-3 text-2xl xs:text-3xl font-bold tracking-tight sm:text-4xl text-slate-900">
               Precision Cinema Fleet Ready for Set Call.
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-slate-600 leading-relaxed">
+            <p className="mt-2 max-w-2xl text-xs sm:text-sm text-slate-600 leading-relaxed">
               Bench-calibrated 8K camera bodies, anamorphic primes, stage LED softlights, and 32-bit float audio. Flight-cased with turnkey accessories and ₹0 deposit coverage across Mumbai & India.
             </p>
           </div>
 
           {/* Segmented Duration Switcher [1 Day | 3 Days (-10%) | 7 Days (-25%)] */}
-          <div className="flex flex-col items-start gap-2 lg:items-end">
+          <div className="flex flex-col items-start gap-2 lg:items-end w-full lg:w-auto">
             <span className="font-mono text-[11px] tracking-wider uppercase text-slate-500 flex items-center gap-1.5 font-semibold">
               <Clock className="h-3.5 w-3.5 text-red-500" />
               <span>RENTAL SHOOT DURATION</span>
             </span>
-            <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1 font-mono text-xs shadow-inner">
+            <div className="inline-flex w-full sm:w-auto justify-between sm:justify-start rounded-full border border-slate-200 bg-slate-100 p-1 font-mono text-[11px] sm:text-xs shadow-inner">
               {DURATIONS.map((d, i) => (
                 <button
                   key={d.days}
                   onClick={() => setDurationIdx(i)}
-                  className={`rounded-full px-4 py-2 transition-all duration-200 cursor-pointer ${
+                  className={`flex-1 sm:flex-initial text-center rounded-full px-2.5 sm:px-4 py-1.5 sm:py-2 transition-all duration-200 cursor-pointer ${
                     durationIdx === i
                       ? "bg-white text-slate-900 font-bold shadow-md"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
@@ -680,7 +788,7 @@ function Index() {
               ))}
             </div>
             {activeDuration.discount > 0 && (
-              <span className="font-mono text-[11px] text-emerald-700 font-semibold">
+              <span className="font-mono text-[10px] sm:text-[11px] text-emerald-700 font-semibold">
                 ⚡ Volume rate active: Save {activeDuration.discount * 100}% on all equipment below
               </span>
             )}
@@ -688,8 +796,8 @@ function Index() {
         </div>
 
         {/* Category Filter Pills & Search Command Bar */}
-        <div className="mt-8 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-6 sm:mt-8 space-y-4">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 sm:pb-0 sm:flex-wrap no-scrollbar">
             {CATS.map((c) => {
               const count = categoryCounts[c] ?? 0;
               const isActive = selectedCat === c;
@@ -697,7 +805,7 @@ function Index() {
                 <button
                   key={c}
                   onClick={() => setSelectedCat(c)}
-                  className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                  className={`shrink-0 flex items-center gap-2 rounded-full border px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "border-red-500 bg-red-50 text-red-600 font-bold ring-1 ring-red-400 shadow-sm"
                       : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900 shadow-sm"
@@ -705,7 +813,7 @@ function Index() {
                 >
                   <span>{c}</span>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] ${
+                    className={`rounded-full px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] ${
                       isActive ? "bg-red-600 text-white font-bold" : "bg-slate-100 text-slate-600"
                     }`}
                   >
@@ -717,15 +825,15 @@ function Index() {
           </div>
 
           {/* Search & Secondary Filter Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-            <div className="relative flex-1 min-w-[240px]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="relative flex-1 min-w-0 sm:min-w-[240px]">
               <Search className="pointer-events-none absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search cinema bodies, primes, sensor, mounts..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-400"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-8 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-400"
               />
               {searchQuery && (
                 <button
@@ -738,11 +846,11 @@ function Index() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-slate-500">Mount:</span>
+              <span className="font-mono text-xs text-slate-500 hidden xs:inline">Mount:</span>
               <select
                 value={selectedMount}
                 onChange={(e) => setSelectedMount(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
+                className="flex-1 sm:flex-initial rounded-xl border border-slate-200 bg-slate-50 px-2.5 sm:px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
               >
                 <option value="All">All Mounts</option>
                 <option value="PL">PL Mount</option>
@@ -754,7 +862,7 @@ function Index() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
+                className="flex-1 sm:flex-initial rounded-xl border border-slate-200 bg-slate-50 px-2.5 sm:px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="price-low">Rate: Low to High</option>
@@ -889,92 +997,16 @@ function Index() {
           </p>
         </div>
 
-        {/* 4 Bento Advantage Blocks */}
+        {/* 3 Bento Advantage Blocks */}
         <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* Block 1 (Large 2-column span): Sub-Micron Sensor Bench Testing with Interactive Flange Focal Distance Diagram */}
-          <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between font-mono text-xs">
-                <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 uppercase tracking-wider text-red-600 font-bold">
-                  01 / BENCH TESTING
-                </span>
-                <span className="text-emerald-600 flex items-center gap-1.5 font-semibold">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>±0.010mm Tolerance Pass</span>
-                </span>
-              </div>
-
-              <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-                Sub-Micron Sensor Bench Testing
-              </h3>
-              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-                Back-focus drift destroys 8K anamorphic sharpness. Every lens and mount is calibrated on our digital autocollimator before rolling onto set.
-              </p>
-
-              {/* Interactive Mount Selector */}
-              <div className="mt-6 flex flex-wrap gap-2 font-mono text-xs">
-                {FFD_PRESETS.map((p, idx) => (
-                  <button
-                    key={p.mount}
-                    onClick={() => setSelectedFfdIdx(idx)}
-                    className={`rounded-xl border px-3.5 py-2 transition cursor-pointer ${
-                      selectedFfdIdx === idx
-                        ? "border-red-500 bg-red-50 text-red-600 font-bold ring-1 ring-red-400 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900 shadow-sm"
-                    }`}
-                  >
-                    <span>{p.mount} ({p.targetFfd.toFixed(2)}mm)</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Interactive Optical Collimation Diagram Graphic */}
-            <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-mono">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <Aperture className="h-4 w-4 text-red-600" />
-                  <span className="text-slate-900 font-semibold">{currentFfd.mount} Collimation Telemetry</span>
-                </div>
-                <div className="flex items-center gap-3 text-[11px]">
-                  <span className="text-slate-500">SPEC: {currentFfd.standard}</span>
-                  <span className="text-emerald-700 font-semibold">DEVIATION: {currentFfd.dev}</span>
-                </div>
-              </div>
-
-              {/* Laser Reticle & Scale Line */}
-              <div className="relative mt-4 h-16 w-full overflow-hidden rounded-xl border border-slate-200 bg-white flex items-center justify-center shadow-inner">
-                <div className="absolute inset-x-0 h-px bg-red-400/40" />
-                <div className="absolute inset-y-0 w-px bg-red-400/40" />
-                <div className="h-10 w-10 rounded-full border border-dashed border-red-500/50 flex items-center justify-center">
-                  <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
-                </div>
-                {/* Millimeter ticks */}
-                <div className="absolute bottom-1 inset-x-4 flex justify-between text-[9px] text-slate-500 font-medium">
-                  <span>-0.010mm</span>
-                  <span>-0.005mm</span>
-                  <span className="text-red-600 font-bold">0.000mm</span>
-                  <span>+0.005mm</span>
-                  <span>+0.010mm</span>
-                </div>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between text-[11px] text-slate-600">
-                <span>Measured FFD: <strong className="text-slate-900">{currentFfd.measuredFfd.toFixed(3)} mm</strong></span>
-                <span className="text-emerald-700 font-semibold">Class-100 Cleanroom Certified</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Block 2: Production Damage Shield (Zero Deposit for verified DPs) */}
+          {/* Block 1: Production Damage Shield (Zero Deposit for verified DPs) */}
           <div id="damage-shield" className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between scroll-mt-28">
             <div>
               <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-600 font-bold">
-                02 / DAMAGE SHIELD
+                01 / DAMAGE SHIELD
               </span>
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-                Production Damage Shield (Zero Deposit for verified DPs)
+                Production Damage Shield (Zero Deposit)
               </h3>
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 Full on-set and transit accidental damage coverage. Instant deposit waivers for GSTIN holders and WICA / SICA members.
@@ -986,20 +1018,20 @@ function Index() {
                 <ShieldCheck className="h-4 w-4 text-emerald-600" />
                 <span>100% IN-TRANSIT & ON-SET COVERAGE</span>
               </div>
-              <p className="mt-1 text-[11px] text-emerald-700 leading-relaxed">
+              <p className="mt-1.5 text-[11px] text-emerald-700 leading-relaxed">
                 Drops, thermal stress, and optical element hazards covered without tied-up credit card holds.
               </p>
             </div>
           </div>
 
-          {/* Block 3: 3-Hour Studio Set Dispatch Across Mumbai */}
+          {/* Block 2: 3-Hour Studio Set Dispatch Across Mumbai */}
           <div className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-600 font-bold">
-                03 / METRO SET DISPATCH
+                02 / METRO SET DISPATCH
               </span>
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-                3-Hour Studio Set Dispatch Across Mumbai
+                3-Hour Studio Set Dispatch
               </h3>
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 Flight-ready Pelican Air hardcases dispatched in dedicated sprinter vans across Film City, Mehboob, Yash Raj, and national studios.
@@ -1009,7 +1041,7 @@ function Index() {
             <div className="mt-6">
               <a
                 href="/track"
-                className="framer-pill-secondary flex items-center justify-between p-3.5 font-mono text-xs shadow-sm"
+                className="framer-pill-secondary flex items-center justify-between p-3.5 font-mono text-xs shadow-sm hover:border-red-300 transition"
               >
                 <span className="flex items-center gap-2 text-slate-800 font-medium">
                   <Truck className="h-4 w-4 text-red-600" />
@@ -1020,43 +1052,42 @@ function Index() {
             </div>
           </div>
 
-          {/* Block 4: Pre-Charged V-Mount Batteries & Flight Pelican Cases */}
-          <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
+          {/* Block 3: Pre-Charged V-Mount Batteries & Flight Pelican Cases */}
+          <div className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between font-mono text-xs">
                 <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 uppercase tracking-wider text-red-600 font-bold">
-                  04 / TURNKEY POWER & HARDCASES
+                  03 / TURNKEY POWER & HARDCASES
                 </span>
-                <span className="text-slate-500 font-semibold">4x 150Wh V-Mount Standard</span>
               </div>
 
               <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-                Pre-Charged V-Mount Batteries & Flight Pelican Cases
+                Pre-Charged Power & Flight Cases
               </h3>
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 No half-charged surprises. Every body ships with four 150Wh high-draw V-mount bricks, quad fast-charger, 15mm carbon rods, and Arri standard bridgeplates.
               </p>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+            <div className="mt-6 grid grid-cols-2 gap-2.5 font-mono text-xs">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
                 <Zap className="h-4 w-4 text-red-600 mx-auto" />
-                <p className="mt-1 font-bold text-slate-900">4x 150Wh</p>
+                <p className="mt-1 font-bold text-slate-900 text-[11px]">4x 150Wh</p>
                 <p className="text-[10px] text-slate-500">V-Mount Cells</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
                 <Box className="h-4 w-4 text-red-600 mx-auto" />
-                <p className="mt-1 font-bold text-slate-900">Pelican Air</p>
+                <p className="mt-1 font-bold text-slate-900 text-[11px]">Pelican Air</p>
                 <p className="text-[10px] text-slate-500">Flight Hardcase</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
                 <SlidersHorizontal className="h-4 w-4 text-red-600 mx-auto" />
-                <p className="mt-1 font-bold text-slate-900">15mm Rods</p>
+                <p className="mt-1 font-bold text-slate-900 text-[11px]">15mm Rods</p>
                 <p className="text-[10px] text-slate-500">Carbon System</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
                 <Radio className="h-4 w-4 text-emerald-600 mx-auto" />
-                <p className="mt-1 font-bold text-emerald-700">100% Full</p>
+                <p className="mt-1 font-bold text-emerald-700 text-[11px]">100% Full</p>
                 <p className="text-[10px] text-slate-500">Pre-Charged</p>
               </div>
             </div>

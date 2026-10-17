@@ -400,14 +400,14 @@ export function ReserveModal({
           role="dialog"
           aria-modal="true"
           aria-label={`Rental inquiry for ${gear.name}`}
-          className="relative my-4 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-2xl backdrop-blur-2xl ring-1 ring-slate-900/5 animate-in zoom-in-95 duration-200"
+          className="relative my-4 flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-white text-left shadow-2xl backdrop-blur-2xl ring-1 ring-slate-900/5 animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Ambient Top Glow Line */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
 
           {/* PINNED MODAL HEADER (Always Visible & Accessible) */}
-          <div className="flex-none flex items-start justify-between gap-4 border-b border-slate-200 bg-white/95 px-6 pt-5 pb-4 sm:px-8 sm:pt-6 z-10 backdrop-blur-md">
+          <div className="flex-none flex items-start justify-between gap-3 sm:gap-4 border-b border-slate-200 bg-white/95 px-4 pt-4 pb-3 sm:px-8 sm:pt-6 sm:pb-4 z-10 backdrop-blur-md">
             <div className="flex items-center gap-3.5 min-w-0">
               {gear.img ? (
                 <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md">
@@ -434,7 +434,7 @@ export function ReserveModal({
                     MUMBAI DISPATCH
                   </span>
                 </div>
-                <h3 className="mt-0.5 text-lg sm:text-xl font-bold tracking-tight text-slate-900 truncate">
+                <h3 className="mt-0.5 text-base sm:text-xl font-bold tracking-tight text-slate-900 truncate">
                   {gear.name}
                 </h3>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs">
@@ -460,7 +460,7 @@ export function ReserveModal({
           </div>
 
           {/* SCROLLABLE MODAL BODY */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 space-y-5 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-5 space-y-5 custom-scrollbar overscroll-contain pb-safe">
             {/* STATE 1: ANIMATED CONFIRMATION CARD */}
             {confirmation ? (
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
