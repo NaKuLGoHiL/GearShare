@@ -418,7 +418,7 @@ export function AppleScrollyCanvas({
       id="scrollytech"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full h-[350vh] bg-[#050505] select-none touch-pan-y"
+      className="relative w-full h-[350vh] bg-[#09090b] select-none touch-pan-y"
     >
       {/* Sticky Fullscreen Canvas Viewport with 100dvh for iOS Safari stability */}
       <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden relative flex flex-col justify-between">
@@ -465,12 +465,12 @@ export function AppleScrollyCanvas({
           style={{ width: "100%", height: "100%" }}
         />
 
-        {/* 3. ARRI / RED VIEWFINDER OS FRAMING & RETICLES */}
-        <div className="pointer-events-none absolute inset-3 sm:inset-5 md:inset-8 flex flex-col justify-between z-20">
+        {/* 3. ARRI / RED VIEWFINDER OS FRAMING & RETICLES (Pushed down to top-24 to avoid fixed navbar collision) */}
+        <div className="pointer-events-none absolute inset-x-3 sm:inset-x-6 md:inset-x-8 top-24 bottom-3 sm:bottom-5 flex flex-col justify-between z-20">
           {/* Top Reticles Bar */}
           <div className="flex items-start justify-between font-mono text-[9px] sm:text-[10px] tracking-wider text-zinc-500">
-            {/* Top-Left: Corner Bracket ┌ & Live REC Tally */}
-            <div className="flex items-center gap-2">
+            {/* Top-Left: Corner Bracket ┌ & Live REC Tally + Disassembly Mode */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
                 <path d="M1 17V1H17" stroke="currentColor" strokeWidth="1.5" />
               </svg>
@@ -480,14 +480,21 @@ export function AppleScrollyCanvas({
                 <span className="text-zinc-600">·</span>
                 <span className="text-red-400 font-semibold">{timecode}</span>
               </div>
+              <div className="hidden md:flex items-center gap-1.5 font-mono text-[10px] text-zinc-400 border-l border-white/10 pl-2.5">
+                <span className="text-zinc-500">MODE:</span>
+                <span className="text-zinc-200 font-semibold">DISASSEMBLY {Math.round(scrollProgress * 100).toString().padStart(2, "0")}%</span>
+              </div>
             </div>
 
-            {/* Top-Right: Sensor Format & Corner Bracket ┐ */}
-            <div className="flex items-center gap-2">
-              <div className="font-mono text-[10px] text-zinc-400 text-right hidden xs:block">
-                <span className="text-white font-semibold">8K VISTAVISION</span>
-                <span className="text-zinc-600"> · </span>
-                <span className="text-emerald-400 font-semibold">120 FPS RAW</span>
+            {/* Top-Right: T2.0, Sensor Format & Corner Bracket ┐ */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="font-mono text-[10px] text-zinc-400 text-right flex items-center gap-1.5 sm:gap-2">
+                <span className="rounded bg-red-500/10 border border-red-500/30 px-1.5 py-0.5 text-red-300 font-bold">
+                  T2.0
+                </span>
+                <span className="text-white font-semibold hidden xs:inline">8K VISTAVISION</span>
+                <span className="text-zinc-600 hidden sm:inline"> · </span>
+                <span className="text-emerald-400 font-semibold hidden sm:inline">120 FPS RAW</span>
               </div>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
                 <path d="M17 17V1H1" stroke="currentColor" strokeWidth="1.5" />
@@ -544,96 +551,295 @@ export function AppleScrollyCanvas({
           </div>
         </div>
 
-        {/* 4. BEAT 1 HERO DISPLAY: TYPOGRAPHY, STAGGERED REVEAL & CALLOUT ACTION CLUSTER */}
+        {/* 4. BEAT 1 HERO DISPLAY: CLEAN VERTICAL FLOW (Zero overlap with dedicated camera stage) */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-14 sm:top-18 md:top-20 max-w-4xl mx-auto text-center z-30 transition-all duration-300 ease-out ${
+          className={`relative z-30 flex flex-col items-center justify-start pt-24 pb-2 px-3 sm:px-6 w-full max-w-6xl mx-auto transition-all duration-300 ease-out ${
             scrollProgress <= 0.20
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 -translate-y-6 scale-95 pointer-events-none"
+              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+              : "opacity-0 -translate-y-6 scale-95 pointer-events-none absolute inset-x-0 top-0"
           }`}
         >
-          {/* Subtle atmospheric vignette backing for 100% crisp editorial contrast */}
-          <div className="pointer-events-none absolute -inset-x-12 -top-10 -bottom-8 bg-gradient-to-b from-[#050505]/85 via-[#050505]/40 to-transparent blur-2xl -z-10 rounded-3xl" />
+          {/* Subtle atmospheric vignette backing */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#09090b]/90 via-[#09090b]/40 to-transparent blur-2xl -z-10" />
 
-          {/* Top Telemetry Badge */}
+          {/* TOP BLOCK: Overline Badge + Headline (2 lines max, Uncompromised Sensor Power. on 1 single line) */}
+          <div className="text-center w-full max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center gap-2 border border-white/10 bg-zinc-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-300 shadow-[0_0_20px_rgba(220,38,38,0.15)] mb-2 sm:mb-2.5"
+            >
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              <span className="hidden sm:inline">01 // CINEMA HARDWARE ARCHITECTURE • MUMBAI STAGE DESK</span>
+              <span className="sm:hidden">01 // MUMBAI STAGE DESK</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.03em] leading-[1.02] drop-shadow-2xl"
+            >
+              <span className="bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent block">
+                Precision Optics.
+              </span>
+              <span className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent block drop-shadow-[0_0_35px_rgba(239,68,68,0.25)] whitespace-normal md:whitespace-nowrap">
+                Uncompromised Sensor Power.
+              </span>
+            </motion.h1>
+          </div>
+
+          {/* MIDDLE BLOCK: Sub-copy + Compact Side-by-Side CTA Buttons */}
+          <div className="text-center w-full max-w-3xl mx-auto mt-2 sm:mt-2.5">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-xs sm:text-sm md:text-base text-zinc-300 font-normal leading-relaxed text-balance"
+            >
+              The cinema hardware behind award-winning frames. Calibrated to{" "}
+              <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+                ±0.010mm FFD
+              </span>
+              , standard{" "}
+              <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+                PL-Mount
+              </span>
+              , with{" "}
+              <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
+                16+ Stops DR
+              </span>
+              —flight-cased and dispatched directly to your set.
+            </motion.p>
+
+            {/* Compact Side-by-Side CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-3.5 sm:mt-4 flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
+            >
+              <button
+                onClick={onRentClick}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-medium px-7 py-3.5 rounded-full shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs sm:text-sm tracking-wide"
+              >
+                <span>Configure & Reserve Kit</span>
+                <span className="font-mono text-xs">→</span>
+              </button>
+
+              <button
+                onClick={() => handleSelectMode(activeMode === "assembled" ? "exploded" : "assembled")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 font-medium px-7 py-3.5 rounded-full backdrop-blur-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs sm:text-sm"
+              >
+                <Sparkles className="h-4 w-4 text-rose-400" />
+                <span>{activeMode === "assembled" ? "Inspect Exploded View ⚡" : "Reset Assembled Rig"}</span>
+              </button>
+            </motion.div>
+          </div>
+
+          {/* CAMERA STAGE: Dedicated Unobstructed Space with Hotspot Pins & Seamless Blending */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center gap-2 border border-white/10 bg-zinc-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-300 shadow-[0_0_20px_rgba(220,38,38,0.15)] mb-2.5 sm:mb-3"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-6 sm:mt-8 h-[280px] xs:h-[340px] md:h-[420px] lg:h-[480px] w-full max-w-4xl mx-auto relative flex items-center justify-center select-none"
           >
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
-            <span className="hidden sm:inline">01 // CINEMA HARDWARE ARCHITECTURE • MUMBAI STAGE DESK</span>
-            <span className="sm:hidden">01 // MUMBAI STAGE DESK</span>
+            {/* Seamless Camera Wrapper with radial mask, mix-blend-lighten, and matching #09090b background blending */}
+            <div className="relative h-full w-full flex items-center justify-center [mask-image:radial-gradient(closest-side,black_65%,transparent_100%)] mix-blend-lighten bg-[#09090b]/40">
+              <img
+                src="/frames/beat_1_hero.jpg"
+                alt="Sony FX3 Cinema Rig"
+                className="h-full w-full object-contain pointer-events-none select-none"
+                loading="eager"
+              />
+            </div>
+
+            {/* Hotspot Pins strictly anchored inside camera container with text label beside + */}
+            {/* 1. OPTICS: top-[55%] left-[28%] */}
+            <div className="absolute top-[55%] left-[28%] -translate-x-1/2 -translate-y-1/2 z-20">
+              <button
+                onClick={() => setActiveHotspot(activeHotspot === "optics" ? null : "optics")}
+                onMouseEnter={() => setActiveHotspot("optics")}
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                aria-label="Inspect Optics"
+              >
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                  <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
+                </span>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
+                  OPTICS
+                </span>
+              </button>
+
+              {/* Tooltip Card */}
+              <AnimatePresence>
+                {activeHotspot === "optics" && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="absolute z-40 w-64 sm:w-72 right-2 bottom-8 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    onMouseLeave={() => setActiveHotspot(null)}
+                  >
+                    <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                        01 // ANAMORPHIC GLASS
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveHotspot(null);
+                        }}
+                        className="text-zinc-500 hover:text-white text-xs cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <h4 className="mt-1.5 text-xs font-bold text-white tracking-tight">
+                      Cooke S4/i 35mm T2.0 • PL Mount
+                    </h4>
+                    <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
+                      Factory-collimated anamorphic prime with organic cinema roll-off and laser-measured optical center.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1 font-mono text-[9px]">
+                      {["T2.0 - T22 Iris", "/i Metadata Protocol", "±0.005mm Collimation"].map((s) => (
+                        <span key={s} className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 text-zinc-300">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* 2. SENSOR CORE: top-[42%] left-[52%] */}
+            <div className="absolute top-[42%] left-[52%] -translate-x-1/2 -translate-y-1/2 z-20">
+              <button
+                onClick={() => setActiveHotspot(activeHotspot === "sensor" ? null : "sensor")}
+                onMouseEnter={() => setActiveHotspot("sensor")}
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                aria-label="Inspect Sensor Core"
+              >
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                  <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
+                </span>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
+                  SENSOR CORE
+                </span>
+              </button>
+
+              {/* Tooltip Card */}
+              <AnimatePresence>
+                {activeHotspot === "sensor" && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="absolute z-40 w-64 sm:w-72 left-1/2 -translate-x-1/2 bottom-9 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    onMouseLeave={() => setActiveHotspot(null)}
+                  >
+                    <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                        02 // 8K SENSOR DIE
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveHotspot(null);
+                        }}
+                        className="text-zinc-500 hover:text-white text-xs cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <h4 className="mt-1.5 text-xs font-bold text-white tracking-tight">
+                      Full-Frame 8K VV • 16.5 Stops DR
+                    </h4>
+                    <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
+                      Back-illuminated full-frame sensor die with zero thermal throttling and titanium locking flange.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1 font-mono text-[9px]">
+                      {["Exmor R BSI CMOS", "Dual ISO 800/12800", "16-Bit Linear RAW"].map((s) => (
+                        <span key={s} className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 text-zinc-300">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* 3. POWER / I/O: top-[48%] left-[72%] */}
+            <div className="absolute top-[48%] left-[72%] -translate-x-1/2 -translate-y-1/2 z-20">
+              <button
+                onClick={() => setActiveHotspot(activeHotspot === "power" ? null : "power")}
+                onMouseEnter={() => setActiveHotspot("power")}
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                aria-label="Inspect Power and I/O"
+              >
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                  <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
+                </span>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
+                  POWER / I/O
+                </span>
+              </button>
+
+              {/* Tooltip Card */}
+              <AnimatePresence>
+                {activeHotspot === "power" && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="absolute z-40 w-64 sm:w-72 left-2 bottom-8 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    onMouseLeave={() => setActiveHotspot(null)}
+                  >
+                    <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                        03 // DUAL BUS POWER
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveHotspot(null);
+                        }}
+                        className="text-zinc-500 hover:text-white text-xs cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <h4 className="mt-1.5 text-xs font-bold text-white tracking-tight">
+                      Dual V-Lock Hot-Swap • 12G-SDI RAW Out
+                    </h4>
+                    <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
+                      Continuous soundstage power switching with dual high-bandwidth uncompressed RAW monitoring.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1 font-mono text-[9px]">
+                      {["Continuous 14.8V", "12G-SDI 4K 120p", "SMPTE Timecode"].map((s) => (
+                        <span key={s} className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 text-zinc-300">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
-          {/* Hero Display Title: Metallic + Tungsten Red Gradients */}
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] font-extrabold tracking-[-0.03em] leading-[1.02] text-balance drop-shadow-2xl"
-          >
-            <span className="bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent block">
-              Precision Optics.
-            </span>
-            <span className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent block drop-shadow-[0_0_35px_rgba(239,68,68,0.25)]">
-              Uncompromised Sensor Power.
-            </span>
-          </motion.h1>
-
-          {/* Technical Sub-copy with inline monospace spec pills */}
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-2.5 sm:mt-3 text-xs sm:text-sm md:text-base text-zinc-300 max-w-2xl mx-auto font-normal leading-relaxed text-balance px-2"
-          >
-            The cinema hardware behind award-winning frames. Calibrated to{" "}
-            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
-              ±0.010mm FFD
-            </span>
-            , standard{" "}
-            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
-              PL-Mount
-            </span>
-            , with{" "}
-            <span className="font-mono text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-200">
-              16+ Stops DR
-            </span>
-            —flight-cased and dispatched directly to your set.
-          </motion.p>
-
-          {/* Action Cluster */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-3.5 sm:mt-4 flex flex-col xs:flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full max-w-md mx-auto pointer-events-auto"
-          >
-            <button
-              onClick={onRentClick}
-              className="w-full xs:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold px-6 sm:px-7 py-2.5 sm:py-3 rounded-full shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-h-[44px] text-xs sm:text-sm tracking-wide"
-            >
-              <span>Configure & Reserve Kit</span>
-              <span className="font-mono text-xs">→</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectMode(activeMode === "assembled" ? "exploded" : "assembled")}
-              className="w-full xs:w-auto inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full backdrop-blur-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-h-[44px] text-xs sm:text-sm"
-            >
-              <Sparkles className="h-4 w-4 text-rose-400" />
-              <span>{activeMode === "assembled" ? "Inspect Exploded View ⚡" : "Reset Assembled Rig"}</span>
-            </button>
-          </motion.div>
-
-          {/* Tactile Segmented Mode Switcher */}
+          {/* BOTTOM DOCK: Tactile Mode Switcher Cleanly Below Camera Image */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-3 inline-flex items-center gap-1 p-1 rounded-full border border-white/10 bg-zinc-900/80 backdrop-blur-xl shadow-2xl pointer-events-auto max-w-[95vw]"
+            className="mt-3 sm:mt-5 inline-flex items-center gap-1 p-1 rounded-full border border-white/10 bg-zinc-900/80 backdrop-blur-xl shadow-2xl pointer-events-auto max-w-[95vw]"
           >
             {[
               { id: "assembled", label: "Assembled Rig", badge: "8K VV" },
@@ -643,7 +849,7 @@ export function AppleScrollyCanvas({
               <button
                 key={tab.id}
                 onClick={() => handleSelectMode(tab.id as any)}
-                className={`relative px-3 sm:px-4 py-1 rounded-full font-mono text-[10px] sm:text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`relative px-3 sm:px-4 py-1.5 rounded-full font-mono text-[10px] sm:text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeMode === tab.id
                     ? "text-white font-semibold shadow-md"
                     : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
@@ -668,191 +874,6 @@ export function AppleScrollyCanvas({
             ))}
           </motion.div>
         </div>
-
-        {/* 5. INTERACTIVE "X-RAY" HARDWARE HOTSPOTS & SVG LEADER LINES */}
-        {scrollProgress <= 0.20 && activeMode === "assembled" && (
-          <div
-            className="pointer-events-none absolute inset-0 z-30 transition-transform duration-100 ease-out"
-            style={{
-              transform: `translate3d(${mousePos.x * 12}px, ${mousePos.y * 12}px, 0)`,
-            }}
-          >
-            {/* SVG Connecting Leader Lines for Active Desktop Tooltip */}
-            <svg className="hidden md:block absolute inset-0 h-full w-full pointer-events-none z-30">
-              {SPEC_HOTSPOTS.map((h) => {
-                if (activeHotspot !== h.id) return null;
-                const ax = cameraStage.x + h.relX * cameraStage.w;
-                const ay = cameraStage.y + h.relY * cameraStage.h;
-                let path = "";
-
-                if (h.tooltipSide === "left") {
-                  path = `M ${ax} ${ay} L ${ax - 40} ${ay - 40} L ${ax - 70} ${ay - 40}`;
-                } else if (h.tooltipSide === "top") {
-                  path = `M ${ax} ${ay} L ${ax - 20} ${ay - 50} L ${ax - 20} ${ay - 80}`;
-                } else {
-                  path = `M ${ax} ${ay} L ${ax + 40} ${ay - 30} L ${ax + 80} ${ay - 30}`;
-                }
-
-                return (
-                  <g key={`svg-leader-${h.id}`}>
-                    <motion.path
-                      d={path}
-                      fill="none"
-                      stroke="rgba(239, 68, 68, 0.9)"
-                      strokeWidth="1.5"
-                      strokeDasharray="4 2"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    <circle cx={ax} cy={ay} r="3" fill="#ef4444" className="animate-pulse" />
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Pulsing Hotspot Nodes anchored on Camera Components */}
-            {SPEC_HOTSPOTS.map((h) => {
-              const ax = cameraStage.x + h.relX * cameraStage.w;
-              const ay = cameraStage.y + h.relY * cameraStage.h;
-              const isActive = activeHotspot === h.id;
-
-              return (
-                <div
-                  key={h.id}
-                  className="absolute pointer-events-auto"
-                  style={{
-                    left: `${ax}px`,
-                    top: `${ay}px`,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                >
-                  <button
-                    onClick={() => setActiveHotspot(isActive ? null : h.id)}
-                    onMouseEnter={() => setActiveHotspot(h.id)}
-                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none"
-                    aria-label={`Inspect ${h.label} specifications`}
-                  >
-                    {/* Pulsing outer aura ring */}
-                    <span className="absolute h-8 w-8 rounded-full border border-red-500/50 bg-red-500/15 animate-ping pointer-events-none" />
-
-                    {/* Button node chassis */}
-                    <span
-                      className={`relative flex h-6 w-6 items-center justify-center rounded-full border shadow-xl transition-all duration-300 ${
-                        isActive
-                          ? "border-red-400 bg-red-600 text-white scale-125 shadow-red-500/50"
-                          : "border-white/30 bg-zinc-950/90 text-zinc-300 hover:scale-110 hover:border-white group-hover:text-white"
-                      }`}
-                    >
-                      <Crosshair className="h-3 w-3" />
-                    </span>
-
-                    {/* Subtle label pill for instant context */}
-                    <span className="absolute left-8 top-1/2 -translate-y-1/2 hidden lg:inline-flex items-center gap-1 rounded bg-black/80 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-zinc-300 border border-white/10 opacity-70 group-hover:opacity-100 transition whitespace-nowrap">
-                      {h.label}
-                    </span>
-                  </button>
-
-                  {/* Desktop Hover / Click HUD Tooltip Card */}
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className={`hidden md:block absolute z-40 w-72 rounded-xl border border-white/20 bg-zinc-950/90 p-3.5 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_25px_rgba(239,68,68,0.2)] text-left pointer-events-auto ${
-                          h.tooltipSide === "left"
-                            ? "right-10 bottom-6"
-                            : h.tooltipSide === "top"
-                            ? "left-1/2 -translate-x-1/2 bottom-12"
-                            : "left-10 bottom-6"
-                        }`}
-                        onMouseLeave={() => setActiveHotspot(null)}
-                      >
-                        <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                          <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
-                            {h.tag}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveHotspot(null);
-                            }}
-                            className="text-zinc-500 hover:text-white text-xs cursor-pointer"
-                          >
-                            ×
-                          </button>
-                        </div>
-
-                        <h4 className="mt-2 text-xs font-bold text-white tracking-tight">{h.name}</h4>
-                        <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">{h.description}</p>
-
-                        <div className="mt-2.5 flex flex-wrap gap-1 font-mono text-[9px]">
-                          {h.specs.map((spec) => (
-                            <span
-                              key={spec}
-                              className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 text-zinc-300 font-medium"
-                            >
-                              {spec}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Mobile Hotspot Drawer Card (Tapping a hotspot opens this dismissible mini-card) */}
-        <AnimatePresence>
-          {activeHotspot && (
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 280, damping: 25 }}
-              className="md:hidden absolute inset-x-4 bottom-20 z-40 rounded-2xl border border-white/20 bg-zinc-950/95 p-4 backdrop-blur-2xl shadow-2xl text-left pointer-events-auto"
-            >
-              {(() => {
-                const h = SPEC_HOTSPOTS.find((item) => item.id === activeHotspot);
-                if (!h) return null;
-                return (
-                  <div>
-                    <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                      <span className="font-mono text-[10px] text-red-400 font-bold tracking-wider">
-                        {h.tag}
-                      </span>
-                      <button
-                        onClick={() => setActiveHotspot(null)}
-                        className="h-6 w-6 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center text-xs"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    <h4 className="mt-2 text-sm font-bold text-white">{h.name}</h4>
-                    <p className="mt-1 text-xs text-zinc-400 leading-relaxed">{h.description}</p>
-
-                    <div className="mt-2.5 flex flex-wrap gap-1 font-mono text-[10px]">
-                      {h.specs.map((spec) => (
-                        <span
-                          key={spec}
-                          className="rounded bg-white/5 border border-white/10 px-2 py-0.5 text-zinc-300"
-                        >
-                          {spec}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* 6. BOTTOM CINEMA TELEMETRY HUD & MOBILE FOLLOW-FOCUS SCRUBBER */}
         <div className="relative z-30 w-full pointer-events-auto">
@@ -1187,9 +1208,14 @@ function renderKinematicCameraFlow(
   const caseAlpha = t34;
 
   // 2. RENDER PERSPECTIVE-LOCKED CAMERA RIG
-  if (cameraAlpha > 0.001) {
+  // Seamless handoff: During Beat 1 (p <= 0.12), the dedicated DOM Camera Stage renders cleanly.
+  // As the user scrolls into Beat 2 disassembly (p: 0.12 -> 0.22), the canvas camera fades in to take over.
+  const canvasIntroAlpha = smoothstep(0.12, 0.22, p);
+  const effectiveCameraAlpha = cameraAlpha * canvasIntroAlpha;
+
+  if (effectiveCameraAlpha > 0.001) {
     ctx.save();
-    ctx.globalAlpha = cameraAlpha;
+    ctx.globalAlpha = effectiveCameraAlpha;
 
     // Draw base layer:
     if (t23 <= 0.001) {
