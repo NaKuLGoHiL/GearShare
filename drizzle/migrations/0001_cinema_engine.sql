@@ -153,6 +153,19 @@ DROP POLICY IF EXISTS "Users view own bookings" ON public.rental_bookings;
 CREATE POLICY "Users view own bookings" ON public.rental_bookings
     FOR SELECT USING (auth.uid() = customer_id);
 
+-- Public Guest Permissions: Allow filmmakers to reserve hardware and track by reference code
+DROP POLICY IF EXISTS "Public can insert bookings" ON public.rental_bookings;
+CREATE POLICY "Public can insert bookings" ON public.rental_bookings
+    FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view bookings by reference" ON public.rental_bookings;
+CREATE POLICY "Public can view bookings by reference" ON public.rental_bookings
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can insert booking blocks" ON public.inventory_blocks;
+CREATE POLICY "Public can insert booking blocks" ON public.inventory_blocks
+    FOR INSERT WITH CHECK (true);
+
 -- 9. INITIAL SEED DATA FLEET (MUMBAI CINEMA VAULT)
 INSERT INTO public.gear_inventory (slug, name, brand, category, mount_type, sensor_type, base_daily_rate, replacement_value, badge, specs, included_accessories)
 VALUES
