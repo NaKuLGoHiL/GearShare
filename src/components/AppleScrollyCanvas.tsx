@@ -328,40 +328,61 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 4 (80% - 100%): Reassembly & Fleet CTA */}
         <div
-          className={`absolute inset-x-6 top-10 sm:top-12 md:top-14 max-w-2xl mx-auto text-center z-30 transition-all duration-700 ${
+          className={`absolute inset-x-4 sm:inset-x-6 top-6 sm:top-8 md:top-10 max-w-xl mx-auto z-30 transition-all duration-500 ${
             scrollProgress >= 0.80
               ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-8 scale-95 pointer-events-none"
+              : "opacity-0 translate-y-6 scale-95 pointer-events-none"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-3">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>REASSEMBLED • FLIGHT-CASE SEALED</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.04em] text-white leading-tight">
-            Ready for Wrap Time.
-            <br />
-            <span className="text-red-500">Rent the Fleet Below.</span>
-          </h2>
-          <p className="mt-2.5 text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed drop-shadow-md">
-            Magnesium alloy body sealed, batteries charged to 100%, and dispatched directly to your Mumbai soundstage in under 3 hours.
-          </p>
+          {/* Framer Frosted Glass Blurred Container Box */}
+          <div className="rounded-3xl border border-white/12 bg-zinc-950/85 p-5 sm:p-7 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(239,68,68,0.15)] text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-2.5 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>03 / DISPATCH CALIBRATION • FLIGHT-CASE SEALED</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.03em] text-white leading-tight">
+              Ready for Wrap Time.
+              <br />
+              <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
+                Rent the Fleet Below.
+              </span>
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+              Magnesium alloy body sealed, batteries charged to 100%, and dispatched directly to your Mumbai soundstage in under 3 hours.
+            </p>
 
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#catalog"
-              className="framer-pill-primary inline-flex items-center gap-2 px-8 py-3 text-sm font-semibold cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.4)]"
-            >
-              <span>Explore Fleet Catalog</span>
-              <span className="font-mono text-xs">→</span>
-            </a>
-            <a
-              href="#damage-shield"
-              className="framer-pill-secondary inline-flex items-center gap-2 px-6 py-3 text-sm font-medium cursor-pointer"
-            >
-              <ShieldCheck className="h-4 w-4 text-red-400" />
-              <span>₹0 Deposit Waiver</span>
-            </a>
+            {/* Quality Pass Badges */}
+            <div className="mt-3.5 grid grid-cols-3 gap-2 font-mono text-[10px]">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
+                <span className="text-[9px] text-zinc-500 block">COLLIMATION</span>
+                <span className="text-emerald-400 font-bold">±0.010mm Pass</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
+                <span className="text-[9px] text-zinc-500 block">CLEANROOM</span>
+                <span className="text-white font-bold">ISO Class 5</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
+                <span className="text-[9px] text-zinc-500 block">DISPATCH</span>
+                <span className="text-red-400 font-bold">Pelican Air Case</span>
+              </div>
+            </div>
+
+            <div className="mt-4.5 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="#catalog"
+                className="framer-pill-primary inline-flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer shadow-[0_0_25px_rgba(239,68,68,0.4)]"
+              >
+                <span>Explore Fleet Catalog</span>
+                <span className="font-mono text-xs">→</span>
+              </a>
+              <a
+                href="#damage-shield"
+                className="framer-pill-secondary inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-medium cursor-pointer border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-red-400" />
+                <span>₹0 Deposit Waiver</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -618,17 +639,9 @@ function renderKinematicCameraFlow(
     const caseW = width * caseFitScale;
     const caseH = caseW / caseAspect;
     const caseX = (width - caseW) / 2;
-    const caseY = (height - caseH) / 2 + (height > 700 ? 115 : 65);
+    const caseY = (height - caseH) / 2 + (height > 700 ? 140 : 80);
 
     ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
-
-    // Subtle case latch indicator glow
-    ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.strokeRect(caseX + 20, caseY + 20, caseW - 40, caseH - 40);
-    ctx.setLineDash([]);
-
     ctx.restore();
   }
 
