@@ -260,25 +260,30 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 1 (0% - 20%): Fully Assembled Hero Shot */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-24 md:top-28 max-w-4xl mx-auto text-center z-30 transition-all duration-300 ease-out pointer-events-none ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-20 md:top-22 lg:top-24 max-w-3xl mx-auto text-center z-30 transition-all duration-300 ease-out pointer-events-none ${
             scrollProgress <= 0.20
               ? "opacity-100 translate-y-0 scale-100"
               : "opacity-0 -translate-y-6 scale-95"
           }`}
         >
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/70 px-3 sm:px-4 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 backdrop-blur-xl mb-3 sm:mb-4 shadow-lg ring-1 ring-white/10 max-w-[95vw]">
+          {/* Soft ambient vignette backing ensuring 100% crisp editorial contrast */}
+          <div className="pointer-events-none absolute -inset-x-8 -top-8 -bottom-6 bg-gradient-to-b from-[#050505]/80 via-[#050505]/35 to-transparent blur-xl -z-10 rounded-3xl" />
+
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/80 px-3 sm:px-3.5 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 backdrop-blur-xl mb-2 sm:mb-2.5 shadow-md ring-1 ring-white/10 max-w-[95vw]">
             <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
             <span className="hidden sm:inline">01 / CINEMA HARDWARE ARCHITECTURE • </span>
             <span className="sm:hidden">01 / CINEMA RIG • </span>
             <span>MUMBAI STAGE DESK</span>
           </div>
-          <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.035em] text-white leading-[1.08] text-balance">
+
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-black tracking-[-0.035em] text-white leading-[1.08] text-balance drop-shadow-lg">
             Precision Optics.{" "}
             <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
               Uncompromised Sensor Power.
             </span>
           </h1>
-          <p className="mt-2.5 sm:mt-3.5 text-xs sm:text-base text-slate-300 max-w-xl mx-auto font-normal leading-relaxed drop-shadow-md text-balance px-2 sm:px-0">
+
+          <p className="mt-2 sm:mt-2.5 text-xs sm:text-sm md:text-[15px] text-zinc-300 max-w-lg mx-auto font-normal leading-relaxed drop-shadow-md text-balance px-2 sm:px-0">
             The cinema hardware behind award-winning frames. Calibrated to ±0.010mm FFD, flight-cased, and dispatched directly to your set.
           </p>
         </div>
@@ -472,12 +477,20 @@ function renderKinematicCameraFlow(
   const isMobile = width < 640;
   const isTabletPortrait = isPortrait && width < 1024;
 
-  // Contain cleanly inside viewport with breathing room for top and bottom typography
+  // Safe vertical stage boundaries to guarantee zero collision with typography & HUD
+  // Top safe bound: clear margin below Beat 1 headline & subtext
+  const textBottomSafe = isMobile ? 210 : isTabletPortrait ? 250 : 285;
+  // Bottom safe bound: clear margin above bottom disassembly prompt & HUD
+  const bottomPromptSafe = height - (isMobile ? 55 : 70);
+  const availStageH = Math.max(180, bottomPromptSafe - textBottomSafe);
+
+  // Scaled cleanly with strict vertical headroom so the Tilta handle never touches text
   const fitScale = Math.min(
     1,
     Math.min(
-      (width * (isMobile ? 0.94 : 0.88)) / width,
-      (height * (isMobile ? 0.46 : isTabletPortrait ? 0.54 : 0.72)) / (width / imgAspect)
+      (width * (isMobile ? 0.92 : 0.86)) / width,
+      (availStageH * (isMobile ? 0.95 : isTabletPortrait ? 0.88 : 0.90)) / (width / imgAspect),
+      (height * (isMobile ? 0.44 : isTabletPortrait ? 0.48 : 0.54)) / (width / imgAspect)
     )
   );
   const finalW = width * fitScale;
@@ -487,12 +500,19 @@ function renderKinematicCameraFlow(
   const origX = (width - finalW) / 2;
   const beat4Offset = p >= 0.78 ? Math.min(32, (p - 0.78) * 130) : 0;
 
-  // Adaptive camera position: On mobile/tablet portrait, smoothly lift camera to top ~28% of screen
-  // during Beats 2 and 3 so the text card docking at bottom doesn't block the camera!
-  let targetY = (height - finalH) / 2 + (isMobile ? 75 : height > 700 ? 115 : 65);
+  // Beat 1: Center the camera in the safe stage below the header text with generous breathing room
+  const heroStageY = textBottomSafe + (availStageH - finalH) / 2 + (isMobile ? 12 : 18);
+  // Beats 2 & 3: Once Beat 1 text fades away, smoothly glide to optical viewport center
+  const centerStageY = (height - finalH) / 2 + (height > 700 ? 25 : 10);
+
+  // Smooth interpolation: as user scrolls (p: 0.18 -> 0.35), camera transitions from heroStageY to centerStageY
+  const stageTransition = smoothstep(0.18, 0.35, p);
+  let targetY = heroStageY * (1 - stageTransition) + centerStageY * stageTransition;
+
+  // On mobile/tablet portrait during Beats 2 and 3, lift camera so bottom telemetry card doesn't block it
   if (isMobile || isTabletPortrait) {
     const disassembleLift = smoothstep(0.18, 0.30, p) * (1 - smoothstep(0.78, 0.90, p));
-    const portraitTopY = Math.max(70, height * 0.22 - finalH / 2);
+    const portraitTopY = Math.max(65, height * 0.22 - finalH / 2);
     targetY = targetY * (1 - disassembleLift) + portraitTopY * disassembleLift;
   }
   const origY = targetY + beat4Offset;
@@ -693,14 +713,14 @@ function renderKinematicCameraFlow(
     const caseFitScale = Math.min(
       1,
       Math.min(
-        (width * (isMobile ? 0.92 : 0.88)) / width,
-        (height * (isMobile ? 0.48 : isTabletPortrait ? 0.58 : 0.72)) / (width / caseAspect)
+        (width * (isMobile ? 0.92 : 0.86)) / width,
+        (height * (isMobile ? 0.46 : isTabletPortrait ? 0.52 : 0.58)) / (width / caseAspect)
       )
     );
     const caseW = width * caseFitScale;
     const caseH = caseW / caseAspect;
     const caseX = (width - caseW) / 2;
-    const caseY = (height - caseH) / 2 + (isMobile ? 75 : height > 700 ? 120 : 65);
+    const caseY = (height - caseH) / 2 + (isMobile ? 75 : height > 700 ? 115 : 60);
 
     ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
     ctx.restore();
