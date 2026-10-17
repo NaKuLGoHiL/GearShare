@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ShieldCheck, Zap, Aperture, ChevronDown } from "lucide-react";
+import { ShieldCheck, ChevronDown, CheckCircle2, Sparkles } from "lucide-react";
 
-interface ScrollyBeat {
-  id: string;
-  startProgress: number;
-  endProgress: number;
+interface MasterImages {
+  beat1: HTMLImageElement;
+  beat2: HTMLImageElement;
+  beat3: HTMLImageElement;
+  beat4: HTMLImageElement;
 }
 
 export function AppleScrollyCanvas({
@@ -16,12 +17,11 @@ export function AppleScrollyCanvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Preloaded image frames buffer
-  const framesRef = useRef<HTMLImageElement[]>([]);
-  const hasLocalFramesRef = useRef(false);
+  // Preloaded master cinema storytelling images
+  const masterImagesRef = useRef<MasterImages | null>(null);
 
   // Track inertial lerp progress for silky smooth 60fps scrubbing
   const currentProgressRef = useRef(0);
@@ -29,37 +29,43 @@ export function AppleScrollyCanvas({
   const mouseLerpRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const animFrameIdRef = useRef(0);
 
-  // Attempt to preload local frame sequence up to 120 frames
+  // Preload the 4 High-Resolution Cinema Storytelling Master Images
   useEffect(() => {
     let isCancelled = false;
-    const TOTAL_FRAMES = 120;
-    const loadedImages: HTMLImageElement[] = [];
-    let loadedCount = 0;
 
-    const testImg = new Image();
-    testImg.src = "/frames/frame_001.jpg";
-    testImg.onload = () => {
-      if (isCancelled) return;
-      hasLocalFramesRef.current = true;
-      for (let i = 1; i <= TOTAL_FRAMES; i++) {
-        const img = new Image();
-        const padIndex = String(i).padStart(3, "0");
-        img.src = `/frames/frame_${padIndex}.jpg`;
-        img.onload = () => {
-          loadedCount++;
-          if (loadedCount >= 10 && !isCancelled) {
-            setImagesLoaded(true);
-          }
-        };
-        loadedImages.push(img);
+    const img1 = new Image();
+    img1.src = "/frames/beat_1_hero.jpg";
+
+    const img2 = new Image();
+    img2.src = "/frames/beat_2_sensor.jpg";
+
+    const img3 = new Image();
+    img3.src = "/frames/beat_3_optics.jpg";
+
+    const img4 = new Image();
+    img4.src = "/frames/beat_4_sealed.jpg";
+
+    masterImagesRef.current = {
+      beat1: img1,
+      beat2: img2,
+      beat3: img3,
+      beat4: img4,
+    };
+
+    let loaded = 0;
+    const checkAll = () => {
+      loaded++;
+      if (!isCancelled) {
+        setImagesReady(true);
       }
-      framesRef.current = loadedImages;
     };
-    testImg.onerror = () => {
-      // Local frames folder not populated - fallback to high-detail procedural exploded view
-      hasLocalFramesRef.current = false;
-      setImagesLoaded(true);
-    };
+
+    img1.onload = checkAll;
+    img2.onload = checkAll;
+    img3.onload = checkAll;
+    img4.onload = checkAll;
+
+    if (img1.complete) checkAll();
 
     return () => {
       isCancelled = true;
@@ -86,7 +92,7 @@ export function AppleScrollyCanvas({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mouse tilt tracking
+  // Mouse tilt tracking for subtle 3D parallax
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -96,7 +102,7 @@ export function AppleScrollyCanvas({
     setMousePos({ x, y });
   }, []);
 
-  // Main Canvas Render Loop (Scrubbing + High-Detail Exploded Cinema Assembly Fallback)
+  // Main Canvas Render Loop (Apple-style Alpha Cross-Fade + Parallax + Procedural Fallback)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -104,6 +110,55 @@ export function AppleScrollyCanvas({
     if (!ctx) return;
 
     let time = 0;
+
+    // Helper to draw an image scaled cleanly and centered with tilt & spatial shift
+    const drawCinemaFrame = (
+      img: HTMLImageElement,
+      alpha: number,
+      width: number,
+      height: number,
+      mx: number,
+      scaleMod = 1,
+      shiftX = 0,
+      shiftY = 0
+    ) => {
+      if (!img || !img.complete || img.naturalWidth === 0 || alpha <= 0.001) {
+        return;
+      }
+
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const canvasAspect = width / height;
+
+      let baseW = width;
+      let baseH = height;
+
+      if (canvasAspect > imgAspect) {
+        baseH = width / imgAspect;
+      } else {
+        baseW = height * imgAspect;
+      }
+
+      // Contain cleanly inside viewport with ample breathing room
+      const fitScale =
+        Math.min(1, Math.min((width * 0.86) / baseW, (height * 0.72) / baseH)) *
+        scaleMod;
+      const finalW = baseW * fitScale;
+      const finalH = baseH * fitScale;
+
+      const drawX = (width - finalW) / 2 + shiftX;
+      const drawY = (height - finalH) / 2 + shiftY;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+      // Subtle mouse tilt rotation
+      ctx.translate(drawX + finalW / 2, drawY + finalH / 2);
+      ctx.rotate(mx * 0.02);
+      ctx.translate(-(drawX + finalW / 2), -(drawY + finalH / 2));
+
+      ctx.drawImage(img, drawX, drawY, finalW, finalH);
+      ctx.restore();
+    };
 
     const render = () => {
       time += 0.015;
@@ -136,41 +191,76 @@ export function AppleScrollyCanvas({
       ctx.fillStyle = "#050505";
       ctx.fillRect(0, 0, width, height);
 
-      // Check if image frame sequence is available
-      const frames = framesRef.current;
-      if (hasLocalFramesRef.current && frames.length > 0) {
-        const frameIdx = Math.min(
-          frames.length - 1,
-          Math.floor(p * (frames.length - 1))
-        );
-        const img = frames[frameIdx];
-        if (img && img.complete && img.naturalWidth > 0) {
-          // Draw letterboxed / covered frame
-          const imgAspect = img.naturalWidth / img.naturalHeight;
-          const canvasAspect = width / height;
-          let drawW = width;
-          let drawH = height;
-          let drawX = 0;
-          let drawY = 0;
+      // Soft radial cinema illumination glow centered behind the camera
+      const glowGrad = ctx.createRadialGradient(
+        width / 2,
+        height / 2 + 30,
+        40,
+        width / 2,
+        height / 2 + 30,
+        Math.min(width, height) * 0.55
+      );
+      glowGrad.addColorStop(0, "rgba(239, 68, 68, 0.09)");
+      glowGrad.addColorStop(0.4, "rgba(255, 255, 255, 0.02)");
+      glowGrad.addColorStop(1, "rgba(5, 5, 5, 0)");
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(0, 0, width, height);
 
-          if (canvasAspect > imgAspect) {
-            drawH = width / imgAspect;
-            drawY = (height - drawH) / 2;
-          } else {
-            drawW = height * imgAspect;
-            drawX = (width - drawW) / 2;
-          }
+      const masters = masterImagesRef.current;
+      const anyImageReady =
+        masters &&
+        (masters.beat1.complete ||
+          masters.beat2.complete ||
+          masters.beat3.complete ||
+          masters.beat4.complete);
 
-          // Subtle cursor tilt transform on the image
-          ctx.save();
-          ctx.translate(width / 2, height / 2);
-          ctx.rotate(mx * 0.03);
-          ctx.translate(-width / 2, -height / 2);
-          ctx.drawImage(img, drawX, drawY, drawW, drawH);
-          ctx.restore();
+      if (anyImageReady && masters) {
+        // Continuous partition of unity for silky smooth transitions across 4 beats
+        let alpha1 = 0;
+        let alpha2 = 0;
+        let alpha3 = 0;
+        let alpha4 = 0;
+
+        if (p <= 0.22) {
+          alpha1 = 1;
+        } else if (p < 0.32) {
+          const t = (p - 0.22) / 0.1;
+          alpha1 = 1 - t;
+          alpha2 = t;
+        } else if (p <= 0.52) {
+          alpha2 = 1;
+        } else if (p < 0.62) {
+          const t = (p - 0.52) / 0.1;
+          alpha2 = 1 - t;
+          alpha3 = t;
+        } else if (p <= 0.80) {
+          alpha3 = 1;
+        } else if (p < 0.88) {
+          const t = (p - 0.80) / 0.08;
+          alpha3 = 1 - t;
+          alpha4 = t;
+        } else {
+          alpha4 = 1;
         }
+
+        // Slight breathing zoom scale based on scrub
+        const s1 = 1.0 + p * 0.03;
+        const s2 = 1.02 + Math.sin(p * Math.PI) * 0.02;
+        const s3 = 1.02 + Math.cos(p * Math.PI) * 0.02;
+        const s4 = 1.0;
+
+        // Spatial offsets: offset Beat 1 & 4 downward, offset Beat 2 right & Beat 3 left on wide screens
+        const offsetY1 = height > 700 ? 120 : 70;
+        const offsetY4 = height > 700 ? 110 : 70;
+        const shiftX2 = width > 1024 ? 90 : 0;
+        const shiftX3 = width > 1024 ? -90 : 0;
+
+        if (alpha1 > 0) drawCinemaFrame(masters.beat1, alpha1, width, height, mx, s1, 0, offsetY1);
+        if (alpha2 > 0) drawCinemaFrame(masters.beat2, alpha2, width, height, mx, s2, shiftX2, 10);
+        if (alpha3 > 0) drawCinemaFrame(masters.beat3, alpha3, width, height, mx, s3, shiftX3, 10);
+        if (alpha4 > 0) drawCinemaFrame(masters.beat4, alpha4, width, height, mx, s4, 0, offsetY4);
       } else {
-        // PROCEDURAL EXPLODED CINEMA CAMERA ENGINE (Sony FX3 / RED Cinema Body Architecture)
+        // High-precision procedural exploded cinema camera engine fallback
         renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
       }
 
@@ -201,7 +291,7 @@ export function AppleScrollyCanvas({
         <div className="pointer-events-none absolute inset-0 framer-grid-lines framer-grid-mask opacity-60" />
 
         {/* Cinematic Viewfinder Framing Brackets */}
-        <div className="pointer-events-none absolute inset-8 sm:inset-16 flex flex-col justify-between z-20 opacity-40">
+        <div className="pointer-events-none absolute inset-8 sm:inset-14 flex flex-col justify-between z-20 opacity-40">
           <div className="flex justify-between items-start">
             <span className="font-mono text-[10px] text-zinc-500 tracking-widest uppercase flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
@@ -212,134 +302,146 @@ export function AppleScrollyCanvas({
             </span>
           </div>
           <div className="flex justify-between items-end font-mono text-[10px] text-zinc-600">
-            <span>SCROLL PROGRESS: {Math.round(scrollProgress * 100)}%</span>
+            <span>SCROLL DISASSEMBLY: {Math.round(scrollProgress * 100)}%</span>
             <span>SHUTTER 1/48 • DUAL ISO 800/12800</span>
           </div>
         </div>
 
         {/* SYNCHRONIZED SCROLL STORYTELLING BEATS */}
 
-        {/* BEAT 1 (0% - 20%): Fully Assembled Hero Shot */}
+        {/* BEAT 1 (0% - 25%): Fully Assembled Hero Shot */}
         <div
-          className={`absolute inset-x-6 top-1/2 -translate-y-1/2 max-w-3xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress < 0.22
-              ? "opacity-100 translate-y-[-50%] scale-100"
-              : "opacity-0 translate-y-[-70%] scale-95"
+          className={`absolute inset-x-6 top-10 sm:top-12 md:top-14 max-w-4xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress <= 0.25
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 -translate-y-8 scale-95"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 backdrop-blur-md mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 backdrop-blur-md mb-4 shadow-sm">
             <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
             <span>GEARSHARE CINEMA ARCHITECTURE</span>
           </div>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-[-0.04em] text-white leading-[1.04]">
-            Precision Optics.
-            <br />
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] text-white leading-[1.06]">
+            Precision Optics.{" "}
             <span className="bg-gradient-to-r from-red-500 via-rose-400 to-white bg-clip-text text-transparent">
               Uncompromised Sensor Power.
             </span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-slate-400 max-w-xl mx-auto font-normal leading-relaxed">
-            The cinema hardware behind award-winning frames. Calibrated, cased, and dispatched directly to your set.
+          <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-xl mx-auto font-normal leading-relaxed drop-shadow-md">
+            The cinema hardware behind award-winning frames. Calibrated to ±0.010mm FFD, flight-cased, and dispatched directly to your set.
           </p>
+        </div>
 
-          <div className="mt-8 flex items-center justify-center gap-2 font-mono text-xs text-zinc-500 animate-bounce">
-            <ChevronDown className="h-4 w-4 text-red-500" />
+        {/* Scroll Prompt at Viewport Bottom (Fades out when user starts scrolling) */}
+        <div
+          className={`absolute inset-x-0 bottom-8 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-500 ${
+            scrollProgress < 0.1
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/70 px-4 py-1.5 font-mono text-[11px] text-zinc-300 backdrop-blur-md shadow-lg">
+            <ChevronDown className="h-3.5 w-3.5 text-red-500 animate-bounce" />
             <span>Scroll to disassemble camera architecture</span>
           </div>
         </div>
 
-        {/* BEAT 2 (20% - 50%): Internal Breakdown & Full-Frame Sensor Block */}
+        {/* BEAT 2 (25% - 55%): Internal Breakdown & Full-Frame Sensor Block */}
         <div
-          className={`absolute left-6 sm:left-16 md:left-24 top-1/2 -translate-y-1/2 max-w-lg z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress >= 0.22 && scrollProgress < 0.52
+          className={`absolute left-6 sm:left-12 md:left-16 top-1/2 -translate-y-1/2 max-w-md z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress > 0.22 && scrollProgress <= 0.54
               ? "opacity-100 translate-x-0"
               : "opacity-0 -translate-x-12"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-400 mb-4">
-            <span>01 / INTERNAL BREAKDOWN</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.03em] text-white leading-tight">
-            Exmor R Full-Frame Sensor Block. 16-Bit RAW Output.
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed">
-            Back-illuminated 35mm full-frame CMOS sensor with 15+ stops of dynamic latitude. Active copper vapor chamber heatsink and silent turbine fan deliver continuous recording with zero thermal throttling.
-          </p>
-
-          <div className="mt-6 grid grid-cols-2 gap-3 font-mono text-xs">
-            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 backdrop-blur-md">
-              <span className="text-[10px] text-zinc-500 block">SENSOR SIZE</span>
-              <span className="text-white font-bold">35.7 × 23.8 mm</span>
+          <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-400 mb-4">
+              <span>01 / INTERNAL BREAKDOWN</span>
             </div>
-            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 backdrop-blur-md">
-              <span className="text-[10px] text-zinc-500 block">BASE DUAL ISO</span>
-              <span className="text-red-400 font-bold">800 / 12,800</span>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-[-0.03em] text-white leading-tight">
+              Exmor R Full-Frame Sensor Block. 16-Bit RAW.
+            </h2>
+            <p className="mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Back-illuminated 35mm full-frame CMOS sensor with 15+ stops of dynamic latitude. Active copper vapor chamber heatsink and silent turbine fan deliver continuous recording with zero thermal throttling.
+            </p>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 font-mono text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <span className="text-[10px] text-zinc-500 block">SENSOR SIZE</span>
+                <span className="text-white font-bold">35.7 × 23.8 mm</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <span className="text-[10px] text-zinc-500 block">BASE DUAL ISO</span>
+                <span className="text-red-400 font-bold">800 / 12,800</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* BEAT 3 (50% - 80%): Optical Rig & Flange Tolerances */}
+        {/* BEAT 3 (55% - 82%): Optical Rig & Flange Tolerances */}
         <div
-          className={`absolute right-6 sm:right-16 md:right-24 top-1/2 -translate-y-1/2 max-w-lg text-right z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress >= 0.52 && scrollProgress < 0.82
+          className={`absolute right-6 sm:right-12 md:right-16 top-1/2 -translate-y-1/2 max-w-md text-right z-30 transition-all duration-700 pointer-events-none ${
+            scrollProgress > 0.52 && scrollProgress <= 0.82
               ? "opacity-100 translate-x-0"
               : "opacity-0 translate-x-12"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 mb-4 ml-auto">
-            <span>02 / OPTICAL GLASS & FLANGE</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.03em] text-white leading-tight">
-            Bench-Calibrated Flange & Optic Tolerances.
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-slate-400 leading-relaxed">
-            Laser autocollimation holds Flange Focal Distance (FFD) within ±0.010mm. Floating chromatic glass element groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
-          </p>
-
-          <div className="mt-6 flex justify-end gap-3 font-mono text-xs">
-            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 text-left backdrop-blur-md">
-              <span className="text-[10px] text-zinc-500 block">FFD TOLERANCE</span>
-              <span className="text-emerald-400 font-bold">±0.010 mm Pass</span>
+          <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 mb-4 ml-auto">
+              <span>02 / OPTICAL GLASS & FLANGE</span>
             </div>
-            <div className="rounded-xl border border-white/10 bg-zinc-950/70 p-3 text-left backdrop-blur-md">
-              <span className="text-[10px] text-zinc-500 block">IRIS MECHANISM</span>
-              <span className="text-white font-bold">11-Blade Circular</span>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-[-0.03em] text-white leading-tight">
+              Bench-Calibrated Flange & Optic Tolerances.
+            </h2>
+            <p className="mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed text-right">
+              Laser autocollimation holds Flange Focal Distance (FFD) within ±0.010mm. Floating chromatic glass element groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
+            </p>
+
+            <div className="mt-5 flex justify-end gap-3 font-mono text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left">
+                <span className="text-[10px] text-zinc-500 block">FFD TOLERANCE</span>
+                <span className="text-emerald-400 font-bold">±0.010 mm Pass</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left">
+                <span className="text-[10px] text-zinc-500 block">IRIS MECHANISM</span>
+                <span className="text-white font-bold">11-Blade Circular</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* BEAT 4 (80% - 100%): Reassembly & Fleet CTA */}
         <div
-          className={`absolute inset-x-6 top-1/2 -translate-y-1/2 max-w-2xl mx-auto text-center z-30 transition-all duration-700 ${
-            scrollProgress >= 0.82
-              ? "opacity-100 translate-y-[-50%] scale-100"
-              : "opacity-0 translate-y-[-30%] scale-95 pointer-events-none"
+          className={`absolute inset-x-6 top-10 sm:top-12 md:top-14 max-w-2xl mx-auto text-center z-30 transition-all duration-700 ${
+            scrollProgress >= 0.80
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-8 scale-95 pointer-events-none"
           }`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 font-mono text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-3">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>REASSEMBLED • FLIGHT-CASE SEALED</span>
           </div>
-          <h2 className="text-4xl sm:text-6xl font-black tracking-[-0.04em] text-white leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[-0.04em] text-white leading-tight">
             Ready for Wrap Time.
             <br />
             <span className="text-red-500">Rent the Fleet Below.</span>
           </h2>
-          <p className="mt-4 text-base text-slate-400 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2.5 text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed drop-shadow-md">
             Magnesium alloy body sealed, batteries charged to 100%, and dispatched directly to your Mumbai soundstage in under 3 hours.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#catalog"
-              className="framer-pill-primary inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.4)]"
+              className="framer-pill-primary inline-flex items-center gap-2 px-8 py-3 text-sm font-semibold cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.4)]"
             >
               <span>Explore Fleet Catalog</span>
               <span className="font-mono text-xs">→</span>
             </a>
             <a
               href="#damage-shield"
-              className="framer-pill-secondary inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium cursor-pointer"
+              className="framer-pill-secondary inline-flex items-center gap-2 px-6 py-3 text-sm font-medium cursor-pointer"
             >
               <ShieldCheck className="h-4 w-4 text-red-400" />
               <span>₹0 Deposit Waiver</span>

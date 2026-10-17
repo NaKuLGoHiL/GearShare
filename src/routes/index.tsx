@@ -432,7 +432,7 @@ function Index() {
   const currentFfd = FFD_PRESETS[selectedFfdIdx] ?? FFD_PRESETS[0]!;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-foreground relative selection:bg-red-500/30 selection:text-white antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#050505] text-foreground relative selection:bg-red-500/30 selection:text-white antialiased overflow-x-clip">
       {/* BACKGROUND: Framer 24px x 24px Subtle Geometric Dot/Line Grid with Radial Edge Fade */}
       <div className="pointer-events-none fixed inset-0 framer-grid-lines framer-grid-mask z-0 opacity-80" />
       
