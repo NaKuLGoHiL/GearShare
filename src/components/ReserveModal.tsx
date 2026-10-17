@@ -392,7 +392,7 @@ export function ReserveModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div className="flex min-h-full items-center justify-center p-3 sm:p-6 text-center">
@@ -400,26 +400,26 @@ export function ReserveModal({
           role="dialog"
           aria-modal="true"
           aria-label={`Rental inquiry for ${gear.name}`}
-          className="relative my-4 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0d10] text-left shadow-[0_0_60px_-15px_rgba(239,68,68,0.3)] backdrop-blur-2xl ring-1 ring-white/5 animate-in zoom-in-95 duration-200"
+          className="relative my-4 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-2xl backdrop-blur-2xl ring-1 ring-slate-900/5 animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Ambient Top Glow Line */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
 
           {/* PINNED MODAL HEADER (Always Visible & Accessible) */}
-          <div className="flex-none flex items-start justify-between gap-4 border-b border-border/70 bg-[#0d0d10]/95 px-6 pt-5 pb-4 sm:px-8 sm:pt-6 z-10 backdrop-blur-md">
+          <div className="flex-none flex items-start justify-between gap-4 border-b border-slate-200 bg-white/95 px-6 pt-5 pb-4 sm:px-8 sm:pt-6 z-10 backdrop-blur-md">
             <div className="flex items-center gap-3.5 min-w-0">
               {gear.img ? (
-                <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black shadow-md">
+                <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md">
                   <img
                     src={gear.img}
                     alt={gear.name}
                     className="h-full w-full object-cover"
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                 </div>
               ) : (
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-carbon text-primary">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-primary">
                   <Camera className="h-6 w-6" />
                 </div>
               )}
@@ -427,22 +427,22 @@ export function ReserveModal({
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="tally h-2 w-2 rounded-full" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary font-bold">
                     {gear.category}
                   </span>
-                  <span className="hidden sm:inline-block rounded-full border border-border/80 bg-background/60 px-2 py-0.5 font-mono text-[9px] text-muted-foreground">
+                  <span className="hidden sm:inline-block rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[9px] text-slate-600 font-medium">
                     MUMBAI DISPATCH
                   </span>
                 </div>
-                <h3 className="mt-0.5 text-lg sm:text-xl font-bold tracking-tight text-foreground truncate">
+                <h3 className="mt-0.5 text-lg sm:text-xl font-bold tracking-tight text-slate-900 truncate">
                   {gear.name}
                 </h3>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs">
-                  <span className="text-muted-foreground">
-                    Base: <strong className="text-foreground">₹{gear.rate.toLocaleString("en-IN")}</strong>/day
+                  <span className="text-slate-500">
+                    Base: <strong className="text-slate-900">₹{gear.rate.toLocaleString("en-IN")}</strong>/day
                   </span>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="text-emerald-400 font-medium">Stage Ready</span>
+                  <span className="text-slate-400">·</span>
+                  <span className="text-emerald-700 font-semibold">Stage Ready</span>
                 </div>
               </div>
             </div>
@@ -453,7 +453,7 @@ export function ReserveModal({
               onClick={onClose}
               aria-label="Close dialog"
               title="Close (Esc)"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/80 bg-white/5 text-muted-foreground transition hover:border-primary/50 hover:bg-white/10 hover:text-foreground active:scale-95 cursor-pointer"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-600 transition hover:border-primary/50 hover:bg-slate-200 hover:text-slate-900 active:scale-95 cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
@@ -590,30 +590,30 @@ export function ReserveModal({
                 </div>
 
                 {/* LIVE PRICING TELEMETRY CARD */}
-                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-gradient-to-r from-carbon via-[#15151b] to-carbon p-4 font-mono">
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 font-mono shadow-sm">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
                         ESTIMATED TOTAL
                       </span>
                       {savings > 0 && (
-                        <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                        <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
                           Save ₹{savings.toLocaleString("en-IN")}
                         </span>
                       )}
                     </div>
                     <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                      <span className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                         ₹{estimatedTotal.toLocaleString("en-IN")}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-slate-500">
                         ({rentalDays} {rentalDays === 1 ? "Day" : "Days"} @ ₹{gear.rate.toLocaleString("en-IN")}/day)
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-emerald-400">
-                    <ShieldCheck className="h-4 w-4 shrink-0" />
+                  <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-emerald-800">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />
                     <div className="text-left font-sans">
                       <p className="font-semibold text-xs leading-tight">₹0 Deposit</p>
                       <p className="text-[10px] opacity-80 leading-tight">GSTIN / WICA Waiver</p>
@@ -712,7 +712,7 @@ export function ReserveModal({
                   </div>
 
                   {/* CINEMA SEAT-BOOKING STYLE DATE SELECTION MATRIX */}
-                  <div className="rounded-2xl border border-white/10 bg-carbon/70 p-4 sm:p-5 shadow-inner">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
                     {/* HIDDEN INPUTS TO PRESERVE 100% FORM & API COMPATIBILITY */}
                     <input type="hidden" name="start_date" value={startDate} />
                     <input type="hidden" name="end_date" value={returnDate} />
@@ -780,27 +780,27 @@ export function ReserveModal({
                     </div>
 
                     {/* Movie Ticket Booking Seat Legend */}
-                    <div className="mb-3.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl border border-white/5 bg-background/40 py-2 px-3 font-mono text-[10px]">
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <span className="h-3 w-3 rounded-md border border-emerald-500/40 bg-emerald-500/20 flex items-center justify-center">
-                          <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                    <div className="mb-3.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 font-mono text-[10px]">
+                      <div className="flex items-center gap-1.5 text-slate-600">
+                        <span className="h-3 w-3 rounded-md border border-emerald-500/40 bg-emerald-100 flex items-center justify-center">
+                          <span className="h-1 w-1 rounded-full bg-emerald-600" />
                         </span>
                         <span>Available</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-foreground font-medium">
+                      <div className="flex items-center gap-1.5 text-slate-900 font-semibold">
                         <span className="h-3 w-3 rounded-md bg-primary text-white flex items-center justify-center text-[7px] font-bold shadow-sm shadow-primary/50">
                           ★
                         </span>
                         <span>Selected Window</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <span className="h-3 w-3 rounded-md border border-white/10 bg-black/60 flex items-center justify-center text-muted-foreground/40 text-[8px] line-through">
+                      <div className="flex items-center gap-1.5 text-slate-500">
+                        <span className="h-3 w-3 rounded-md border border-slate-200 bg-slate-100 flex items-center justify-center text-slate-400 text-[8px] line-through">
                           ✕
                         </span>
                         <span>Booked On Stage</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground/50">
-                        <span className="h-3 w-3 rounded-md bg-transparent border border-white/5" />
+                      <div className="flex items-center gap-1.5 text-slate-400">
+                        <span className="h-3 w-3 rounded-md bg-transparent border border-slate-200" />
                         <span>Past Date</span>
                       </div>
                     </div>
@@ -836,30 +836,30 @@ export function ReserveModal({
                         const isSingleDay = isStart && isEnd;
 
                         let tileStyle =
-                          "border-border/60 bg-carbon/90 text-foreground hover:border-primary hover:bg-white/10 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] hover:scale-105 active:scale-95 cursor-pointer";
+                          "border-slate-200 bg-white text-slate-900 hover:border-primary hover:bg-red-50/50 hover:shadow-sm hover:scale-105 active:scale-95 cursor-pointer";
                         let badgeLabel = "";
 
                         if (isPast) {
-                          tileStyle = "border-transparent bg-transparent text-muted-foreground/20 cursor-not-allowed select-none";
+                          tileStyle = "border-transparent bg-transparent text-slate-300 cursor-not-allowed select-none";
                         } else if (isBooked) {
                           tileStyle =
-                            "border-white/5 bg-black/50 text-muted-foreground/30 cursor-not-allowed select-none line-through relative";
+                            "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed select-none line-through relative";
                           badgeLabel = "BUSY";
                         } else if (isSingleDay) {
                           tileStyle =
-                            "border-primary bg-primary text-white font-bold shadow-[0_0_16px_rgba(239,68,68,0.7)] ring-2 ring-primary ring-offset-2 ring-offset-[#0d0d10] scale-[1.04] z-10 cursor-pointer";
+                            "border-primary bg-primary text-white font-bold shadow-md ring-2 ring-primary ring-offset-2 ring-offset-white scale-[1.04] z-10 cursor-pointer";
                           badgeLabel = "1 DAY";
                         } else if (isStart) {
                           tileStyle =
-                            "border-primary bg-primary text-white font-bold shadow-[0_0_16px_rgba(239,68,68,0.7)] ring-2 ring-primary ring-offset-2 ring-offset-[#0d0d10] scale-[1.04] z-10 cursor-pointer rounded-l-xl";
+                            "border-primary bg-primary text-white font-bold shadow-md ring-2 ring-primary ring-offset-2 ring-offset-white scale-[1.04] z-10 cursor-pointer rounded-l-xl";
                           badgeLabel = "CALL";
                         } else if (isEnd) {
                           tileStyle =
-                            "border-primary bg-primary text-white font-bold shadow-[0_0_16px_rgba(239,68,68,0.7)] ring-2 ring-primary ring-offset-2 ring-offset-[#0d0d10] scale-[1.04] z-10 cursor-pointer rounded-r-xl";
+                            "border-primary bg-primary text-white font-bold shadow-md ring-2 ring-primary ring-offset-2 ring-offset-white scale-[1.04] z-10 cursor-pointer rounded-r-xl";
                           badgeLabel = "WRAP";
                         } else if (isInRange) {
                           tileStyle =
-                            "border-y border-primary/40 bg-primary/20 text-white font-semibold cursor-pointer hover:bg-primary/30";
+                            "border-y border-red-300 bg-red-50 text-red-950 font-semibold cursor-pointer hover:bg-red-100";
                         }
 
                         return (

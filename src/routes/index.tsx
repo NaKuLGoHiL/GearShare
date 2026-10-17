@@ -432,50 +432,50 @@ function Index() {
   const currentFfd = FFD_PRESETS[selectedFfdIdx] ?? FFD_PRESETS[0]!;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-foreground relative selection:bg-red-500/30 selection:text-white antialiased overflow-x-clip">
+    <div className="min-h-screen bg-[#f8fafc] text-foreground relative selection:bg-red-500/20 selection:text-red-900 antialiased overflow-x-clip">
       {/* BACKGROUND: Framer 24px x 24px Subtle Geometric Dot/Line Grid with Radial Edge Fade */}
       <div className="pointer-events-none fixed inset-0 framer-grid-lines framer-grid-mask z-0 opacity-80" />
       
       {/* SOFT RADIAL ILLUMINATION GRADIENTS */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(239,68,68,0.14),transparent_65%)] blur-3xl z-0" />
-      <div className="pointer-events-none absolute top-[900px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03),transparent_70%)] blur-3xl z-0" />
-      <div className="pointer-events-none absolute top-[2200px] left-1/3 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.08),transparent_70%)] blur-3xl z-0" />
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.06),transparent_65%)] blur-3xl z-0" />
+      <div className="pointer-events-none absolute top-[900px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.02),transparent_70%)] blur-3xl z-0" />
+      <div className="pointer-events-none absolute top-[2200px] left-1/3 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.05),transparent_70%)] blur-3xl z-0" />
 
       {/* SECTION 1: FIXED APPLE-STYLE TRANSLUCENT NAVBAR */}
-      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-[#050505]/75 border-b border-zinc-800/50 transition-all">
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-white/85 border-b border-slate-200/80 shadow-sm transition-all">
         <div className="mx-auto max-w-7xl h-14 px-4 sm:px-6 flex items-center justify-between">
           {/* Brand mark with pulsing red tally light: ● GEARSHARE */}
           <a
             href="#overview"
-            className="group flex items-center gap-2.5 font-mono text-xs font-bold tracking-[0.22em] text-white transition"
+            className="group flex items-center gap-2.5 font-mono text-xs font-bold tracking-[0.22em] text-slate-900 transition"
           >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
             </span>
-            <span className="transition group-hover:text-red-400">GEARSHARE</span>
+            <span className="transition group-hover:text-red-600">GEARSHARE</span>
           </a>
 
           {/* Links: Overview, Hardware, Scrollytech, Pricing, FAQ */}
-          <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-zinc-400">
-            <a href="#overview" className="transition hover:text-white">
+          <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-slate-600">
+            <a href="#overview" className="transition hover:text-slate-900">
               Overview
             </a>
-            <a href="#hardware" className="transition hover:text-white">
+            <a href="#hardware" className="transition hover:text-slate-900">
               Hardware
             </a>
-            <a href="#scrollytech" className="transition hover:text-white">
+            <a href="#scrollytech" className="transition hover:text-slate-900">
               Scrollytech
             </a>
-            <a href="#catalog" className="transition hover:text-white">
+            <a href="#catalog" className="transition hover:text-slate-900">
               Pricing
             </a>
-            <a href="#faq" className="transition hover:text-white">
+            <a href="#faq" className="transition hover:text-slate-900">
               FAQ
             </a>
             <a
               href="/track"
-              className="flex items-center gap-1.5 text-red-400 transition hover:text-red-300"
+              className="flex items-center gap-1.5 text-red-600 transition hover:text-red-700 font-semibold"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>Track Dispatch</span>
@@ -486,7 +486,7 @@ function Index() {
           <div className="flex items-center gap-3">
             <a
               href="#catalog"
-              className="inline-flex items-center justify-center rounded-full bg-red-600 hover:bg-red-500 px-5 py-2 text-xs font-semibold text-white tracking-wide transition shadow-[0_0_20px_rgba(239,68,68,0.35)] hover:shadow-[0_0_25px_rgba(239,68,68,0.5)] cursor-pointer"
+              className="inline-flex items-center justify-center rounded-full bg-red-600 hover:bg-red-700 px-5 py-2 text-xs font-semibold text-white tracking-wide transition shadow-[0_4px_14px_rgba(225,29,72,0.35)] hover:shadow-[0_6px_20px_rgba(225,29,72,0.45)] cursor-pointer"
             >
               <span>Rent Kit</span>
               <span className="ml-1 font-mono text-[10px]">→</span>
@@ -496,7 +496,7 @@ function Index() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation Menu"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-400 transition hover:border-white/20 hover:text-white md:hidden cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-600 transition hover:border-slate-300 hover:text-slate-900 md:hidden cursor-pointer"
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -505,61 +505,61 @@ function Index() {
 
         {/* Mobile Navigation Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-zinc-800/80 bg-[#050505]/95 px-6 py-4 md:hidden animate-in fade-in slide-in-from-top-2">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 font-mono text-xs">
-              <span className="flex items-center gap-2 text-zinc-400">
+          <div className="border-t border-slate-200 bg-white/95 px-6 py-4 md:hidden animate-in fade-in slide-in-from-top-2 shadow-lg">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3 font-mono text-xs">
+              <span className="flex items-center gap-2 text-slate-700">
                 <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span>MUMBAI FLEET ACTIVE</span>
               </span>
-              <span className="text-[10px] text-zinc-500">24/7 METRO DISPATCH</span>
+              <span className="text-[10px] text-slate-500">24/7 METRO DISPATCH</span>
             </div>
             <nav className="mt-3 flex flex-col gap-2 font-mono text-xs">
               <a
                 href="#overview"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 01 / Overview
               </a>
               <a
                 href="#scrollytech"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 02 / Scrollytech Breakdown
               </a>
               <a
                 href="#catalog"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 03 / Pricing & Fleet Catalog
               </a>
               <a
                 href="#hardware"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 04 / Hardware Bento Specs
               </a>
               <a
                 href="#workflow"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 05 / Rental Workflow
               </a>
               <a
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-zinc-300 hover:text-white"
+                className="py-1.5 text-slate-700 hover:text-slate-900"
               >
                 06 / Operational FAQ
               </a>
               <a
                 href="/track"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1.5 text-red-400 font-semibold"
+                className="py-1.5 text-red-600 font-semibold"
               >
                 ● 07 / Track Soundstage Dispatch
               </a>
@@ -567,7 +567,7 @@ function Index() {
                 <a
                   href="#catalog"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full text-center rounded-full bg-red-600 hover:bg-red-500 py-2.5 text-xs font-semibold text-white shadow-lg"
+                  className="block w-full text-center rounded-full bg-red-600 hover:bg-red-700 py-2.5 text-xs font-semibold text-white shadow-md"
                 >
                   Rent Kit →
                 </a>
@@ -584,26 +584,26 @@ function Index() {
       />
 
       {/* OPTICAL LUT SHADER TEST BENCH & 3D RIG SHOWCASE */}
-      <section className="relative pt-16 pb-20 px-6 text-center z-10 border-t border-white/[0.06]">
+      <section className="relative pt-16 pb-20 px-6 text-center z-10 border-t border-slate-200 bg-[#f8fafc]">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[10px] tracking-widest text-zinc-300 shadow-sm backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 font-mono text-[10px] tracking-widest text-slate-700 shadow-sm backdrop-blur-md">
             <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
             <span>CALIBRATED CINEMA FLEET • READY FOR SOUNDSTAGE DISPATCH</span>
           </div>
 
-          <h2 className="mt-6 text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] leading-[1.04] bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent">
+          <h2 className="mt-6 text-3xl sm:text-5xl md:text-6xl font-black tracking-[-0.04em] leading-[1.04] text-slate-900">
             Real-Time Optical Physics & Sensor Rigging.
           </h2>
 
-          <p className="mt-4 text-base text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="mt-4 text-base text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
             Test custom chromatic anamorphic LUTs, inspect multi-axis rig tilt physics, and reserve zero-deposit cinema packages below.
           </p>
 
           {/* Optical LUT Shader Switcher & Interactive 3D Showcase */}
           <div className="relative mx-auto mt-12 max-w-5xl">
-            <div className="pointer-events-none absolute -bottom-10 inset-x-12 h-24 bg-gradient-to-b from-white/[0.05] via-red-500/[0.04] to-transparent blur-xl rounded-full transform scale-y-50" />
+            <div className="pointer-events-none absolute -bottom-10 inset-x-12 h-24 bg-gradient-to-b from-slate-200/50 via-red-500/10 to-transparent blur-xl rounded-full transform scale-y-50" />
 
-            <div className="relative rounded-3xl border border-white/[0.08] bg-zinc-900/35 p-2 sm:p-3 shadow-2xl backdrop-blur-2xl ring-1 ring-white/5">
+            <div className="relative rounded-3xl border border-slate-200 bg-white p-2 sm:p-3 shadow-xl backdrop-blur-2xl ring-1 ring-slate-900/5">
               <div className="pointer-events-none absolute -top-1.5 -left-1.5 h-4 w-4 border-t-2 border-l-2 border-red-500 z-20" />
               <div className="pointer-events-none absolute -top-1.5 -right-1.5 h-4 w-4 border-t-2 border-r-2 border-red-500 z-20" />
               <div className="pointer-events-none absolute -bottom-1.5 -left-1.5 h-4 w-4 border-b-2 border-l-2 border-red-500 z-20" />
@@ -614,17 +614,17 @@ function Index() {
 
             {/* Optical LUT Switcher */}
             <div className="mt-6 flex items-center justify-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/80 px-4 py-2 font-mono text-xs backdrop-blur-xl shadow-lg">
-                <Sparkles className="h-3.5 w-3.5 text-red-400" />
-                <span className="text-zinc-400 uppercase text-[10px] tracking-wider">3-WAY OPTICAL LUT:</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 font-mono text-xs shadow-md">
+                <Sparkles className="h-3.5 w-3.5 text-red-500" />
+                <span className="text-slate-500 uppercase text-[10px] tracking-wider font-semibold">3-WAY OPTICAL LUT:</span>
                 {(["kodak-500t", "anamorphic-cyan", "silver-noir"] as const).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setCinemaLook(mode)}
-                    className={`rounded-full px-3 py-1 text-[11px] font-medium transition cursor-pointer ${
+                    className={`rounded-full px-3.5 py-1 text-[11px] font-medium transition cursor-pointer ${
                       cinemaLook === mode
-                        ? "bg-white/15 text-white shadow-sm ring-1 ring-white/20"
-                        : "text-zinc-500 hover:text-zinc-300"
+                        ? "bg-slate-900 text-white font-semibold shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     {mode === "kodak-500t" ? "Kodak 500T" : mode === "anamorphic-cyan" ? "Anamorphic Cyan" : "Silver Noir"}
@@ -636,44 +636,43 @@ function Index() {
         </div>
       </section>
 
-
       {/* SECTION 3: FRAMER-STYLE BENTO GRID CATALOG (INTERACTIVE CORE) */}
       <section id="catalog" className="relative mx-auto max-w-7xl px-6 pt-20 pb-32 z-10 scroll-mt-28">
         {/* Catalog Header & Command Deck */}
-        <div className="flex flex-col justify-between gap-6 border-b border-white/[0.08] pb-8 lg:flex-row lg:items-end">
+        <div className="flex flex-col justify-between gap-6 border-b border-slate-200 pb-8 lg:flex-row lg:items-end">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-400 uppercase">
+            <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1 font-mono text-[10px] tracking-widest text-red-600 uppercase font-semibold">
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>INSTANT INVENTORY ACCESS</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl text-white">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900">
               Precision Cinema Fleet Ready for Set Call.
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-slate-400 leading-relaxed">
+            <p className="mt-2 max-w-2xl text-sm text-slate-600 leading-relaxed">
               Bench-calibrated 8K camera bodies, anamorphic primes, stage LED softlights, and 32-bit float audio. Flight-cased with turnkey accessories and ₹0 deposit coverage across Mumbai & India.
             </p>
           </div>
 
           {/* Segmented Duration Switcher [1 Day | 3 Days (-10%) | 7 Days (-25%)] */}
           <div className="flex flex-col items-start gap-2 lg:items-end">
-            <span className="font-mono text-[11px] tracking-wider uppercase text-zinc-400 flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-red-400" />
+            <span className="font-mono text-[11px] tracking-wider uppercase text-slate-500 flex items-center gap-1.5 font-semibold">
+              <Clock className="h-3.5 w-3.5 text-red-500" />
               <span>RENTAL SHOOT DURATION</span>
             </span>
-            <div className="inline-flex rounded-full border border-white/10 bg-zinc-950/80 p-1 font-mono text-xs backdrop-blur-xl shadow-inner">
+            <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1 font-mono text-xs shadow-inner">
               {DURATIONS.map((d, i) => (
                 <button
                   key={d.days}
                   onClick={() => setDurationIdx(i)}
                   className={`rounded-full px-4 py-2 transition-all duration-200 cursor-pointer ${
                     durationIdx === i
-                      ? "bg-white text-zinc-950 font-bold shadow-md"
-                      : "text-zinc-400 hover:text-white hover:bg-white/5"
+                      ? "bg-white text-slate-900 font-bold shadow-md"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
                   }`}
                 >
                   <span>{d.label}</span>
                   {d.discount > 0 && (
-                    <span className="ml-1 text-[10px] text-red-500 font-bold">
+                    <span className="ml-1 text-[10px] text-red-600 font-bold">
                       (-{d.discount * 100}%)
                     </span>
                   )}
@@ -681,7 +680,7 @@ function Index() {
               ))}
             </div>
             {activeDuration.discount > 0 && (
-              <span className="font-mono text-[11px] text-emerald-400 font-medium">
+              <span className="font-mono text-[11px] text-emerald-700 font-semibold">
                 ⚡ Volume rate active: Save {activeDuration.discount * 100}% on all equipment below
               </span>
             )}
@@ -700,14 +699,14 @@ function Index() {
                   onClick={() => setSelectedCat(c)}
                   className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? "border-red-500/50 bg-red-500/15 text-red-400 font-bold ring-1 ring-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
-                      : "border-white/10 bg-zinc-900/40 text-zinc-400 hover:border-white/20 hover:text-white"
+                      ? "border-red-500 bg-red-50 text-red-600 font-bold ring-1 ring-red-400 shadow-sm"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900 shadow-sm"
                   }`}
                 >
                   <span>{c}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] ${
-                      isActive ? "bg-red-500 text-white font-bold" : "bg-white/10 text-zinc-400"
+                      isActive ? "bg-red-600 text-white font-bold" : "bg-slate-100 text-slate-600"
                     }`}
                   >
                     {count}
@@ -718,20 +717,20 @@ function Index() {
           </div>
 
           {/* Search & Secondary Filter Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-zinc-900/30 p-3 backdrop-blur-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
             <div className="relative flex-1 min-w-[240px]">
-              <Search className="pointer-events-none absolute left-3.5 top-2.5 h-4 w-4 text-zinc-500" />
+              <Search className="pointer-events-none absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search cinema bodies, primes, sensor, mounts..."
-                className="w-full rounded-xl border border-white/10 bg-zinc-950/60 pl-10 pr-3.5 py-2 font-mono text-xs text-white placeholder:text-zinc-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500/40"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-400"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-2 text-zinc-500 hover:text-white"
+                  className="absolute right-3 top-2 text-slate-400 hover:text-slate-700"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -739,11 +738,11 @@ function Index() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-zinc-500">Mount:</span>
+              <span className="font-mono text-xs text-slate-500">Mount:</span>
               <select
                 value={selectedMount}
                 onChange={(e) => setSelectedMount(e.target.value)}
-                className="rounded-xl border border-white/10 bg-zinc-950/60 px-3 py-2 font-mono text-xs text-white outline-none cursor-pointer"
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
               >
                 <option value="All">All Mounts</option>
                 <option value="PL">PL Mount</option>
@@ -755,7 +754,7 @@ function Index() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="rounded-xl border border-white/10 bg-zinc-950/60 px-3 py-2 font-mono text-xs text-white outline-none cursor-pointer"
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-900 outline-none cursor-pointer"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="price-low">Rate: Low to High</option>
@@ -778,36 +777,36 @@ function Index() {
                   <div>
                     {/* Card Top: Highlight Badge & In-Stock Indicator */}
                     <div className="flex items-center justify-between font-mono text-[10px]">
-                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 uppercase tracking-widest text-zinc-300">
+                      <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 uppercase tracking-widest text-slate-700 font-semibold">
                         {item.highlight || item.category}
                       </span>
-                      <span className="flex items-center gap-1.5 text-emerald-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         <span>{item.inStockCount ?? 2} in Stock</span>
                       </span>
                     </div>
 
                     {/* Image Container with Smooth Zoom on Hover */}
-                    <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 bg-black">
+                    <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
                       <img
                         src={item.img}
                         alt={item.name}
                         className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                       />
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
                       
                       {item.mount && (
-                        <span className="absolute bottom-2.5 left-2.5 rounded-lg border border-white/10 bg-black/70 px-2 py-0.5 font-mono text-[10px] text-zinc-300 backdrop-blur-md">
+                        <span className="absolute bottom-2.5 left-2.5 rounded-lg border border-white/20 bg-slate-950/75 px-2 py-0.5 font-mono text-[10px] text-white backdrop-blur-md">
                           {item.mount}
                         </span>
                       )}
                     </div>
 
                     {/* Gear Title & Category */}
-                    <h3 className="mt-4 text-xl font-bold tracking-tight text-white group-hover:text-red-400 transition-colors">
+                    <h3 className="mt-4 text-xl font-bold tracking-tight text-slate-900 group-hover:text-red-600 transition-colors">
                       {item.name}
                     </h3>
-                    <p className="mt-0.5 font-mono text-xs text-zinc-500 uppercase tracking-wider">
+                    <p className="mt-0.5 font-mono text-xs text-slate-500 uppercase tracking-wider">
                       {item.category}
                     </p>
 
@@ -816,7 +815,7 @@ function Index() {
                       {item.specs.map((s) => (
                         <span
                           key={s}
-                          className="rounded-lg border border-white/[0.08] bg-zinc-900/60 px-2.5 py-1 font-mono text-[10px] text-zinc-300"
+                          className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-[10px] text-slate-700 font-medium"
                         >
                           {s}
                         </span>
@@ -825,16 +824,16 @@ function Index() {
                   </div>
 
                   {/* Card Bottom: Rate Badge & Action Buttons */}
-                  <div className="mt-6 border-t border-white/[0.08] pt-4">
+                  <div className="mt-6 border-t border-slate-100 pt-4">
                     <div className="flex items-baseline justify-between mb-3.5">
                       <div>
-                        <span className="font-mono text-2xl font-bold text-white">
+                        <span className="font-mono text-2xl font-bold text-slate-900">
                           ₹{perDayRate.toLocaleString("en-IN")}
                         </span>
-                        <span className="font-mono text-xs text-zinc-500"> /day</span>
+                        <span className="font-mono text-xs text-slate-500"> /day</span>
                       </div>
                       {activeDuration.discount > 0 && (
-                        <span className="rounded bg-red-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-red-400">
+                        <span className="rounded bg-red-50 border border-red-200 px-2 py-0.5 font-mono text-[10px] font-bold text-red-600">
                           {activeDuration.label} (-{activeDuration.discount * 100}%)
                         </span>
                       )}
@@ -846,7 +845,7 @@ function Index() {
                         onClick={() => setQuickSpecsGear(item)}
                         className="framer-pill-secondary flex items-center justify-center gap-1.5 py-2.5 text-xs font-mono cursor-pointer"
                       >
-                        <Info className="h-3.5 w-3.5 text-zinc-400" />
+                        <Info className="h-3.5 w-3.5 text-slate-500" />
                         <span>Specs</span>
                       </button>
 
@@ -878,14 +877,14 @@ function Index() {
       {/* SECTION 4: 4-BLOCK BENTO HARDWARE SPECS */}
       <section id="hardware" className="relative mx-auto max-w-7xl px-6 py-24 z-10 scroll-mt-20">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 uppercase">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 font-mono text-[10px] tracking-widest text-slate-700 uppercase font-semibold shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
             <span>THE GEARSHARE STANDARD</span>
           </div>
-          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-white">
+          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-slate-900">
             Engineered for Zero Failure on Stage.
           </h2>
-          <p className="mt-3 text-slate-400 text-sm sm:text-base leading-relaxed">
+          <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
             Every cinema body, prime lens set, and battery brick is bench-inspected in cleanroom conditions before flight-case sealing.
           </p>
         </div>
@@ -897,19 +896,19 @@ function Index() {
           <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between font-mono text-xs">
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 uppercase tracking-wider text-red-400 font-bold">
+                <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 uppercase tracking-wider text-red-600 font-bold">
                   01 / BENCH TESTING
                 </span>
-                <span className="text-emerald-400 flex items-center gap-1.5">
+                <span className="text-emerald-600 flex items-center gap-1.5 font-semibold">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>±0.010mm Tolerance Pass</span>
                 </span>
               </div>
 
-              <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
                 Sub-Micron Sensor Bench Testing
               </h3>
-              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 Back-focus drift destroys 8K anamorphic sharpness. Every lens and mount is calibrated on our digital autocollimator before rolling onto set.
               </p>
 
@@ -921,8 +920,8 @@ function Index() {
                     onClick={() => setSelectedFfdIdx(idx)}
                     className={`rounded-xl border px-3.5 py-2 transition cursor-pointer ${
                       selectedFfdIdx === idx
-                        ? "border-red-500 bg-red-500/20 text-white font-bold ring-1 ring-red-500"
-                        : "border-white/10 bg-zinc-950/60 text-zinc-400 hover:border-white/20 hover:text-white"
+                        ? "border-red-500 bg-red-50 text-red-600 font-bold ring-1 ring-red-400 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900 shadow-sm"
                     }`}
                   >
                     <span>{p.mount} ({p.targetFfd.toFixed(2)}mm)</span>
@@ -932,38 +931,38 @@ function Index() {
             </div>
 
             {/* Interactive Optical Collimation Diagram Graphic */}
-            <div className="mt-6 rounded-2xl border border-white/[0.08] bg-zinc-950/80 p-5 font-mono">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-3 text-xs">
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-mono">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3 text-xs">
                 <div className="flex items-center gap-2">
-                  <Aperture className="h-4 w-4 text-red-400" />
-                  <span className="text-zinc-300 font-semibold">{currentFfd.mount} Collimation Telemetry</span>
+                  <Aperture className="h-4 w-4 text-red-600" />
+                  <span className="text-slate-900 font-semibold">{currentFfd.mount} Collimation Telemetry</span>
                 </div>
                 <div className="flex items-center gap-3 text-[11px]">
-                  <span className="text-zinc-500">SPEC: {currentFfd.standard}</span>
-                  <span className="text-emerald-400">DEVIATION: {currentFfd.dev}</span>
+                  <span className="text-slate-500">SPEC: {currentFfd.standard}</span>
+                  <span className="text-emerald-700 font-semibold">DEVIATION: {currentFfd.dev}</span>
                 </div>
               </div>
 
               {/* Laser Reticle & Scale Line */}
-              <div className="relative mt-4 h-16 w-full overflow-hidden rounded-xl border border-white/10 bg-black/60 flex items-center justify-center">
-                <div className="absolute inset-x-0 h-px bg-red-500/40" />
-                <div className="absolute inset-y-0 w-px bg-red-500/40" />
+              <div className="relative mt-4 h-16 w-full overflow-hidden rounded-xl border border-slate-200 bg-white flex items-center justify-center shadow-inner">
+                <div className="absolute inset-x-0 h-px bg-red-400/40" />
+                <div className="absolute inset-y-0 w-px bg-red-400/40" />
                 <div className="h-10 w-10 rounded-full border border-dashed border-red-500/50 flex items-center justify-center">
-                  <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)]" />
+                  <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
                 </div>
                 {/* Millimeter ticks */}
-                <div className="absolute bottom-1 inset-x-4 flex justify-between text-[9px] text-zinc-600">
+                <div className="absolute bottom-1 inset-x-4 flex justify-between text-[9px] text-slate-500 font-medium">
                   <span>-0.010mm</span>
                   <span>-0.005mm</span>
-                  <span className="text-red-400 font-bold">0.000mm</span>
+                  <span className="text-red-600 font-bold">0.000mm</span>
                   <span>+0.005mm</span>
                   <span>+0.010mm</span>
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-400">
-                <span>Measured FFD: <strong className="text-white">{currentFfd.measuredFfd.toFixed(3)} mm</strong></span>
-                <span className="text-emerald-400">Class-100 Cleanroom Certified</span>
+              <div className="mt-3 flex items-center justify-between text-[11px] text-slate-600">
+                <span>Measured FFD: <strong className="text-slate-900">{currentFfd.measuredFfd.toFixed(3)} mm</strong></span>
+                <span className="text-emerald-700 font-semibold">Class-100 Cleanroom Certified</span>
               </div>
             </div>
           </div>
@@ -971,23 +970,23 @@ function Index() {
           {/* Block 2: Production Damage Shield (Zero Deposit for verified DPs) */}
           <div id="damage-shield" className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between scroll-mt-28">
             <div>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-400 font-bold">
+              <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-600 font-bold">
                 02 / DAMAGE SHIELD
               </span>
-              <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
                 Production Damage Shield (Zero Deposit for verified DPs)
               </h3>
-              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 Full on-set and transit accidental damage coverage. Instant deposit waivers for GSTIN holders and WICA / SICA members.
               </p>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 font-mono text-xs text-emerald-400">
-              <div className="flex items-center gap-2 font-bold">
-                <ShieldCheck className="h-4 w-4" />
+            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 font-mono text-xs text-emerald-800">
+              <div className="flex items-center gap-2 font-bold text-emerald-900">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
                 <span>100% IN-TRANSIT & ON-SET COVERAGE</span>
               </div>
-              <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
+              <p className="mt-1 text-[11px] text-emerald-700 leading-relaxed">
                 Drops, thermal stress, and optical element hazards covered without tied-up credit card holds.
               </p>
             </div>
@@ -996,13 +995,13 @@ function Index() {
           {/* Block 3: 3-Hour Studio Set Dispatch Across Mumbai */}
           <div className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between">
             <div>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-400 font-bold">
+              <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 font-mono text-xs uppercase tracking-wider text-red-600 font-bold">
                 03 / METRO SET DISPATCH
               </span>
-              <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
                 3-Hour Studio Set Dispatch Across Mumbai
               </h3>
-              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 Flight-ready Pelican Air hardcases dispatched in dedicated sprinter vans across Film City, Mehboob, Yash Raj, and national studios.
               </p>
             </div>
@@ -1010,13 +1009,13 @@ function Index() {
             <div className="mt-6">
               <a
                 href="/track"
-                className="framer-pill-secondary flex items-center justify-between p-3.5 font-mono text-xs"
+                className="framer-pill-secondary flex items-center justify-between p-3.5 font-mono text-xs shadow-sm"
               >
-                <span className="flex items-center gap-2 text-white">
-                  <Truck className="h-4 w-4 text-red-400" />
+                <span className="flex items-center gap-2 text-slate-800 font-medium">
+                  <Truck className="h-4 w-4 text-red-600" />
                   <span>Launch Soundstage Tracker</span>
                 </span>
-                <span className="text-red-400">→</span>
+                <span className="text-red-600 font-bold">→</span>
               </a>
             </div>
           </div>
@@ -1025,40 +1024,40 @@ function Index() {
           <div className="framer-bento-card lg:col-span-2 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between font-mono text-xs">
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 uppercase tracking-wider text-red-400 font-bold">
+                <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 uppercase tracking-wider text-red-600 font-bold">
                   04 / TURNKEY POWER & HARDCASES
                 </span>
-                <span className="text-zinc-400">4x 150Wh V-Mount Standard</span>
+                <span className="text-slate-500 font-semibold">4x 150Wh V-Mount Standard</span>
               </div>
 
-              <h3 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
                 Pre-Charged V-Mount Batteries & Flight Pelican Cases
               </h3>
-              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 No half-charged surprises. Every body ships with four 150Wh high-draw V-mount bricks, quad fast-charger, 15mm carbon rods, and Arri standard bridgeplates.
               </p>
             </div>
 
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-              <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-center">
-                <Zap className="h-4 w-4 text-red-400 mx-auto" />
-                <p className="mt-1 font-bold text-white">4x 150Wh</p>
-                <p className="text-[10px] text-zinc-500">V-Mount Cells</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+                <Zap className="h-4 w-4 text-red-600 mx-auto" />
+                <p className="mt-1 font-bold text-slate-900">4x 150Wh</p>
+                <p className="text-[10px] text-slate-500">V-Mount Cells</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-center">
-                <Box className="h-4 w-4 text-red-400 mx-auto" />
-                <p className="mt-1 font-bold text-white">Pelican Air</p>
-                <p className="text-[10px] text-zinc-500">Flight Hardcase</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+                <Box className="h-4 w-4 text-red-600 mx-auto" />
+                <p className="mt-1 font-bold text-slate-900">Pelican Air</p>
+                <p className="text-[10px] text-slate-500">Flight Hardcase</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-center">
-                <SlidersHorizontal className="h-4 w-4 text-red-400 mx-auto" />
-                <p className="mt-1 font-bold text-white">15mm Rods</p>
-                <p className="text-[10px] text-zinc-500">Carbon System</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+                <SlidersHorizontal className="h-4 w-4 text-red-600 mx-auto" />
+                <p className="mt-1 font-bold text-slate-900">15mm Rods</p>
+                <p className="text-[10px] text-slate-500">Carbon System</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-center">
-                <Radio className="h-4 w-4 text-emerald-400 mx-auto" />
-                <p className="mt-1 font-bold text-emerald-400">100% Full</p>
-                <p className="text-[10px] text-zinc-500">Pre-Charged</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+                <Radio className="h-4 w-4 text-emerald-600 mx-auto" />
+                <p className="mt-1 font-bold text-emerald-700">100% Full</p>
+                <p className="text-[10px] text-slate-500">Pre-Charged</p>
               </div>
             </div>
           </div>
@@ -1066,16 +1065,16 @@ function Index() {
       </section>
 
       {/* SECTION 5: INTERACTIVE WORKFLOW TIMELINE */}
-      <section id="workflow" className="relative mx-auto max-w-7xl px-6 py-24 z-10 scroll-mt-28 border-t border-white/[0.08]">
+      <section id="workflow" className="relative mx-auto max-w-7xl px-6 py-24 z-10 scroll-mt-28 border-t border-slate-200">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 uppercase">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 font-mono text-[10px] tracking-widest text-slate-700 uppercase font-semibold shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
             <span>RENTAL LIFECYCLE</span>
           </div>
-          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-white">
+          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-slate-900">
             From Reservation to Roll Time in Three Steps.
           </h2>
-          <p className="mt-3 text-slate-400 text-sm sm:text-base leading-relaxed">
+          <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
             Eliminating production friction with automated digital paperwork and flight-case set deliveries.
           </p>
         </div>
@@ -1085,17 +1084,17 @@ function Index() {
             <div key={step.step} className="framer-bento-card p-6 sm:p-8 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between font-mono text-xs">
-                  <span className="text-4xl font-black tracking-tight text-white/20 font-mono">
+                  <span className="text-4xl font-black tracking-tight text-slate-300 font-mono">
                     {step.step}
                   </span>
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[10px] text-red-400 font-bold">
+                  <span className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[10px] text-red-600 font-bold">
                     {step.badge}
                   </span>
                 </div>
-                <h3 className="mt-4 text-xl font-bold tracking-tight text-white">
+                <h3 className="mt-4 text-xl font-bold tracking-tight text-slate-900">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                   {step.desc}
                 </p>
               </div>
@@ -1105,16 +1104,16 @@ function Index() {
       </section>
 
       {/* SECTION 6: FRAMER COLLAPSIBLE FAQ ACCORDION */}
-      <section id="faq" className="relative mx-auto max-w-4xl px-6 py-24 z-10 scroll-mt-28 border-t border-white/[0.08]">
+      <section id="faq" className="relative mx-auto max-w-4xl px-6 py-24 z-10 scroll-mt-28 border-t border-slate-200">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1 font-mono text-[10px] tracking-widest text-zinc-300 uppercase">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 font-mono text-[10px] tracking-widest text-slate-700 uppercase font-semibold shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
             <span>OPERATIONAL CLARITY</span>
           </div>
-          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-white">
+          <h2 className="mt-4 text-3xl font-black tracking-[-0.04em] sm:text-5xl text-slate-900">
             Frequently Asked Questions.
           </h2>
-          <p className="mt-3 text-slate-400 text-sm sm:text-base">
+          <p className="mt-3 text-slate-600 text-sm sm:text-base">
             Everything you need to know about our soundstage delivery, insurance, and zero-deposit policies.
           </p>
         </div>
@@ -1126,22 +1125,22 @@ function Index() {
             return (
               <div
                 key={faq.q}
-                className="rounded-2xl border border-white/[0.08] bg-zinc-900/40 backdrop-blur-xl overflow-hidden transition-all duration-200"
+                className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden transition-all duration-200"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-5 text-left transition hover:bg-white/[0.02] cursor-pointer"
+                  className="flex w-full items-center justify-between p-5 text-left transition hover:bg-slate-50/70 cursor-pointer"
                 >
-                  <span className="text-base font-semibold text-white pr-4">{faq.q}</span>
+                  <span className="text-base font-semibold text-slate-900 pr-4">{faq.q}</span>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 text-red-400" : ""
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${
+                      isOpen ? "rotate-180 text-red-600" : ""
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-white/[0.06] p-5 pt-3 text-sm text-slate-400 leading-relaxed animate-in fade-in duration-200">
+                  <div className="border-t border-slate-100 p-5 pt-3 text-sm text-slate-600 leading-relaxed animate-in fade-in duration-200">
                     {faq.a}
                   </div>
                 )}
@@ -1152,41 +1151,41 @@ function Index() {
       </section>
 
       {/* SECTION 7: TECHNICAL FRAMER-STYLE FOOTER */}
-      <footer className="relative border-t border-white/[0.08] bg-zinc-950/80 px-6 py-16 z-10">
+      <footer className="relative border-t border-slate-200 bg-slate-100/80 px-6 py-16 z-10">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2 space-y-4">
-              <div className="flex items-center gap-2 font-mono text-sm font-bold tracking-[0.2em] text-white">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              <div className="flex items-center gap-2 font-mono text-sm font-bold tracking-[0.2em] text-slate-900">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
                 <span>GEARSHARE</span>
               </div>
-              <p className="text-sm text-zinc-400 max-w-md leading-relaxed">
+              <p className="text-sm text-slate-600 max-w-md leading-relaxed">
                 Precision on-demand cinema camera bodies, prime glass, and lighting fleets. Bench-collimated to ±0.01mm FFD and delivered directly to production stages across India.
               </p>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-xs text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-xs text-emerald-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>All Rental Hubs Operational (Film City · Andheri · Bandra)</span>
               </div>
             </div>
 
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-wider text-zinc-400 font-semibold mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-wider text-slate-900 font-semibold mb-3">
                 Platform
               </h4>
-              <ul className="space-y-2 font-mono text-xs text-zinc-500">
-                <li><a href="#catalog" className="hover:text-white transition">Equipment Catalog</a></li>
-                <li><a href="#bento-features" className="hover:text-white transition">Bento Specifications</a></li>
-                <li><a href="#workflow" className="hover:text-white transition">Rental Lifecycle</a></li>
-                <li><a href="#damage-shield" className="hover:text-white transition">Damage Shield</a></li>
-                <li><a href="/track" className="hover:text-white transition text-red-400">Soundstage Dispatch</a></li>
+              <ul className="space-y-2 font-mono text-xs text-slate-600">
+                <li><a href="#catalog" className="hover:text-slate-900 transition">Equipment Catalog</a></li>
+                <li><a href="#hardware" className="hover:text-slate-900 transition">Bento Specifications</a></li>
+                <li><a href="#workflow" className="hover:text-slate-900 transition">Rental Lifecycle</a></li>
+                <li><a href="#damage-shield" className="hover:text-slate-900 transition">Damage Shield</a></li>
+                <li><a href="/track" className="hover:text-slate-900 transition text-red-600 font-semibold">Soundstage Dispatch</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-wider text-zinc-400 font-semibold mb-3">
+              <h4 className="font-mono text-xs uppercase tracking-wider text-slate-900 font-semibold mb-3">
                 Cinema Depots
               </h4>
-              <ul className="space-y-2 font-mono text-xs text-zinc-500">
+              <ul className="space-y-2 font-mono text-xs text-slate-600">
                 <li>Mumbai: Film City Bay 1</li>
                 <li>Mumbai: Andheri West Depot</li>
                 <li>Hyderabad: Jubilee Hills Bay</li>
@@ -1196,10 +1195,10 @@ function Index() {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-white/[0.08] pt-8 font-mono text-xs text-zinc-500 gap-4">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 pt-8 font-mono text-xs text-slate-500 gap-4">
             <p>© 2026 GearShare Technologies Inc. All rights reserved.</p>
             {/* ZootechX Prototype Attribution */}
-            <p className="text-zinc-400">
+            <p className="text-slate-500">
               ZootechX Technical Assessment Prototype • Topic 02: GearShare
             </p>
           </div>
