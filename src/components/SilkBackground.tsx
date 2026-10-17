@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 const VERT = `attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
-// Flowing silk / fluid ribbons, tinted cinema-red, mouse-reactive.
+// Flowing silk / fluid ribbons, tinted cyber magenta-violet with neon cyan highlights, mouse-reactive.
 const FRAG = `precision highp float;
 uniform vec2 r;uniform float t;uniform vec2 m;
 float n(vec2 p){return sin(p.x)*sin(p.y);}
@@ -17,8 +17,11 @@ void main(){
   float s=.5+.5*sin(q.x*1.4+q.y*1.1);
   float ribbon=pow(s,10.)*.85+pow(s,3.)*.08;
   float vig=smoothstep(1.4,.15,length(uv));
-  vec3 red=vec3(.75,.06,.18);
-  vec3 col=red*ribbon*vig+vec3(1.,.5,.55)*pow(s,24.)*.18*vig;
+  vec3 magenta=vec3(1.0, 0.165, 0.55);
+  vec3 violet=vec3(0.486, 0.227, 0.93);
+  vec3 base=mix(violet, magenta, clamp(uv.x * 0.6 + 0.5, 0.0, 1.0));
+  vec3 cyan=vec3(0.0, 0.94, 1.0);
+  vec3 col=base*ribbon*vig+cyan*pow(s,24.)*.18*vig;
   gl_FragColor=vec4(col,1.);
 }`;
 

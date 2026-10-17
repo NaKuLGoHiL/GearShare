@@ -328,24 +328,48 @@ export function AppleScrollyCanvas({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Pitch black void (#050505) seamlessly matching background
-      ctx.fillStyle = "#050505";
+      // Pitch black obsidian canvas (#07070d)
+      ctx.fillStyle = "#07070d";
       ctx.fillRect(0, 0, width, height);
 
-      // Soft radial cinema illumination glow centered behind the camera
-      const glowGrad = ctx.createRadialGradient(
-        width / 2,
-        height / 2 + 50,
-        40,
-        width / 2,
-        height / 2 + 50,
-        Math.min(width, height) * 0.6
+      // 1. Dynamic Ambient Multi-Point Volumetric Neon Lighting
+      // Primary purple/magenta aura (shifts with cursor parallax)
+      const primaryGlow = ctx.createRadialGradient(
+        width * 0.5 + mx * 45,
+        height * 0.42 + my * 30,
+        30,
+        width * 0.5,
+        height * 0.42,
+        Math.min(width, height) * 0.75
       );
-      glowGrad.addColorStop(0, "rgba(239, 68, 68, 0.12)");
-      glowGrad.addColorStop(0.4, "rgba(255, 255, 255, 0.025)");
-      glowGrad.addColorStop(1, "rgba(5, 5, 5, 0)");
-      ctx.fillStyle = glowGrad;
+      primaryGlow.addColorStop(0, "rgba(255, 42, 141, 0.16)");
+      primaryGlow.addColorStop(0.35, "rgba(124, 58, 237, 0.10)");
+      primaryGlow.addColorStop(0.7, "rgba(0, 240, 255, 0.03)");
+      primaryGlow.addColorStop(1, "rgba(7, 7, 13, 0)");
+      ctx.fillStyle = primaryGlow;
       ctx.fillRect(0, 0, width, height);
+
+      // Secondary floating neon orb (pulsing cyan)
+      const cyanOrbX = width * 0.65 + Math.cos(time * 0.6) * 50;
+      const cyanOrbY = height * 0.35 + Math.sin(time * 0.7) * 35;
+      const cyanOrb = ctx.createRadialGradient(cyanOrbX, cyanOrbY, 10, cyanOrbX, cyanOrbY, Math.min(width, height) * 0.45);
+      cyanOrb.addColorStop(0, "rgba(0, 240, 255, 0.08)");
+      cyanOrb.addColorStop(0.6, "rgba(0, 240, 255, 0.015)");
+      cyanOrb.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = cyanOrb;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Subtle Cinematic Technical Crosshairs & Ambient Grid
+      ctx.save();
+      const gridSpacing = 80;
+      ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.font = "8px monospace";
+      for (let gx = gridSpacing; gx < width; gx += gridSpacing * 2) {
+        for (let gy = gridSpacing; gy < height; gy += gridSpacing * 2) {
+          ctx.fillText("+", gx, gy);
+        }
+      }
+      ctx.restore();
 
       const masters = masterImagesRef.current;
       const heroReady =
@@ -373,8 +397,8 @@ export function AppleScrollyCanvas({
           const cy = height * 0.38;
           // Soft radial glow
           const loadGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 140);
-          loadGrad.addColorStop(0, "rgba(225, 29, 72, 0.2)");
-          loadGrad.addColorStop(1, "rgba(5, 5, 5, 0)");
+          loadGrad.addColorStop(0, "rgba(255, 42, 141, 0.2)");
+          loadGrad.addColorStop(1, "rgba(7, 7, 13, 0)");
           ctx.fillStyle = loadGrad;
           ctx.beginPath();
           ctx.arc(cx, cy, 140, 0, Math.PI * 2);
@@ -387,9 +411,9 @@ export function AppleScrollyCanvas({
           ctx.arc(cx, cy, 54, 0, Math.PI * 2);
           ctx.stroke();
 
-          // Pulsing red tally indicator
+          // Pulsing magenta tally indicator
           const pulse = 0.4 + Math.sin(time * 5) * 0.4;
-          ctx.fillStyle = `rgba(239, 68, 68, ${pulse})`;
+          ctx.fillStyle = `rgba(255, 42, 141, ${pulse})`;
           ctx.beginPath();
           ctx.arc(cx, cy - 24, 2.5, 0, Math.PI * 2);
           ctx.fill();
@@ -418,7 +442,7 @@ export function AppleScrollyCanvas({
       id="scrollytech"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full h-[350vh] bg-[#09090b] select-none touch-pan-y"
+      className="relative w-full h-[350vh] bg-[#07070d] select-none touch-pan-y"
     >
       {/* Sticky Fullscreen Canvas Viewport with 100dvh for iOS Safari stability */}
       <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden relative flex flex-col justify-between">
@@ -475,10 +499,10 @@ export function AppleScrollyCanvas({
                 <path d="M1 17V1H17" stroke="currentColor" strokeWidth="1.5" />
               </svg>
               <div className="flex items-center gap-1.5 font-mono text-[10px] text-zinc-400">
-                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+                <span className="h-2 w-2 rounded-full bg-[#ff2a8d] shadow-[0_0_8px_#ff2a8d] animate-pulse shrink-0" />
                 <span className="font-bold text-white tracking-widest">REC</span>
                 <span className="text-zinc-600">·</span>
-                <span className="text-red-400 font-semibold">{timecode}</span>
+                <span className="text-[#ff2a8d] font-semibold">{timecode}</span>
               </div>
               <div className="hidden md:flex items-center gap-1.5 font-mono text-[10px] text-zinc-400 border-l border-white/10 pl-2.5">
                 <span className="text-zinc-500">MODE:</span>
@@ -489,12 +513,12 @@ export function AppleScrollyCanvas({
             {/* Top-Right: T2.0, Sensor Format & Corner Bracket ┐ */}
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="font-mono text-[10px] text-zinc-400 text-right flex items-center gap-1.5 sm:gap-2">
-                <span className="rounded bg-red-500/10 border border-red-500/30 px-1.5 py-0.5 text-red-300 font-bold">
+                <span className="rounded bg-[#ff2a8d]/10 border border-[#ff2a8d]/30 px-1.5 py-0.5 text-[#ff2a8d] font-bold">
                   T2.0
                 </span>
                 <span className="text-white font-semibold hidden xs:inline">8K VISTAVISION</span>
                 <span className="text-zinc-600 hidden sm:inline"> · </span>
-                <span className="text-emerald-400 font-semibold hidden sm:inline">120 FPS RAW</span>
+                <span className="text-[#00f0ff] font-semibold hidden sm:inline">120 FPS RAW</span>
               </div>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
                 <path d="M17 17V1H1" stroke="currentColor" strokeWidth="1.5" />
@@ -534,7 +558,7 @@ export function AppleScrollyCanvas({
                 <span className="text-zinc-500">STAGE:</span>
                 <span className="text-zinc-200 font-medium">MUMBAI-STAGE-04</span>
                 <span className="text-zinc-600">·</span>
-                <span className="text-emerald-400 font-semibold">BAT 14.8V (98%)</span>
+                <span className="text-[#00f0ff] font-semibold">BAT 14.8V (98%)</span>
               </div>
             </div>
 
@@ -542,7 +566,7 @@ export function AppleScrollyCanvas({
             <div className="flex items-center gap-2">
               <div className="font-mono text-[10px] text-zinc-400 text-right hidden sm:block">
                 <span className="text-zinc-500">COLOR SPACE: </span>
-                <span className="text-red-400 font-medium">S-GAMUT3.CINE / S-LOG3</span>
+                <span className="text-[#ff2a8d] font-medium">S-GAMUT3.CINE / S-LOG3</span>
               </div>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-white/40">
                 <path d="M17 1V17H1" stroke="currentColor" strokeWidth="1.5" />
@@ -568,9 +592,9 @@ export function AppleScrollyCanvas({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 border border-white/10 bg-zinc-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-300 shadow-[0_0_20px_rgba(220,38,38,0.15)] mb-2 sm:mb-2.5"
+              className="inline-flex items-center gap-2 border border-[#ff2a6d]/40 bg-[#ff2a6d]/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-[#ff4b82] shadow-[0_0_20px_rgba(255,42,141,0.2)] mb-2 sm:mb-2.5"
             >
-              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              <span className="h-2 w-2 rounded-full bg-[#ff2a8d] shadow-[0_0_8px_#ff2a8d] animate-pulse shrink-0" />
               <span className="hidden sm:inline">01 // CINEMA HARDWARE ARCHITECTURE • MUMBAI STAGE DESK</span>
               <span className="sm:hidden">01 // MUMBAI STAGE DESK</span>
             </motion.div>
@@ -584,7 +608,7 @@ export function AppleScrollyCanvas({
               <span className="bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent block">
                 Precision Optics.
               </span>
-              <span className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent block drop-shadow-[0_0_35px_rgba(239,68,68,0.25)] whitespace-normal md:whitespace-nowrap">
+              <span className="bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#8b5cf6] bg-clip-text text-transparent block drop-shadow-[0_0_35px_rgba(255,42,141,0.35)] whitespace-normal md:whitespace-nowrap">
                 Uncompromised Sensor Power.
               </span>
             </motion.h1>
@@ -622,7 +646,7 @@ export function AppleScrollyCanvas({
             >
               <button
                 onClick={onRentClick}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-medium px-7 py-3.5 rounded-full shadow-[0_0_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs sm:text-sm tracking-wide"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] text-white font-medium px-7 py-3.5 rounded-full shadow-[0_0_30px_rgba(255,42,141,0.5),0_0_50px_rgba(124,58,237,0.25)] transition-all hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_0_40px_rgba(255,42,141,0.7)] cursor-pointer text-xs sm:text-sm tracking-wide"
               >
                 <span>Configure & Reserve Kit</span>
                 <span className="font-mono text-xs">→</span>
@@ -632,7 +656,7 @@ export function AppleScrollyCanvas({
                 onClick={() => handleSelectMode(activeMode === "assembled" ? "exploded" : "assembled")}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 font-medium px-7 py-3.5 rounded-full backdrop-blur-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs sm:text-sm"
               >
-                <Sparkles className="h-4 w-4 text-rose-400" />
+                <Sparkles className="h-4 w-4 text-[#ff4b82]" />
                 <span>{activeMode === "assembled" ? "Inspect Exploded View ⚡" : "Reset Assembled Rig"}</span>
               </button>
             </motion.div>
@@ -661,10 +685,10 @@ export function AppleScrollyCanvas({
               <button
                 onClick={() => setActiveHotspot(activeHotspot === "optics" ? null : "optics")}
                 onMouseEnter={() => setActiveHotspot("optics")}
-                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/20 bg-[#0d0c18]/90 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-[#ff2a8d] hover:scale-105 transition-all cursor-pointer"
                 aria-label="Inspect Optics"
               >
-                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] text-white font-bold text-[10px] sm:text-xs shadow-md shadow-[#ff2a8d]/50">
                   <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
                 </span>
                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
@@ -680,11 +704,11 @@ export function AppleScrollyCanvas({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 10 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    className="absolute z-40 w-64 sm:w-72 right-2 bottom-8 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    className="absolute z-40 w-64 sm:w-72 right-2 bottom-8 rounded-xl border border-white/15 bg-[#0e0d1a]/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
                     onMouseLeave={() => setActiveHotspot(null)}
                   >
                     <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                      <span className="font-mono text-[9px] text-[#ff2a8d] font-bold tracking-widest uppercase">
                         01 // ANAMORPHIC GLASS
                       </span>
                       <button
@@ -720,10 +744,10 @@ export function AppleScrollyCanvas({
               <button
                 onClick={() => setActiveHotspot(activeHotspot === "sensor" ? null : "sensor")}
                 onMouseEnter={() => setActiveHotspot("sensor")}
-                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/20 bg-[#0d0c18]/90 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-[#ff2a8d] hover:scale-105 transition-all cursor-pointer"
                 aria-label="Inspect Sensor Core"
               >
-                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] text-white font-bold text-[10px] sm:text-xs shadow-md shadow-[#ff2a8d]/50">
                   <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
                 </span>
                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
@@ -739,11 +763,11 @@ export function AppleScrollyCanvas({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 10 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    className="absolute z-40 w-64 sm:w-72 left-1/2 -translate-x-1/2 bottom-9 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    className="absolute z-40 w-64 sm:w-72 left-1/2 -translate-x-1/2 bottom-9 rounded-xl border border-white/15 bg-[#0e0d1a]/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
                     onMouseLeave={() => setActiveHotspot(null)}
                   >
                     <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                      <span className="font-mono text-[9px] text-[#ff2a8d] font-bold tracking-widest uppercase">
                         02 // 8K SENSOR DIE
                       </span>
                       <button
@@ -779,10 +803,10 @@ export function AppleScrollyCanvas({
               <button
                 onClick={() => setActiveHotspot(activeHotspot === "power" ? null : "power")}
                 onMouseEnter={() => setActiveHotspot("power")}
-                className="group relative flex items-center gap-1.5 rounded-full border border-white/25 bg-zinc-950/85 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                className="group relative flex items-center gap-1.5 rounded-full border border-white/20 bg-[#0d0c18]/90 pl-1.5 pr-2.5 py-1 backdrop-blur-md shadow-xl shadow-black/90 hover:border-[#ff2a8d] hover:scale-105 transition-all cursor-pointer"
                 aria-label="Inspect Power and I/O"
               >
-                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-red-600 text-white font-bold text-[10px] sm:text-xs shadow-md shadow-red-500/50">
+                <span className="relative flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] text-white font-bold text-[10px] sm:text-xs shadow-md shadow-[#ff2a8d]/50">
                   <Plus className="h-2.5 sm:h-3 w-2.5 sm:w-3 stroke-[2.5]" />
                 </span>
                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 font-semibold group-hover:text-white transition whitespace-nowrap">
@@ -798,11 +822,11 @@ export function AppleScrollyCanvas({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 10 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    className="absolute z-40 w-64 sm:w-72 left-2 bottom-8 rounded-xl border border-white/20 bg-zinc-950/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
+                    className="absolute z-40 w-64 sm:w-72 left-2 bottom-8 rounded-xl border border-white/15 bg-[#0e0d1a]/95 p-3.5 backdrop-blur-2xl shadow-2xl text-left"
                     onMouseLeave={() => setActiveHotspot(null)}
                   >
                     <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                      <span className="font-mono text-[9px] text-red-400 font-bold tracking-widest uppercase">
+                      <span className="font-mono text-[9px] text-[#ff2a8d] font-bold tracking-widest uppercase">
                         03 // DUAL BUS POWER
                       </span>
                       <button
@@ -858,7 +882,7 @@ export function AppleScrollyCanvas({
                 {activeMode === tab.id && (
                   <motion.div
                     layoutId="hero-mode-pill"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_0_20px_rgba(220,38,38,0.45)]"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] shadow-[0_0_20px_rgba(255,42,141,0.5)]"
                     transition={{ type: "spring", stiffness: 350, damping: 25 }}
                   />
                 )}
@@ -880,7 +904,7 @@ export function AppleScrollyCanvas({
           {/* Mobile Follow-Focus Touch Scrubber Slider */}
           <div className="sm:hidden w-full max-w-xs mx-auto px-4 py-2">
             <div className="flex justify-between items-center text-[9px] font-mono text-zinc-400 mb-1">
-              <span className="text-red-400 font-bold flex items-center gap-1">
+              <span className="text-[#ff4b82] font-bold flex items-center gap-1">
                 <SlidersHorizontal className="h-2.5 w-2.5" />
                 <span>FOCUS / DISASSEMBLY</span>
               </span>
@@ -906,7 +930,7 @@ export function AppleScrollyCanvas({
                 step="0.002"
                 value={scrollProgress}
                 onChange={(e) => handleSliderChange(parseFloat(e.target.value))}
-                className="relative z-10 w-full accent-red-500 cursor-pointer h-5 bg-transparent appearance-none focus:outline-none"
+                className="relative z-10 w-full accent-[#ff2a8d] cursor-pointer h-5 bg-transparent appearance-none focus:outline-none"
                 aria-label="Cinema Rig Follow Focus Disassembly Scrubber"
               />
             </div>
@@ -929,12 +953,12 @@ export function AppleScrollyCanvas({
             {/* Left Telemetry Column */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5 text-zinc-300 font-semibold">
-                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-[#ff2a8d] shadow-[0_0_6px_#ff2a8d] animate-pulse" />
                 <span>DISASSEMBLY: {Math.round(scrollProgress * 100).toString().padStart(2, "0")}%</span>
               </div>
               <div className="h-1.5 w-16 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-red-600 to-rose-400 transition-all duration-75"
+                  className="h-full bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] transition-all duration-75"
                   style={{ width: `${Math.max(2, scrollProgress * 100)}%` }}
                 />
               </div>
@@ -944,8 +968,8 @@ export function AppleScrollyCanvas({
             </div>
 
             {/* Center Interactive Scroll / Drag Pill */}
-            <div className="relative rounded-full border border-red-500/30 bg-zinc-900/80 px-4 py-1 text-[11px] text-zinc-300 shadow-[0_0_15px_rgba(220,38,38,0.2)] flex items-center gap-2">
-              <ChevronDown className="h-3.5 w-3.5 text-red-500 animate-bounce" />
+            <div className="relative rounded-full border border-pink-500/30 bg-zinc-900/80 px-4 py-1 text-[11px] text-zinc-300 shadow-[0_0_15px_rgba(255,42,141,0.2)] flex items-center gap-2">
+              <ChevronDown className="h-3.5 w-3.5 text-[#ff2a8d] animate-bounce" />
               <span>SCROLL OR SCRUB TO DISASSEMBLE CAMERA</span>
             </div>
 
@@ -960,7 +984,7 @@ export function AppleScrollyCanvas({
               <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300 font-medium">
                 6000K
               </span>
-              <span className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-red-300 font-bold">
+              <span className="rounded-md border border-[#ff2a8d]/30 bg-[#ff2a8d]/10 px-2 py-0.5 text-[#ff2a8d] font-bold">
                 T2.0
               </span>
             </div>
@@ -975,14 +999,14 @@ export function AppleScrollyCanvas({
               : "opacity-0 translate-y-6 sm:-translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,42,141,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-red-400 mb-1.5 sm:mb-3.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#ff2a8d]/30 bg-[#ff2a8d]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#ff2a8d] mb-1.5 sm:mb-3.5">
               <span>01 / INTERNAL BREAKDOWN</span>
             </div>
             <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Exmor R Full-Frame Sensor Block.
-              <span className="block text-red-400 text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+              <span className="block bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] bg-clip-text text-transparent text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
                 16-Bit RAW • 15+ Stops Latitude
               </span>
             </h2>
@@ -997,7 +1021,7 @@ export function AppleScrollyCanvas({
               </div>
               <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3">
                 <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">DUAL BASE ISO</span>
-                <span className="text-red-400 font-bold">800 / 12,800</span>
+                <span className="text-[#ff2a8d] font-bold">800 / 12,800</span>
               </div>
             </div>
           </div>
@@ -1011,14 +1035,14 @@ export function AppleScrollyCanvas({
               : "opacity-0 translate-y-6 sm:translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(0,240,255,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.05] px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 mb-1.5 sm:mb-3.5 sm:ml-auto">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#00f0ff] mb-1.5 sm:mb-3.5 sm:ml-auto">
               <span>02 / OPTICAL GLASS & FLANGE</span>
             </div>
             <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Bench-Calibrated Flange Tolerances.
-              <span className="block text-emerald-400 text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+              <span className="block text-[#00f0ff] text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
                 FFD Precision ±0.010mm
               </span>
             </h2>
@@ -1029,7 +1053,7 @@ export function AppleScrollyCanvas({
             <div className="mt-2.5 sm:mt-5 flex justify-start sm:justify-end gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
               <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
                 <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">FFD TOLERANCE</span>
-                <span className="text-emerald-400 font-bold">±0.010 mm Pass</span>
+                <span className="text-[#00f0ff] font-bold">±0.010 mm Pass</span>
               </div>
               <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
                 <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">IRIS MECHANISM</span>
@@ -1039,58 +1063,62 @@ export function AppleScrollyCanvas({
           </div>
         </div>
 
-        {/* BEAT 4 (80% - 100%): Turnkey Stage Dispatch */}
+        {/* BEAT 4 (80% - 100%): Turnkey Stage Dispatch (Centered without static photo) */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-28 sm:top-32 md:top-36 max-w-lg mx-auto z-30 transition-all duration-300 ease-out ${
-            scrollProgress >= 0.80
-              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-              : "opacity-0 translate-y-6 scale-95 pointer-events-none"
+          className={`absolute inset-x-3 sm:inset-x-6 top-1/2 -translate-y-1/2 max-w-lg sm:max-w-xl mx-auto z-30 transition-all duration-500 ease-out ${
+            scrollProgress >= 0.78
+              ? "opacity-100 translate-y-[-50%] scale-100 pointer-events-auto"
+              : "opacity-0 translate-y-[-45%] scale-95 pointer-events-none"
           }`}
         >
+          {/* Ambient Multi-Layer Neon Glow Halo */}
+          <div className="pointer-events-none absolute -inset-8 sm:-inset-12 rounded-[48px] bg-gradient-to-r from-[#ff2a8d]/30 via-[#7c3aed]/25 to-[#00f0ff]/30 blur-3xl opacity-80 animate-pulse -z-10" />
+          <div className="pointer-events-none absolute -inset-2 rounded-3xl sm:rounded-[32px] bg-gradient-to-r from-[#ff2a8d]/20 via-transparent to-[#00f0ff]/20 blur-md -z-10" />
+
           {/* Framer Frosted Glass Mirror Blurred Container Box */}
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/20 bg-zinc-950/90 p-3.5 xs:p-4 sm:p-6 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-center text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-[#0e0d1a]/95 p-5 xs:p-6 sm:p-8 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95),0_0_45px_rgba(255,42,141,0.12),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-center text-white">
             {/* Top Specular Mirror Sheen Highlight */}
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
 
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-emerald-400 backdrop-blur-md mb-1.5 sm:mb-2 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#10b981] backdrop-blur-md mb-2 sm:mb-3 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse" />
               <span>03 / TURNKEY DISPATCH • PELICAN SEALED</span>
             </div>
             
-            <h2 className="text-base xs:text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Soundstage-Ready Fleet.
-              <span className="block mt-0.5 bg-gradient-to-r from-red-500 via-rose-400 to-amber-200 bg-clip-text text-transparent">
+              <span className="block mt-0.5 sm:mt-1 bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] bg-clip-text text-transparent">
                 Dispatched in Under 3 Hours.
               </span>
             </h2>
             
-            <p className="mt-1 sm:mt-1.5 text-[11px] sm:text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
               Factory-collimated cinema bodies & matched primes, flight-cased for instant Mumbai set call.
             </p>
 
             {/* Precision Telemetry Capsule Pill */}
-            <div className="mt-2.5 sm:mt-3 inline-flex items-center justify-center gap-2 sm:gap-3.5 rounded-full border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-1 font-mono text-[9px] sm:text-[10px]">
-              <span className="text-zinc-400">FFD <strong className="text-emerald-400">±0.010mm</strong></span>
+            <div className="mt-3 sm:mt-4 inline-flex items-center justify-center gap-2 sm:gap-3.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 sm:px-4 py-1.5 font-mono text-[9px] sm:text-[10px]">
+              <span className="text-zinc-400">FFD <strong className="text-[#00f0ff]">±0.010mm</strong></span>
               <span className="text-zinc-600">•</span>
               <span className="text-zinc-400">CLEANROOM <strong className="text-white">ISO 5</strong></span>
               <span className="text-zinc-600">•</span>
-              <span className="text-zinc-400">STAGE <strong className="text-red-400">&lt;3h</strong></span>
+              <span className="text-zinc-400">STAGE <strong className="text-[#ff2a8d]">&lt;3h</strong></span>
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-3 sm:mt-4 flex flex-col xs:flex-row items-center justify-center gap-2 sm:gap-3">
+            <div className="mt-4 sm:mt-6 flex flex-col xs:flex-row items-center justify-center gap-2.5 sm:gap-3.5">
               <a
                 href="#catalog"
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 px-5 sm:px-6 py-2 text-xs sm:text-sm font-semibold text-white tracking-wide shadow-lg shadow-red-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] px-6 sm:px-7 py-2.5 text-xs sm:text-sm font-semibold text-white tracking-wide shadow-lg shadow-[#ff2a8d]/40 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Explore Fleet Catalog</span>
                 <span className="font-mono text-xs">→</span>
               </a>
               <a
                 href="#faq"
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 transition-all cursor-pointer"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 px-5 py-2.5 text-xs sm:text-sm font-medium text-zinc-200 transition-all cursor-pointer"
               >
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                <ShieldCheck className="h-3.5 w-3.5 text-[#10b981]" />
                 <span>₹0 Deposit Waiver</span>
               </a>
             </div>
@@ -1242,7 +1270,7 @@ function renderKinematicCameraFlow(
       }
     }
 
-    // 3. UNBROKEN RED LASER COLLIMATION AXIS (Active when disassembled)
+    // 3. UNBROKEN NEON MAGENTA LASER COLLIMATION AXIS (Active when disassembled)
     const expansion = Math.max(t12, t23);
     if (expansion > 0.08 && cameraAlpha > 0.15) {
       const laserY = origY + 390 * scaleRatio;
@@ -1250,8 +1278,8 @@ function renderKinematicCameraFlow(
       const laserEndX = origX + 620 * scaleRatio;
 
       ctx.save();
-      // Outer neon red glow beam
-      ctx.strokeStyle = `rgba(239, 68, 68, ${0.4 + expansion * 0.45})`;
+      // Outer neon magenta glow beam
+      ctx.strokeStyle = `rgba(255, 42, 141, ${0.4 + expansion * 0.45})`;
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(laserStartX, laserY);
@@ -1269,13 +1297,13 @@ function renderKinematicCameraFlow(
       // Sensor plane focal ping
       const sensorX = origX + 565 * scaleRatio;
       const pingPulse = Math.sin(time * 6);
-      ctx.fillStyle = "#ef4444";
+      ctx.fillStyle = "#ff2a8d";
       ctx.beginPath();
       ctx.arc(sensorX, laserY, 3.5 + pingPulse * 1.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Focal point reticle on sensor die
-      ctx.strokeStyle = "rgba(239, 68, 68, 0.75)";
+      ctx.strokeStyle = "rgba(255, 42, 141, 0.75)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(sensorX, laserY, 8 + pingPulse * 2, 0, Math.PI * 2);
@@ -1287,7 +1315,7 @@ function renderKinematicCameraFlow(
         glintPoints.forEach((gx, idx) => {
           const px = origX + gx * scaleRatio;
           const glintAlpha = Math.max(0, Math.sin(time * 4 + idx * 1.2));
-          ctx.fillStyle = `rgba(56, 189, 248, ${glintAlpha * 0.9 * t23})`;
+          ctx.fillStyle = `rgba(0, 240, 255, ${glintAlpha * 0.9 * t23})`;
           ctx.beginPath();
           ctx.arc(px, laserY, 3, 0, Math.PI * 2);
           ctx.fill();
@@ -1312,8 +1340,8 @@ function renderKinematicCameraFlow(
         sensorY,
         120 * scaleRatio
       );
-      heatGrad.addColorStop(0, `rgba(239, 68, 68, ${0.2 * sensorWarmth})`);
-      heatGrad.addColorStop(0.5, `rgba(249, 115, 22, ${0.08 * sensorWarmth})`);
+      heatGrad.addColorStop(0, `rgba(255, 42, 141, ${0.2 * sensorWarmth})`);
+      heatGrad.addColorStop(0.5, `rgba(124, 58, 237, ${0.08 * sensorWarmth})`);
       heatGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = heatGrad;
       ctx.fillRect(sensorX - 130 * scaleRatio, sensorY - 130 * scaleRatio, 260 * scaleRatio, 260 * scaleRatio);
@@ -1329,23 +1357,23 @@ function renderKinematicCameraFlow(
       const hudY = Math.max(20, origY + 155 * scaleRatio);
 
       // Glass HUD background pill
-      ctx.fillStyle = "rgba(10, 10, 12, 0.88)";
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      ctx.fillStyle = "rgba(14, 13, 26, 0.92)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(hudX, hudY, hudW, hudH, 8);
       ctx.fill();
       ctx.stroke();
 
-      // Red status pip
-      ctx.fillStyle = "#ef4444";
+      // Neon magenta status pip
+      ctx.fillStyle = "#ff2a8d";
       ctx.beginPath();
       ctx.arc(hudX + 10, hudY + 15, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Telemetry Text
       ctx.font = `600 9px monospace`;
-      ctx.fillStyle = "#ef4444";
+      ctx.fillStyle = "#ff2a8d";
       const ffdCurrent = (52.0 + t12 * 18.25 + t23 * 16.15).toFixed(3);
       ctx.fillText(
         `OPTICAL AXIS // FFD: ${ffdCurrent}mm`,
@@ -1354,14 +1382,14 @@ function renderKinematicCameraFlow(
       );
 
       ctx.font = `500 8.5px monospace`;
-      ctx.fillStyle = "#10b981";
+      ctx.fillStyle = "#00f0ff";
       ctx.fillText(
         `TOLERANCE: ±0.010mm [PASS]`,
         hudX + 18,
         hudY + 28
       );
 
-      ctx.fillStyle = "#94a3b8";
+      ctx.fillStyle = "#cbd5e1";
       ctx.fillText(
         `EXMOR R FULL FRAME • 16-BIT RAW`,
         hudX + 18,
@@ -1374,26 +1402,18 @@ function renderKinematicCameraFlow(
     ctx.restore();
   }
 
-  // 6. SEALED FLIGHT CASE OVERLAY (Beat 4 Wrap Time)
-  if (caseAlpha > 0.001 && beat4.complete && beat4.naturalWidth > 0) {
-    ctx.save();
-    ctx.globalAlpha = caseAlpha;
-
-    const caseAspect = beat4.naturalWidth / beat4.naturalHeight;
-    const caseFitScale = Math.min(
-      1,
-      Math.min(
-        (width * (isMobile ? 0.92 : 0.86)) / width,
-        (height * (isMobile ? 0.46 : isTabletPortrait ? 0.52 : 0.58)) / (width / caseAspect)
-      )
+  // 6. CYBER SOUNDSTAGE LIGHTFIELD & HOLOGRAPHIC COLLIMATION (Beat 4 Turnkey Dispatch - replaces static photo)
+  if (caseAlpha > 0.001) {
+    renderCyberSoundstageHolofield(
+      ctx,
+      width,
+      height,
+      caseAlpha,
+      mx,
+      my,
+      time,
+      isMobile
     );
-    const caseW = width * caseFitScale;
-    const caseH = caseW / caseAspect;
-    const caseX = (width - caseW) / 2;
-    const caseY = (height - caseH) / 2 + (isMobile ? 75 : height > 700 ? 115 : 60);
-
-    ctx.drawImage(beat4, caseX, caseY, caseW, caseH);
-    ctx.restore();
   }
 
   // 7. CINEMATIC CLEANROOM MICRO-DUST MOTES (Ambient depth)
@@ -1406,6 +1426,253 @@ function renderKinematicCameraFlow(
     ctx.arc(px, py, p.size * scaleRatio, 0, Math.PI * 2);
     ctx.fill();
   });
+  ctx.restore();
+
+  ctx.restore();
+}
+
+/**
+ * Cyber Soundstage Holographic Lightfield & Collimation Holo-Stage
+ * Renders an animated futuristic lightfield behind the Turnkey Dispatch card,
+ * featuring volumetric neon blooms, rotating laser collimation rings, anamorphic flares,
+ * and TARGETSYNC-inspired precision telemetry waveforms.
+ */
+function renderCyberSoundstageHolofield(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  alpha: number,
+  mx: number,
+  my: number,
+  time: number,
+  isMobile: boolean
+) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // 1. Massive Volumetric Ambient Neon Blooms (Magenta, Violet, Cyan)
+  const bloomGrad = ctx.createRadialGradient(
+    cx + mx * 40,
+    cy + my * 25,
+    30,
+    cx,
+    cy,
+    Math.min(width, height) * 0.75
+  );
+  bloomGrad.addColorStop(0, "rgba(255, 42, 141, 0.32)");
+  bloomGrad.addColorStop(0.35, "rgba(124, 58, 237, 0.22)");
+  bloomGrad.addColorStop(0.70, "rgba(0, 240, 255, 0.10)");
+  bloomGrad.addColorStop(1, "rgba(7, 7, 13, 0)");
+  ctx.fillStyle = bloomGrad;
+  ctx.fillRect(-100, -100, width + 200, height + 200);
+
+  // Secondary pulsing cyan ambient light spot
+  const cyanPulse = 0.5 + 0.5 * Math.sin(time * 2.5);
+  const cyanGlow = ctx.createRadialGradient(
+    cx + Math.cos(time * 0.8) * 90,
+    cy + Math.sin(time * 0.8) * 60,
+    10,
+    cx,
+    cy,
+    Math.min(width, height) * 0.48
+  );
+  cyanGlow.addColorStop(0, `rgba(0, 240, 255, ${0.18 + cyanPulse * 0.1})`);
+  cyanGlow.addColorStop(0.55, "rgba(0, 240, 255, 0.03)");
+  cyanGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = cyanGlow;
+  ctx.fillRect(-100, -100, width + 200, height + 200);
+
+  // 2. Anamorphic Cinema Horizontal Flare Beam (2.39:1 Horizon Streak)
+  ctx.save();
+  const flareGrad = ctx.createLinearGradient(0, cy, width, cy);
+  flareGrad.addColorStop(0, "rgba(0, 240, 255, 0)");
+  flareGrad.addColorStop(0.12, "rgba(0, 240, 255, 0.3)");
+  flareGrad.addColorStop(0.48, "rgba(255, 255, 255, 0.95)");
+  flareGrad.addColorStop(0.52, "rgba(255, 255, 255, 0.95)");
+  flareGrad.addColorStop(0.88, "rgba(255, 42, 141, 0.35)");
+  flareGrad.addColorStop(1, "rgba(255, 42, 141, 0)");
+  ctx.fillStyle = flareGrad;
+  ctx.fillRect(0, cy - 1.5, width, 3);
+
+  // Diffuse atmospheric glow along center horizon
+  const diffuseGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, Math.min(width * 0.65, 650));
+  diffuseGrad.addColorStop(0, "rgba(0, 240, 255, 0.35)");
+  diffuseGrad.addColorStop(0.35, "rgba(255, 42, 141, 0.22)");
+  diffuseGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = diffuseGrad;
+  ctx.fillRect(cx - 650, cy - 50, 1300, 100);
+  ctx.restore();
+
+  // 3. Rotating Holographic Collimation Rings (Soundstage Scope Reticle)
+  ctx.save();
+  ctx.translate(cx + mx * 15, cy + my * 10);
+
+  const baseR = isMobile ? 180 : 270;
+
+  // Outer dashed cyan ring with slow clockwise spin
+  ctx.save();
+  ctx.rotate(time * 0.08);
+  ctx.strokeStyle = "rgba(0, 240, 255, 0.28)";
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([8, 14]);
+  ctx.beginPath();
+  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 12 Angle ticks on outer ring
+  ctx.setLineDash([]);
+  ctx.fillStyle = "rgba(0, 240, 255, 0.5)";
+  for (let i = 0; i < 12; i++) {
+    const angle = (i * Math.PI) / 6;
+    const tx = Math.cos(angle) * baseR;
+    const ty = Math.sin(angle) * baseR;
+    ctx.beginPath();
+    ctx.arc(tx, ty, i % 3 === 0 ? 3.5 : 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Middle segmented magenta ring with counter-clockwise spin
+  ctx.save();
+  ctx.rotate(-time * 0.12);
+  ctx.strokeStyle = "rgba(255, 42, 141, 0.35)";
+  ctx.lineWidth = 2;
+  const midR = baseR * 0.72;
+  for (let s = 0; s < 4; s++) {
+    ctx.beginPath();
+    ctx.arc(0, 0, midR, s * (Math.PI / 2) + 0.18, (s + 1) * (Math.PI / 2) - 0.18);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Inner precision targeting circle
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.arc(0, 0, baseR * 0.45, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Dynamic Expanding Sonar Laser Wave (Pulsing outwards)
+  const pulseWave = (time * 60) % (baseR * 1.4);
+  const pulseWaveAlpha = (1 - pulseWave / (baseR * 1.4)) * 0.4;
+  ctx.strokeStyle = `rgba(0, 240, 255, ${pulseWaveAlpha})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, pulseWave, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Crosshairs (+) extending to outer boundaries
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(-baseR * 1.3, 0);
+  ctx.lineTo(baseR * 1.3, 0);
+  ctx.moveTo(0, -baseR * 1.3);
+  ctx.lineTo(0, baseR * 1.3);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // 4. Animated Esports / Precision Telemetry Waveform (Inspired by TARGETSYNC)
+  ctx.save();
+  const waveY = cy + (isMobile ? 140 : 190);
+  const waveW = width;
+  const waveGrad = ctx.createLinearGradient(0, waveY, waveW, waveY);
+  waveGrad.addColorStop(0, "rgba(0, 240, 255, 0)");
+  waveGrad.addColorStop(0.2, "rgba(0, 240, 255, 0.85)");
+  waveGrad.addColorStop(0.5, "rgba(217, 70, 239, 0.95)");
+  waveGrad.addColorStop(0.8, "rgba(255, 42, 141, 0.85)");
+  waveGrad.addColorStop(1, "rgba(255, 42, 141, 0)");
+
+  ctx.strokeStyle = waveGrad;
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = "#ff2a8d";
+  ctx.shadowBlur = 10;
+
+  ctx.beginPath();
+  const step = waveW / 6;
+  const p0 = { x: 0, y: waveY };
+  const p1 = { x: step * 1.5, y: waveY - 35 * Math.sin(time * 1.8) };
+  const p2 = { x: step * 3.0, y: waveY + 25 * Math.cos(time * 2.2) };
+  const p3 = { x: step * 4.5, y: waveY - 45 * Math.sin(time * 1.5 + 1) };
+  const p4 = { x: waveW, y: waveY };
+
+  ctx.moveTo(p0.x, p0.y);
+  ctx.bezierCurveTo(step * 0.7, p0.y, step * 0.9, p1.y, p1.x, p1.y);
+  ctx.bezierCurveTo(step * 2.1, p1.y, step * 2.4, p2.y, p2.x, p2.y);
+  ctx.bezierCurveTo(step * 3.6, p2.y, step * 3.9, p3.y, p3.x, p3.y);
+  ctx.bezierCurveTo(step * 5.1, p3.y, step * 5.4, p4.y, p4.x, p4.y);
+  ctx.stroke();
+
+  // Telemetry Glowing Nodes at Wave Inflection Points
+  const nodes = [p1, p2, p3];
+  nodes.forEach((node, idx) => {
+    const isCyan = idx % 2 === 0;
+    const nodeColor = isCyan ? "#00f0ff" : "#ff2a8d";
+    
+    // Halo
+    ctx.fillStyle = isCyan ? "rgba(0, 240, 255, 0.35)" : "rgba(255, 42, 141, 0.35)";
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Core
+    ctx.fillStyle = nodeColor;
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Readout label
+    ctx.font = "bold 9px monospace";
+    ctx.fillStyle = nodeColor;
+    const label = idx === 0 ? "TELEMETRY: 0.01ms" : idx === 1 ? "FFD: ±0.010mm [PASS]" : "8000Hz ENGINE";
+    ctx.fillText(label, node.x - 35, node.y - 12);
+  });
+  ctx.restore();
+
+  // 5. Ambient Cyber Perspective Floor Grid (Ground plane depth)
+  ctx.save();
+  const gridBottom = height;
+  const gridHorizon = height * 0.65;
+  const numGridLines = 12;
+  ctx.strokeStyle = "rgba(124, 58, 237, 0.08)";
+  ctx.lineWidth = 1;
+  // Receding horizontal lines
+  for (let g = 0; g < 6; g++) {
+    const gy = gridHorizon + (gridBottom - gridHorizon) * Math.pow(g / 5, 2);
+    ctx.beginPath();
+    ctx.moveTo(0, gy);
+    ctx.lineTo(width, gy);
+    ctx.stroke();
+  }
+  // Perspective radiating lines from horizon center
+  for (let l = 0; l <= numGridLines; l++) {
+    const gx = (width / numGridLines) * l;
+    ctx.beginPath();
+    ctx.moveTo(cx, gridHorizon);
+    ctx.lineTo(gx, gridBottom);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 6. Floating Ambient Cyber Embers (Cyan, Magenta, Violet, Gold)
+  ctx.save();
+  for (let i = 0; i < 36; i++) {
+    const px = (cx + Math.sin(time * 0.4 + i * 1.8) * (width * 0.48) + width) % width;
+    const py = (cy + Math.cos(time * 0.35 + i * 2.1) * (height * 0.45) + height) % height;
+    const pColor = i % 3 === 0 ? "#00f0ff" : i % 3 === 1 ? "#ff2a8d" : "#c084fc";
+    const pAlpha = 0.2 + 0.3 * Math.sin(time * 2 + i);
+    ctx.fillStyle = pColor;
+    ctx.globalAlpha = alpha * pAlpha;
+    ctx.beginPath();
+    ctx.arc(px, py, 1.2 + (i % 2), 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 
   ctx.restore();
@@ -1741,8 +2008,8 @@ function drawTitaniumMount(ctx: CanvasRenderingContext2D, explode: number) {
     ctx.restore();
   }
 
-  // Anodized red index pin
-  ctx.fillStyle = "#ef4444";
+  // Anodized magenta index pin
+  ctx.fillStyle = "#ff2a8d";
   ctx.beginPath();
   ctx.arc(0, -radius + 14, 4, 0, Math.PI * 2);
   ctx.fill();
@@ -1760,11 +2027,11 @@ function drawExplodedOptics(
 ) {
   ctx.save();
 
-  // 3 Floating Glass Elements separated along Z
+  // 3 Floating Glass Elements separated along Z (Cyan, Violet, Magenta)
   const elements = [
-    { offset: -40, radius: 75, color: "rgba(56, 189, 248, 0.25)" },
-    { offset: 0, radius: 82, color: "rgba(168, 85, 247, 0.22)" },
-    { offset: 45, radius: 88, color: "rgba(239, 68, 68, 0.2)" },
+    { offset: -40, radius: 75, color: "rgba(0, 240, 255, 0.25)" },
+    { offset: 0, radius: 82, color: "rgba(139, 92, 246, 0.22)" },
+    { offset: 45, radius: 88, color: "rgba(255, 42, 141, 0.2)" },
   ];
 
   elements.forEach((elem) => {
@@ -1792,7 +2059,7 @@ function drawExplodedOptics(
 
   // 11-Blade Circular Iris in between elements
   ctx.save();
-  ctx.strokeStyle = "#ef4444";
+  ctx.strokeStyle = "#ff2a8d";
   ctx.lineWidth = 2;
   for (let blade = 0; blade < 11; blade++) {
     ctx.rotate((Math.PI * 2) / 11);
@@ -1844,8 +2111,8 @@ function drawFrontHousing(ctx: CanvasRenderingContext2D, explode: number) {
     ctx.fill();
   });
 
-  // Anodized red REC tally button on top corner
-  ctx.fillStyle = "#ef4444";
+  // Anodized magenta REC tally button on top corner
+  ctx.fillStyle = "#ff2a8d";
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -1869,7 +2136,7 @@ function drawExplodedCallouts(
   ctx.font = "bold 10px JetBrains Mono, monospace";
 
   // Callout 1: Sensor block (Bottom-center)
-  drawLeaderLine(ctx, 0, 70, 0, 160, "[01] 35.7 x 23.8mm EXMOR R SENSOR", "#ef4444");
+  drawLeaderLine(ctx, 0, 70, 0, 160, "[01] 35.7 x 23.8mm EXMOR R SENSOR", "#ff2a8d");
 
   // Callout 2: Copper vapor chamber (Top-left)
   drawLeaderLine(
@@ -1879,7 +2146,7 @@ function drawExplodedCallouts(
     -120 * explode,
     -170,
     "[02] COPPER VAPOR CHAMBER HEATSINK",
-    "#e08456"
+    "#ff2a8d"
   );
 
   // Callout 3: Titanium PL/E mount (Top-right)
@@ -1890,7 +2157,7 @@ function drawExplodedCallouts(
     140 * explode,
     -170,
     "[03] TITANIUM LOCKING MOUNT (±0.010mm FFD)",
-    "#38bdf8"
+    "#00f0ff"
   );
 
   // Callout 4: Optical glass stack (Bottom-right)
@@ -1901,7 +2168,7 @@ function drawExplodedCallouts(
     260 * explode,
     160,
     "[04] CHROMATIC LENS ELEMENT GROUP",
-    "#a855f7"
+    "#8b5cf6"
   );
 
   ctx.restore();
