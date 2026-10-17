@@ -22,6 +22,9 @@ import { QuickSpecsModal, type DetailedGear } from "@/components/QuickSpecsModal
 import { Hero3DShowcase } from "@/components/Hero3DShowcase";
 import { AppleScrollyCanvas } from "@/components/AppleScrollyCanvas";
 import { CinemaOpticalShader, type CinemaLookMode } from "@/components/CinemaOpticalShader";
+import { KitCartDrawer } from "@/components/KitCartDrawer";
+import { KitReserveModal } from "@/components/KitReserveModal";
+import { useCart } from "@/context/CartContext";
 import {
   Aperture,
   ShieldCheck,
@@ -51,6 +54,8 @@ import {
   Compass,
   ArrowRight,
   ShieldAlert,
+  ShoppingBag,
+  Plus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -345,6 +350,17 @@ function Index() {
   const [cinemaLook, setCinemaLook] = useState<CinemaLookMode>("kodak-500t");
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>(GEAR_CATALOG);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
+  const [isKitReserveOpen, setIsKitReserveOpen] = useState(false);
+
+  const {
+    openCart,
+    isInCart,
+    addToCart,
+    itemCount,
+    totalDailyRate,
+    toastMessage,
+    dismissToast,
+  } = useCart();
 
   // Dynamic Floating Island scroll and section backdrop tracking
   const [scrollY, setScrollY] = useState(0);
@@ -518,8 +534,28 @@ function Index() {
             </a>
           </nav>
 
-          {/* Right Action: TargetSync Neon Gradient Pill "Rent Kit" */}
+          {/* Right Action: Cart Pill & TargetSync Neon Gradient Pill "Rent Kit" */}
           <div className="flex items-center gap-2">
+            {/* Production Kit Cart Button */}
+            <button
+              type="button"
+              onClick={openCart}
+              className={`relative inline-flex items-center gap-1.5 rounded-full border px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono transition-all cursor-pointer ${
+                itemCount > 0
+                  ? "border-[#ff2a8d]/60 bg-[#141224] text-white shadow-[0_0_15px_rgba(255,42,141,0.35)] hover:border-[#ff2a8d]"
+                  : "border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:text-white"
+              }`}
+              aria-label="View Production Kit Cart"
+            >
+              <ShoppingBag className="h-3.5 w-3.5 text-[#ff2a8d]" />
+              <span className="hidden xs:inline">Kit</span>
+              {itemCount > 0 && (
+                <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] px-1 text-[9px] font-bold text-white shadow-[0_0_8px_#ff2a8d]">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+
             <a
               href="#catalog"
               className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] px-3.5 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-white tracking-wide shadow-[0_0_20px_rgba(255,42,141,0.45),0_0_35px_rgba(124,58,237,0.25)] hover:shadow-[0_0_30px_rgba(255,42,141,0.65)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
@@ -601,13 +637,24 @@ function Index() {
               >
                 ● 07 / Track Soundstage Dispatch
               </a>
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openCart();
+                  }}
+                  className="flex items-center justify-center gap-2 w-full rounded-full border border-pink-500/40 bg-[#16142a] py-2.5 text-xs font-semibold text-white shadow-md shadow-[#ff2a8d]/20 cursor-pointer"
+                >
+                  <ShoppingBag className="h-3.5 w-3.5 text-[#ff2a8d]" />
+                  <span>Production Kit Cart ({itemCount} {itemCount === 1 ? "Unit" : "Units"})</span>
+                </button>
                 <a
                   href="#catalog"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block w-full text-center rounded-full bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] py-2.5 text-xs font-semibold text-white shadow-[0_0_20px_rgba(255,42,141,0.4)]"
                 >
-                  Rent Kit →
+                  Browse Catalog →
                 </a>
               </div>
             </nav>
@@ -622,18 +669,18 @@ function Index() {
       />
 
       {/* OPTICAL LUT SHADER TEST BENCH & 3D RIG SHOWCASE */}
-      <section id="rig-showcase" className="relative pt-20 sm:pt-28 pb-16 sm:pb-20 px-3 sm:px-6 text-center z-10 border-t border-white/[0.08] bg-[#07070d] scroll-mt-28 sm:scroll-mt-36">
+      <section id="rig-showcase" className="relative pt-24 sm:pt-32 pb-16 sm:pb-20 px-3 sm:px-6 text-center z-10 border-t border-white/[0.08] bg-[#07070d] scroll-mt-24 sm:scroll-mt-36">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#ff2a6d]/40 bg-[#ff2a6d]/10 px-3.5 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#ff4b82] shadow-[0_0_15px_rgba(255,42,141,0.2)] backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#ff2a6d]/40 bg-[#ff2a6d]/10 px-3 sm:px-3.5 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#ff4b82] shadow-[0_0_15px_rgba(255,42,141,0.2)] backdrop-blur-md">
             <span className="h-1.5 w-1.5 rounded-full bg-[#ff2a8d] shadow-[0_0_6px_#ff2a8d] animate-pulse" />
             <span>CALIBRATED CINEMA FLEET • SET DISPATCH READY</span>
           </div>
 
-          <h2 className="mt-3 sm:mt-5 text-2xl xs:text-3xl sm:text-5xl font-black tracking-[-0.04em] leading-[1.08] text-white">
+          <h2 className="mt-2.5 sm:mt-5 text-xl xs:text-2xl sm:text-5xl font-black tracking-[-0.03em] leading-tight text-white">
             Real-Time Optical Physics & Sensor Rigging.
           </h2>
 
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-zinc-400 max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="mt-1.5 sm:mt-3 text-[11px] sm:text-sm text-zinc-400 max-w-sm sm:max-w-xl mx-auto font-normal leading-relaxed">
             Test custom chromatic anamorphic LUTs, inspect multi-axis rig tilt physics, and reserve zero-deposit cinema packages below.
           </p>
 
@@ -878,14 +925,50 @@ function Index() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-1.5">
                       <button
                         type="button"
                         onClick={() => setQuickSpecsGear(item)}
-                        className="framer-pill-secondary flex items-center justify-center gap-1.5 py-2.5 text-xs font-mono cursor-pointer"
+                        className="framer-pill-secondary flex items-center justify-center gap-1 py-2.5 text-[11px] font-mono cursor-pointer"
+                        title="View technical specifications"
                       >
-                        <Info className="h-3.5 w-3.5 text-zinc-400" />
+                        <Info className="h-3 w-3 text-zinc-400" />
                         <span>Specs</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isInCart(item.name)) {
+                            openCart();
+                          } else {
+                            addToCart({
+                              name: item.name,
+                              category: item.category,
+                              rate: item.rate,
+                              img: item.img,
+                              specs: item.specs,
+                            });
+                          }
+                        }}
+                        className={`flex items-center justify-center gap-1 py-2.5 text-[11px] font-mono rounded-full border transition cursor-pointer ${
+                          isInCart(item.name)
+                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-semibold shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+                            : "border-white/10 bg-white/5 text-zinc-300 hover:border-pink-500/40 hover:text-white"
+                        }`}
+                        title={isInCart(item.name) ? "View in Production Kit" : "Add to Production Kit"}
+                      >
+                        {isInCart(item.name) ? (
+                          <>
+                            <Check className="h-3 w-3 text-emerald-400" />
+                            <span>In Kit</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="h-3 w-3 text-[#ff2a8d]" />
+                            <span>+ Kit</span>
+                          </>
+                        )}
                       </button>
 
                       <button
@@ -899,10 +982,11 @@ function Index() {
                             specs: item.specs,
                           })
                         }
-                        className="framer-pill-primary flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold cursor-pointer"
+                        className="framer-pill-primary flex items-center justify-center gap-1 py-2.5 text-[11px] font-semibold cursor-pointer"
+                        title="Reserve single unit immediately"
                       >
                         <span>Reserve</span>
-                        <span className="font-mono text-[10px]">→</span>
+                        <span className="font-mono text-[9px]">→</span>
                       </button>
                     </div>
                   </div>
@@ -1167,6 +1251,55 @@ function Index() {
         </div>
       </footer>
 
+      {/* FLOATING EPHEMERAL TOAST NOTIFICATION */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-pink-500/40 bg-[#0e0d1a]/95 px-4 py-3 text-xs text-white shadow-[0_10px_35px_rgba(0,0,0,0.85),0_0_20px_rgba(255,42,141,0.25)] backdrop-blur-xl animate-in slide-in-from-bottom-5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff2a8d]/20 text-[#ff2a8d]">
+            <CheckCircle2 className="h-4 w-4" />
+          </div>
+          <span className="font-mono">{toastMessage}</span>
+          <button
+            type="button"
+            onClick={openCart}
+            className="rounded-lg bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] px-3 py-1 font-mono text-[10px] font-bold text-white hover:brightness-110 transition cursor-pointer"
+          >
+            View Kit →
+          </button>
+          <button
+            type="button"
+            onClick={dismissToast}
+            className="text-zinc-500 hover:text-white transition p-0.5 cursor-pointer"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* FLOATING PERSISTENT KIT BADGE (BOTTOM-RIGHT) */}
+      {itemCount > 0 && !toastMessage && (
+        <div className="fixed bottom-5 right-5 z-40 animate-in slide-in-from-bottom-4">
+          <button
+            type="button"
+            onClick={openCart}
+            className="group flex items-center gap-3 rounded-full border border-pink-500/40 bg-[#0e0d1a]/95 px-4 py-2.5 text-xs text-white shadow-[0_15px_40px_rgba(0,0,0,0.9),0_0_25px_rgba(255,42,141,0.35)] backdrop-blur-xl hover:scale-105 transition-all cursor-pointer"
+          >
+            <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] text-white">
+              <ShoppingBag className="h-3.5 w-3.5" />
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-black">
+                {itemCount}
+              </span>
+            </div>
+            <div className="text-left font-mono leading-tight hidden xs:block">
+              <span className="text-white font-bold block">Production Kit</span>
+              <span className="text-[#00f0ff] text-[10px]">₹{totalDailyRate.toLocaleString("en-IN")}/day</span>
+            </div>
+            <span className="rounded-full bg-white/10 px-2 py-0.5 font-mono text-[10px] text-zinc-300 group-hover:bg-[#ff2a8d] group-hover:text-white transition">
+              Review Kit →
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* MODALS */}
       {selectedGear && (
         <ReserveModal
@@ -1184,6 +1317,16 @@ function Index() {
             setQuickSpecsGear(null);
             handleOpenReserve(g);
           }}
+        />
+      )}
+
+      {/* MULTI-UNIT PRODUCTION KIT CART DRAWER & RESERVATION MODAL */}
+      <KitCartDrawer onProceedToCheckout={() => setIsKitReserveOpen(true)} />
+
+      {isKitReserveOpen && (
+        <KitReserveModal
+          initialDurationDays={activeDuration.days}
+          onClose={() => setIsKitReserveOpen(false)}
         />
       )}
     </div>

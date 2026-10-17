@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, type PointerEvent } from "react";
 import cameraRed from "@/assets/camera.jpg";
 import cameraArri from "@/assets/arri_camera.jpg";
-import { Camera, Radio, Disc3, Layers, Sparkles, CheckCircle2 } from "lucide-react";
+import { Camera, Radio, Disc3, Layers, Sparkles, CheckCircle2, Plus, Check } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 type CameraModel = {
   id: string;
@@ -68,6 +69,7 @@ export function Hero3DShowcase({
   }) => void;
   className?: string;
 }) {
+  const { addToCart, isInCart, openCart } = useCart();
   const [activeIdx, setActiveIdx] = useState(0);
   const activeCamera = FLAGSHIPS[activeIdx] ?? FLAGSHIPS[0]!;
 
@@ -245,24 +247,24 @@ export function Hero3DShowcase({
               </div>
             </div>
 
-            {/* Floating Technical Telemetry Card (translateZ 70px) */}
-            <div className="hero-hud-floating absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md pointer-events-auto sm:pointer-events-none">
-              <div className="rounded-xl border border-white/15 bg-[#0e0d1a]/95 p-3.5 sm:p-4 shadow-2xl backdrop-blur-xl text-white">
+            {/* Floating Technical Telemetry Card (Desktop Only - translateZ 70px) */}
+            <div className="hero-hud-floating hidden sm:block absolute bottom-6 left-6 max-w-md pointer-events-none z-20">
+              <div className="rounded-xl border border-white/15 bg-[#0e0d1a]/95 p-4 shadow-2xl backdrop-blur-xl text-white">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-[#ff2a8d] font-semibold">
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-[#ff2a8d] font-semibold">
                     {activeCamera.brand}
                   </p>
-                  <p className="font-mono text-[11px] sm:text-xs text-zinc-300">
+                  <p className="font-mono text-xs text-zinc-300">
                     ₹{activeCamera.rate.toLocaleString("en-IN")}/day
                   </p>
                 </div>
-                <h3 className="mt-0.5 sm:mt-1 text-base sm:text-lg font-bold tracking-tight text-white">
+                <h3 className="mt-1 text-lg font-bold tracking-tight text-white">
                   {activeCamera.name}
                 </h3>
-                <p className="mt-0.5 text-[11px] sm:text-xs text-slate-300 line-clamp-1">{activeCamera.subtitle}</p>
+                <p className="mt-0.5 text-xs text-slate-300 line-clamp-1">{activeCamera.subtitle}</p>
 
-                <div className="mt-2.5 sm:mt-3 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-[10px] sm:text-[11px]">
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 font-mono text-[11px]">
                     <span className="rounded bg-white/10 border border-white/10 px-2 py-0.5 text-white font-medium">
                       {activeCamera.specs.dynamicRange.split(" ")[0]}
                     </span>
@@ -271,34 +273,52 @@ export function Hero3DShowcase({
                     </span>
                     <span className="text-[#00f0ff] font-medium hidden xs:inline">BENCH CERTIFIED ✓</span>
                   </div>
-
-                  {/* Embedded Mobile Reserve Button */}
-                  <button
-                    onClick={() =>
-                      onSelectGear({
-                        name: activeCamera.name,
-                        category: "Cinema Bodies",
-                        rate: activeCamera.rate,
-                        img: activeCamera.img,
-                        specs: [
-                          activeCamera.specs.resolution.split(" ")[0] ?? "",
-                          activeCamera.specs.dynamicRange.split(" ")[0] ?? "",
-                          activeCamera.specs.mount.split(" ")[0] ?? "",
-                        ],
-                      })
-                    }
-                    className="sm:hidden shrink-0 flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] hover:brightness-110 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-[#ff2a8d]/25 transition active:scale-95 cursor-pointer"
-                  >
-                    <span>Reserve</span>
-                    <span className="font-mono text-[10px]">→</span>
-                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Quick Action Hold Button (Desktop Only) */}
-            <div className="hidden sm:block absolute bottom-6 right-6 z-20">
+            {/* Quick Actions (Desktop Only) */}
+            <div className="hidden sm:flex items-center gap-2.5 absolute bottom-6 right-6 z-20">
               <button
+                type="button"
+                onClick={() => {
+                  if (isInCart(activeCamera.name)) {
+                    openCart();
+                  } else {
+                    addToCart({
+                      name: activeCamera.name,
+                      category: "Cinema Bodies",
+                      rate: activeCamera.rate,
+                      img: activeCamera.img,
+                      specs: [
+                        activeCamera.specs.resolution.split(" ")[0] ?? "",
+                        activeCamera.specs.dynamicRange.split(" ")[0] ?? "",
+                        activeCamera.specs.mount.split(" ")[0] ?? "",
+                      ],
+                    });
+                  }
+                }}
+                className={`flex items-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-mono transition cursor-pointer backdrop-blur-md ${
+                  isInCart(activeCamera.name)
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-semibold shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+                    : "border-white/20 bg-[#0e0d1a]/90 text-white hover:border-pink-500 hover:bg-[#141224]"
+                }`}
+              >
+                {isInCart(activeCamera.name) ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>In Kit (View)</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-3.5 w-3.5 text-[#ff2a8d]" />
+                    <span>+ Add to Kit</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
                 onClick={() =>
                   onSelectGear({
                     name: activeCamera.name,
@@ -314,29 +334,103 @@ export function Hero3DShowcase({
                 }
                 className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] px-5 py-2.5 text-sm font-semibold text-white shadow-xl shadow-[#ff2a8d]/30 transition hover:brightness-110 cursor-pointer"
               >
-                <span>Reserve This Kit</span>
+                <span>Reserve Kit</span>
                 <span className="font-mono text-xs">→</span>
               </button>
             </div>
           </div>
 
+          {/* Mobile Dedicated Camera Command Bar - Unobstructed camera image on mobile */}
+          <div className="sm:hidden border-t border-white/10 bg-[#0e0d1a] px-3.5 py-3 flex items-center justify-between gap-3 text-left">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                <span className="text-[#ff2a8d] font-bold tracking-wider uppercase truncate">{activeCamera.brand}</span>
+                <span className="text-zinc-600">·</span>
+                <span className="text-white font-semibold">₹{activeCamera.rate.toLocaleString("en-IN")}/d</span>
+              </div>
+              <h3 className="text-sm font-bold text-white tracking-tight truncate mt-0.5">
+                {activeCamera.name}
+              </h3>
+              <p className="text-[10px] text-zinc-400 truncate mt-0.5">
+                {activeCamera.subtitle}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isInCart(activeCamera.name)) {
+                    openCart();
+                  } else {
+                    addToCart({
+                      name: activeCamera.name,
+                      category: "Cinema Bodies",
+                      rate: activeCamera.rate,
+                      img: activeCamera.img,
+                      specs: [
+                        activeCamera.specs.resolution.split(" ")[0] ?? "",
+                        activeCamera.specs.dynamicRange.split(" ")[0] ?? "",
+                        activeCamera.specs.mount.split(" ")[0] ?? "",
+                      ],
+                    });
+                  }
+                }}
+                className={`flex items-center justify-center rounded-lg border p-2 transition cursor-pointer ${
+                  isInCart(activeCamera.name)
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    : "border-white/15 bg-white/5 text-zinc-300 hover:border-pink-500"
+                }`}
+                title={isInCart(activeCamera.name) ? "View Production Kit" : "Add to Production Kit"}
+                aria-label="Add to Production Kit"
+              >
+                {isInCart(activeCamera.name) ? (
+                  <Check className="h-4 w-4 text-emerald-400" />
+                ) : (
+                  <Plus className="h-4 w-4 text-[#ff2a8d]" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  onSelectGear({
+                    name: activeCamera.name,
+                    category: "Cinema Bodies",
+                    rate: activeCamera.rate,
+                    img: activeCamera.img,
+                    specs: [
+                      activeCamera.specs.resolution.split(" ")[0] ?? "",
+                      activeCamera.specs.dynamicRange.split(" ")[0] ?? "",
+                      activeCamera.specs.mount.split(" ")[0] ?? "",
+                    ],
+                  })
+                }
+                className="shrink-0 flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ff2a8d] to-[#7c3aed] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#ff2a8d]/30 active:scale-95 transition cursor-pointer"
+              >
+                <span>Reserve</span>
+                <span className="font-mono text-[10px]">→</span>
+              </button>
+            </div>
+          </div>
+
           {/* Under-Chassis Technical Bench Readout Grid */}
-          <div className="grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 font-mono text-xs sm:grid-cols-4">
-            <div className="bg-[#0e0d1a] p-4 transition-colors hover:bg-[#141324]">
-              <p className="text-slate-400">ACTIVE SENSOR</p>
-              <p className="mt-1 font-semibold text-white">{activeCamera.specs.sensor}</p>
+          <div className="grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 font-mono text-[10px] sm:text-xs sm:grid-cols-4">
+            <div className="bg-[#0e0d1a] p-2.5 sm:p-4 text-left transition-colors hover:bg-[#141324]">
+              <p className="text-slate-400 text-[9px] sm:text-[10px] tracking-wider">ACTIVE SENSOR</p>
+              <p className="mt-0.5 sm:mt-1 font-semibold text-white text-[11px] sm:text-xs leading-snug">{activeCamera.specs.sensor}</p>
             </div>
-            <div className="bg-[#0e0d1a] p-4 transition-colors hover:bg-[#141324]">
-              <p className="text-slate-400">MAX RESOLUTION</p>
-              <p className="mt-1 font-semibold text-white">{activeCamera.specs.resolution}</p>
+            <div className="bg-[#0e0d1a] p-2.5 sm:p-4 text-left transition-colors hover:bg-[#141324]">
+              <p className="text-slate-400 text-[9px] sm:text-[10px] tracking-wider">MAX RESOLUTION</p>
+              <p className="mt-0.5 sm:mt-1 font-semibold text-white text-[11px] sm:text-xs leading-snug">{activeCamera.specs.resolution}</p>
             </div>
-            <div className="bg-[#0e0d1a] p-4 transition-colors hover:bg-[#141324]">
-              <p className="text-slate-400">LATITUDE RANGE</p>
-              <p className="mt-1 font-semibold text-white">{activeCamera.specs.dynamicRange}</p>
+            <div className="bg-[#0e0d1a] p-2.5 sm:p-4 text-left transition-colors hover:bg-[#141324]">
+              <p className="text-slate-400 text-[9px] sm:text-[10px] tracking-wider">LATITUDE RANGE</p>
+              <p className="mt-0.5 sm:mt-1 font-semibold text-white text-[11px] sm:text-xs leading-snug">{activeCamera.specs.dynamicRange}</p>
             </div>
-            <div className="bg-[#0e0d1a] p-4 transition-colors hover:bg-[#141324]">
-              <p className="text-slate-400">LENS MOUNT</p>
-              <p className="mt-1 font-semibold text-white">{activeCamera.specs.mount}</p>
+            <div className="bg-[#0e0d1a] p-2.5 sm:p-4 text-left transition-colors hover:bg-[#141324]">
+              <p className="text-slate-400 text-[9px] sm:text-[10px] tracking-wider">LENS MOUNT</p>
+              <p className="mt-0.5 sm:mt-1 font-semibold text-white text-[11px] sm:text-xs leading-snug">{activeCamera.specs.mount}</p>
             </div>
           </div>
         </div>

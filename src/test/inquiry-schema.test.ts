@@ -122,4 +122,28 @@ describe("Inquiry Schema & Pricing Engine", () => {
     expect(ref.startsWith("GS-MUM-")).toBe(true);
     expect(ref.length).toBe(13);
   });
+
+  it("successfully parses multi-item production kit packages", () => {
+    const input = {
+      items: [
+        { name: "RED V-Raptor 8K VV", rate: 45000, quantity: 1, category: "Cinema Bodies" },
+        { name: "Cooke S4/i Prime", rate: 12000, quantity: 2, category: "Anamorphic Primes" },
+      ],
+      name: "Anil Mehta",
+      email: "anil@dop.in",
+      phone: "+91 98201 99999",
+      startDate: "2026-11-05",
+      returnDate: "2026-11-08",
+      notes: "Commercial shoot at Mehboob Studio Stage 2",
+    };
+
+    const res = inquirySchema.safeParse(input);
+    expect(res.success).toBe(true);
+    if (res.success) {
+      expect(res.data.gear_name).toBe("RED V-Raptor 8K VV + Cooke S4/i Prime (x2)");
+      expect(res.data.category).toBe("Production Package");
+      expect(res.data.daily_rate).toBe(69000); // 45000 + 12000*2 = 69000
+      expect(res.data.items?.length).toBe(2);
+    }
+  });
 });

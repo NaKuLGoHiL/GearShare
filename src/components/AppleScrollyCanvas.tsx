@@ -489,8 +489,8 @@ export function AppleScrollyCanvas({
           style={{ width: "100%", height: "100%" }}
         />
 
-        {/* 3. ARRI / RED VIEWFINDER OS FRAMING & RETICLES (Pushed down to top-24 to avoid fixed navbar collision) */}
-        <div className="pointer-events-none absolute inset-x-3 sm:inset-x-6 md:inset-x-8 top-24 bottom-3 sm:bottom-5 flex flex-col justify-between z-20">
+        {/* 3. ARRI / RED VIEWFINDER OS FRAMING & RETICLES (Pushed down to top-16 on mobile, top-24 on desktop to avoid fixed navbar collision) */}
+        <div className="pointer-events-none absolute inset-x-3 sm:inset-x-6 md:inset-x-8 top-16 sm:top-24 bottom-3 sm:bottom-5 flex flex-col justify-between z-20">
           {/* Top Reticles Bar */}
           <div className="flex items-start justify-between font-mono text-[9px] sm:text-[10px] tracking-wider text-zinc-500">
             {/* Top-Left: Corner Bracket ┌ & Live REC Tally + Disassembly Mode */}
@@ -993,35 +993,35 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 2 (22% - 49%): Internal Breakdown & Full-Frame Sensor Block */}
         <div
-          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:left-8 md:left-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md z-30 transition-all duration-300 ease-out pointer-events-none ${
+          className={`absolute inset-x-3 bottom-20 xs:bottom-24 sm:bottom-auto sm:inset-x-auto sm:left-8 md:left-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md z-30 transition-all duration-300 ease-out pointer-events-none ${
             scrollProgress > 0.22 && scrollProgress < 0.49
               ? "opacity-100 translate-y-0 sm:translate-x-0"
               : "opacity-0 translate-y-6 sm:-translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,42,141,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,42,141,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#ff2a8d]/30 bg-[#ff2a8d]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#ff2a8d] mb-1.5 sm:mb-3.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#ff2a8d]/30 bg-[#ff2a8d]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#ff2a8d] mb-1 sm:mb-3.5">
               <span>01 / INTERNAL BREAKDOWN</span>
             </div>
-            <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-base xs:text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Exmor R Full-Frame Sensor Block.
-              <span className="block bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] bg-clip-text text-transparent text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+              <span className="block bg-gradient-to-r from-[#ff2a8d] via-[#d946ef] to-[#7c3aed] bg-clip-text text-transparent text-[11px] xs:text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
                 16-Bit RAW • 15+ Stops Latitude
               </span>
             </h2>
-            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed line-clamp-3 sm:line-clamp-none">
-              Back-illuminated 35mm full-frame CMOS sensor with active copper vapor chamber heatsink and silent turbine cooling for continuous high-framerate shooting with zero thermal throttling.
+            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed line-clamp-2 sm:line-clamp-none">
+              Back-illuminated 35mm full-frame CMOS sensor with active copper vapor chamber heatsink and silent turbine cooling for continuous high-framerate shooting.
             </p>
 
-            <div className="mt-2.5 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3">
-                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">SENSOR FORMAT</span>
-                <span className="text-white font-bold">35.7 × 23.8 mm</span>
+            <div className="mt-2 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 xs:p-2 sm:p-3">
+                <span className="text-[8px] sm:text-[10px] text-zinc-400 block tracking-wider">SENSOR FORMAT</span>
+                <span className="text-white font-bold text-[10px] xs:text-xs">35.7 × 23.8 mm</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3">
-                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">DUAL BASE ISO</span>
-                <span className="text-[#ff2a8d] font-bold">800 / 12,800</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 xs:p-2 sm:p-3">
+                <span className="text-[8px] sm:text-[10px] text-zinc-400 block tracking-wider">DUAL BASE ISO</span>
+                <span className="text-[#ff2a8d] font-bold text-[10px] xs:text-xs">800 / 12,800</span>
               </div>
             </div>
           </div>
@@ -1029,35 +1029,35 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 3 (52% - 77%): Optical Rig & Flange Tolerances */}
         <div
-          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:right-8 md:right-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md text-left sm:text-right z-30 transition-all duration-300 ease-out pointer-events-none ${
+          className={`absolute inset-x-3 bottom-20 xs:bottom-24 sm:bottom-auto sm:inset-x-auto sm:right-8 md:right-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md text-left sm:text-right z-30 transition-all duration-300 ease-out pointer-events-none ${
             scrollProgress >= 0.52 && scrollProgress < 0.77
               ? "opacity-100 translate-y-0 sm:translate-x-0"
               : "opacity-0 translate-y-6 sm:translate-x-12 sm:translate-y-0"
           }`}
         >
-          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(0,240,255,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0e0d1a]/95 p-3 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(0,240,255,0.06),inset_0_1.5px_1px_rgba(255,255,255,0.2)] ring-1 ring-white/10 text-white">
             <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#00f0ff] mb-1.5 sm:mb-3.5 sm:ml-auto">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-[#00f0ff] mb-1 sm:mb-3.5 sm:ml-auto">
               <span>02 / OPTICAL GLASS & FLANGE</span>
             </div>
-            <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-base xs:text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
               Bench-Calibrated Flange Tolerances.
-              <span className="block text-[#00f0ff] text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
+              <span className="block text-[#00f0ff] text-[11px] xs:text-xs sm:text-lg md:text-xl font-bold mt-0.5 sm:mt-1">
                 FFD Precision ±0.010mm
               </span>
             </h2>
-            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed text-left sm:text-right line-clamp-3 sm:line-clamp-none">
-              Laser autocollimation holds Flange Focal Distance within ±0.010mm. Floating chromatic glass groupings eliminate back-focus drift and edge chromatic aberrations under extreme set temperatures.
+            <p className="mt-1 sm:mt-3 text-[11px] sm:text-sm text-slate-300 leading-relaxed text-left sm:text-right line-clamp-2 sm:line-clamp-none">
+              Laser autocollimation holds Flange Focal Distance within ±0.010mm. Floating chromatic glass groupings eliminate back-focus drift.
             </p>
 
-            <div className="mt-2.5 sm:mt-5 flex justify-start sm:justify-end gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
-                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">FFD TOLERANCE</span>
-                <span className="text-[#00f0ff] font-bold">±0.010 mm Pass</span>
+            <div className="mt-2 sm:mt-5 flex justify-start sm:justify-end gap-2 sm:gap-3 font-mono text-[10px] sm:text-xs">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 xs:p-2 sm:p-3 text-left">
+                <span className="text-[8px] sm:text-[10px] text-zinc-400 block tracking-wider">FFD TOLERANCE</span>
+                <span className="text-[#00f0ff] font-bold text-[10px] xs:text-xs">±0.010 mm Pass</span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-left">
-                <span className="text-[8.5px] sm:text-[10px] text-zinc-400 block tracking-wider">IRIS MECHANISM</span>
-                <span className="text-white font-bold">11-Blade Circular</span>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-1.5 xs:p-2 sm:p-3 text-left">
+                <span className="text-[8px] sm:text-[10px] text-zinc-400 block tracking-wider">IRIS MECHANISM</span>
+                <span className="text-white font-bold text-[10px] xs:text-xs">11-Blade Circular</span>
               </div>
             </div>
           </div>
@@ -1202,10 +1202,10 @@ function renderKinematicCameraFlow(
   const stageTransition = smoothstep(0.18, 0.35, p);
   let targetY = heroStageY * (1 - stageTransition) + centerStageY * stageTransition;
 
-  // On mobile/tablet portrait during Beats 2 and 3, lift camera so bottom telemetry card doesn't block it
+  // On mobile/tablet portrait during Beats 2 and 3, balance camera in upper-middle viewport
   if (isMobile || isTabletPortrait) {
     const disassembleLift = smoothstep(0.18, 0.30, p) * (1 - smoothstep(0.78, 0.90, p));
-    const portraitTopY = Math.max(65, height * 0.22 - finalH / 2);
+    const portraitTopY = Math.max(105, height * 0.34 - finalH / 2);
     targetY = targetY * (1 - disassembleLift) + portraitTopY * disassembleLift;
   }
   const origY = targetY + beat4Offset;
@@ -1348,17 +1348,19 @@ function renderKinematicCameraFlow(
       ctx.restore();
     }
 
-    // 5. FLOATING TELEMETRY HUD (Placed above lens, clear of left/right text cards)
+    // 5. FLOATING TELEMETRY HUD (Placed cleanly above lens, clear of camera handles & cards)
     if (expansion > 0.15 && cameraAlpha > 0.25) {
       ctx.save();
-      const hudW = Math.max(195, 230 * scaleRatio);
-      const hudH = 48;
-      const hudX = Math.max(12, origX + 310 * scaleRatio);
-      const hudY = Math.max(20, origY + 155 * scaleRatio);
+      const hudW = isMobile ? Math.min(width - 40, 240) : Math.max(195, 230 * scaleRatio);
+      const hudH = isMobile ? 42 : 48;
+      const hudX = isMobile ? (width - hudW) / 2 : Math.max(12, origX + 310 * scaleRatio);
+      const hudY = isMobile
+        ? Math.max(88, origY - hudH - 8)
+        : Math.max(20, origY + 155 * scaleRatio);
 
       // Glass HUD background pill
       ctx.fillStyle = "rgba(14, 13, 26, 0.92)";
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+      ctx.strokeStyle = "rgba(255, 42, 141, 0.25)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(hudX, hudY, hudW, hudH, 8);
@@ -1368,32 +1370,32 @@ function renderKinematicCameraFlow(
       // Neon magenta status pip
       ctx.fillStyle = "#ff2a8d";
       ctx.beginPath();
-      ctx.arc(hudX + 10, hudY + 15, 2.5, 0, Math.PI * 2);
+      ctx.arc(hudX + 10, hudY + (isMobile ? 12 : 15), 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Telemetry Text
-      ctx.font = `600 9px monospace`;
+      ctx.font = `600 ${isMobile ? 8 : 9}px monospace`;
       ctx.fillStyle = "#ff2a8d";
       const ffdCurrent = (52.0 + t12 * 18.25 + t23 * 16.15).toFixed(3);
       ctx.fillText(
         `OPTICAL AXIS // FFD: ${ffdCurrent}mm`,
         hudX + 18,
-        hudY + 16
+        hudY + (isMobile ? 13 : 16)
       );
 
-      ctx.font = `500 8.5px monospace`;
+      ctx.font = `500 ${isMobile ? 7.5 : 8.5}px monospace`;
       ctx.fillStyle = "#00f0ff";
       ctx.fillText(
         `TOLERANCE: ±0.010mm [PASS]`,
         hudX + 18,
-        hudY + 28
+        hudY + (isMobile ? 24 : 28)
       );
 
       ctx.fillStyle = "#cbd5e1";
       ctx.fillText(
         `EXMOR R FULL FRAME • 16-BIT RAW`,
         hudX + 18,
-        hudY + 40
+        hudY + (isMobile ? 34 : 40)
       );
 
       ctx.restore();

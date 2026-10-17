@@ -6,11 +6,22 @@ import { z } from "zod";
  */
 export const rawInquirySchema = z
   .object({
-    gear_name: z.string().trim().min(1, "Equipment name is required").max(120).optional(),
-    gear: z.string().trim().min(1).max(120).optional(),
-    category: z.string().trim().min(1, "Category is required").max(60),
+    gear_name: z.string().trim().min(1, "Equipment name is required").max(500).optional(),
+    gear: z.string().trim().min(1).max(500).optional(),
+    category: z.string().trim().min(1, "Category is required").max(100).optional(),
     daily_rate: z.coerce.number().positive("Daily rate must be a positive number").optional(),
     dailyRate: z.coerce.number().positive("Daily rate must be a positive number").optional(),
+    items: z
+      .array(
+        z.object({
+          name: z.string().min(1),
+          category: z.string().optional(),
+          rate: z.coerce.number().nonnegative(),
+          quantity: z.coerce.number().int().positive().optional().default(1),
+          img: z.string().optional(),
+        })
+      )
+      .optional(),
     customer_name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100).optional(),
     name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100).optional(),
     customer_email: z.string().trim().email("Please provide a valid email address").max(255).optional(),
@@ -34,8 +45,25 @@ export const rawInquirySchema = z
     gstin: z.string().trim().max(50).optional(),
   })
   .transform((val) => {
-    const gearName = val.gear_name || val.gear || "";
-    const dailyRate = val.daily_rate ?? val.dailyRate ?? 0;
+    let gearName = val.gear_name || val.gear || "";
+    let category = val.category || "";
+    let dailyRate = val.daily_rate ?? val.dailyRate ?? 0;
+
+    // Automatic synthesis for multi-item production packages
+    if (val.items && val.items.length > 0) {
+      if (!gearName) {
+        gearName = val.items
+          .map((i) => `${i.name}${i.quantity > 1 ? ` (x${i.quantity})` : ""}`)
+          .join(" + ");
+      }
+      if (!category) {
+        category = val.items.length === 1 ? (val.items[0]?.category || "Cinema Gear") : "Production Package";
+      }
+      if (!dailyRate) {
+        dailyRate = val.items.reduce((acc, i) => acc + i.rate * (i.quantity || 1), 0);
+      }
+    }
+
     const customerName = val.customer_name || val.name || "";
     const customerEmail = val.customer_email || val.email || "";
     const customerPhone = val.customer_phone || val.phone || "";
@@ -45,9 +73,10 @@ export const rawInquirySchema = z
     return {
       gear_name: gearName,
       gear: gearName,
-      category: val.category,
+      category: category,
       daily_rate: dailyRate,
       dailyRate: dailyRate,
+      items: val.items,
       customer_name: customerName,
       name: customerName,
       customer_email: customerEmail,

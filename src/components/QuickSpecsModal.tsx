@@ -10,8 +10,11 @@ import {
   SlidersHorizontal,
   Clock,
   Layers,
+  Plus,
+  Check,
 } from "lucide-react";
 import type { Gear } from "./ReserveModal";
+import { useCart } from "@/context/CartContext";
 
 export type DetailedGear = {
   name: string;
@@ -38,6 +41,8 @@ export function QuickSpecsModal({
   onClose: () => void;
   onReserve: (gear: Gear) => void;
 }) {
+  const { addToCart, isInCart, openCart } = useCart();
+
   useEffect(() => {
     if (!gear) return;
 
@@ -212,32 +217,69 @@ export function QuickSpecsModal({
             </div>
 
             {/* Action Bar */}
-            <div className="pt-2 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 border-t border-white/10">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 border-t border-white/10">
               <button
                 type="button"
                 onClick={onClose}
-                className="framer-pill-secondary w-full sm:w-auto px-6 py-3 font-mono text-xs cursor-pointer"
+                className="framer-pill-secondary w-full sm:w-auto px-5 py-2.5 font-mono text-xs cursor-pointer"
               >
                 Close Specs
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onReserve({
-                    name: gear.name,
-                    category: gear.category,
-                    rate: gear.rate,
-                    img: gear.img,
-                    specs: gear.specs,
-                  });
-                }}
-                className="framer-pill-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-8 py-3 text-sm font-semibold cursor-pointer"
-              >
-                <span>Reserve {gear.name}</span>
-                <span className="font-mono text-xs">→</span>
-              </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-1 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isInCart(gear.name)) {
+                      onClose();
+                      openCart();
+                    } else {
+                      addToCart({
+                        name: gear.name,
+                        category: gear.category,
+                        rate: gear.rate,
+                        img: gear.img,
+                        specs: gear.specs,
+                      });
+                    }
+                  }}
+                  className={`flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-mono rounded-full border transition cursor-pointer ${
+                    isInCart(gear.name)
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-semibold shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+                      : "border-white/15 bg-white/5 text-zinc-200 hover:border-pink-500/40 hover:text-white"
+                  }`}
+                >
+                  {isInCart(gear.name) ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>In Kit (View)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3.5 w-3.5 text-[#ff2a8d]" />
+                      <span>+ Add to Kit</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onReserve({
+                      name: gear.name,
+                      category: gear.category,
+                      rate: gear.rate,
+                      img: gear.img,
+                      specs: gear.specs,
+                    });
+                  }}
+                  className="framer-pill-primary flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-semibold cursor-pointer"
+                >
+                  <span>Reserve Now</span>
+                  <span className="font-mono text-xs">→</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

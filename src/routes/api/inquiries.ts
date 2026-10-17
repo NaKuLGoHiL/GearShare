@@ -74,6 +74,12 @@ export const Route = createFileRoute("/api/inquiries")({
         // Format rates into notes for complete persistence audit trail
         const rateTag = `[Rate: ₹${d.daily_rate.toLocaleString("en-IN")}/day]`;
         let compiledNotes = d.notes ? `${rateTag} ${d.notes}` : rateTag;
+        if (d.items && Array.isArray(d.items) && d.items.length > 0) {
+          const breakdown = d.items
+            .map((i) => `• ${i.name}${i.quantity && i.quantity > 1 ? ` (x${i.quantity})` : ""} - ₹${(i.rate * (i.quantity || 1)).toLocaleString("en-IN")}/d`)
+            .join(", ");
+          compiledNotes = `[Kit Items: ${breakdown}] ${compiledNotes}`;
+        }
         if (d.wica_card) compiledNotes += ` [WICA: ${d.wica_card}]`;
         if (d.gstin) compiledNotes += ` [GSTIN: ${d.gstin}]`;
 
