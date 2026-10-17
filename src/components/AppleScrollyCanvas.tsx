@@ -177,12 +177,42 @@ export function AppleScrollyCanvas({
             time
           );
         } else {
-          // High-precision procedural exploded cinema camera engine fallback
-          renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
+          // Sleek cinema stage loading state with subtle pulsing tally light
+          ctx.save();
+          const cx = width / 2;
+          const cy = height * 0.38;
+          // Soft radial glow
+          const loadGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 140);
+          loadGrad.addColorStop(0, "rgba(225, 29, 72, 0.2)");
+          loadGrad.addColorStop(1, "rgba(5, 5, 5, 0)");
+          ctx.fillStyle = loadGrad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 140, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Camera mount titanium ring outline
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 54, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Pulsing red tally indicator
+          const pulse = 0.4 + Math.sin(time * 5) * 0.4;
+          ctx.fillStyle = `rgba(239, 68, 68, ${pulse})`;
+          ctx.beginPath();
+          ctx.arc(cx, cy - 24, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Minimalist telemetry label
+          ctx.font = "600 9px monospace";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+          ctx.textAlign = "center";
+          ctx.fillText("CALIBRATING 8K SENSOR BENCH...", cx, cy + 16);
+          ctx.restore();
         }
       } catch (err) {
         console.warn("[renderKinematicCameraFlow] Render recovered:", err);
-        renderExplodedCinemaRig(ctx, width, height, p, mx, my, time);
       }
 
       ctx.restore();
@@ -228,12 +258,12 @@ export function AppleScrollyCanvas({
 
         {/* SYNCHRONIZED SCROLL STORYTELLING BEATS */}
 
-        {/* BEAT 1 (0% - 25%): Fully Assembled Hero Shot */}
+        {/* BEAT 1 (0% - 20%): Fully Assembled Hero Shot */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-24 md:top-28 max-w-4xl mx-auto text-center z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress <= 0.25
+          className={`absolute inset-x-3 sm:inset-x-6 top-16 sm:top-24 md:top-28 max-w-4xl mx-auto text-center z-30 transition-all duration-300 ease-out pointer-events-none ${
+            scrollProgress <= 0.20
               ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 -translate-y-8 scale-95"
+              : "opacity-0 -translate-y-6 scale-95"
           }`}
         >
           <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/70 px-3 sm:px-4 py-1 font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 backdrop-blur-xl mb-3 sm:mb-4 shadow-lg ring-1 ring-white/10 max-w-[95vw]">
@@ -255,7 +285,7 @@ export function AppleScrollyCanvas({
 
         {/* Scroll Prompt at Viewport Bottom (Fades out when user starts scrolling) */}
         <div
-          className={`absolute inset-x-0 bottom-6 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-500 ${
+          className={`absolute inset-x-0 bottom-6 sm:bottom-10 flex flex-col items-center justify-center gap-1.5 z-30 pointer-events-none transition-all duration-300 ${
             scrollProgress < 0.1
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
@@ -267,12 +297,12 @@ export function AppleScrollyCanvas({
           </div>
         </div>
 
-        {/* BEAT 2 (25% - 55%): Internal Breakdown & Full-Frame Sensor Block */}
+        {/* BEAT 2 (22% - 49%): Internal Breakdown & Full-Frame Sensor Block */}
         <div
-          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:left-8 md:left-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress > 0.22 && scrollProgress <= 0.54
+          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:left-8 md:left-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md z-30 transition-all duration-300 ease-out pointer-events-none ${
+            scrollProgress > 0.22 && scrollProgress < 0.49
               ? "opacity-100 translate-y-0 sm:translate-x-0"
-              : "opacity-0 translate-y-8 sm:-translate-x-12 sm:translate-y-0"
+              : "opacity-0 translate-y-6 sm:-translate-x-12 sm:translate-y-0"
           }`}
         >
           <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
@@ -303,12 +333,12 @@ export function AppleScrollyCanvas({
           </div>
         </div>
 
-        {/* BEAT 3 (55% - 82%): Optical Rig & Flange Tolerances */}
+        {/* BEAT 3 (52% - 77%): Optical Rig & Flange Tolerances */}
         <div
-          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:right-8 md:right-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md text-left sm:text-right z-30 transition-all duration-700 pointer-events-none ${
-            scrollProgress > 0.52 && scrollProgress <= 0.82
+          className={`absolute inset-x-3 bottom-4 xs:bottom-6 sm:bottom-auto sm:inset-x-auto sm:right-8 md:right-16 sm:top-1/2 sm:-translate-y-1/2 max-w-lg sm:max-w-md text-left sm:text-right z-30 transition-all duration-300 ease-out pointer-events-none ${
+            scrollProgress >= 0.52 && scrollProgress < 0.77
               ? "opacity-100 translate-y-0 sm:translate-x-0"
-              : "opacity-0 translate-y-8 sm:translate-x-12 sm:translate-y-0"
+              : "opacity-0 translate-y-6 sm:translate-x-12 sm:translate-y-0"
           }`}
         >
           <div className="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-zinc-950/85 p-3.5 xs:p-4 sm:p-7 backdrop-blur-2xl shadow-[0_25px_50px_rgba(0,0,0,0.9),inset_0_1.5px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/10 text-white">
@@ -341,7 +371,7 @@ export function AppleScrollyCanvas({
 
         {/* BEAT 4 (80% - 100%): Turnkey Stage Dispatch */}
         <div
-          className={`absolute inset-x-3 sm:inset-x-6 top-24 sm:top-28 md:top-32 max-w-xl mx-auto z-30 transition-all duration-500 ${
+          className={`absolute inset-x-3 sm:inset-x-6 top-24 sm:top-28 md:top-32 max-w-xl mx-auto z-30 transition-all duration-300 ease-out ${
             scrollProgress >= 0.80
               ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
               : "opacity-0 translate-y-6 scale-95 pointer-events-none"
